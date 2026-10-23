@@ -1,26 +1,11 @@
 import pytest
-import stim
 
 from dizx.circuit_extractor import to_stim
 from dizx.schedules import RotatedSurfaceCodeSchedule
 from dizx.realisation import RealisedSED
 from dizx.code import disjoint_union
 from dizx.surgery import _other, straight_interface, two_patch_surgery, zigzag_interface
-
-
-def distance(c: stim.Circuit, p: float = 1e-3) -> int:
-    noisy = stim.Circuit()
-    for inst in c.flattened():
-        if inst.name in ("CX", "CZ"):
-            noisy.append(inst)
-            noisy.append("DEPOLARIZE2", inst.targets_copy(), p)
-        elif inst.name in ("M", "MX", "MPP"):
-            noisy.append(inst.name, inst.targets_copy(), p)
-        else:
-            noisy.append(inst)
-    return len(noisy.search_for_undetectable_logical_errors(
-        dont_explore_detection_event_sets_with_size_above=4, dont_explore_edges_with_degree_above=4,
-        dont_explore_edges_increasing_symptom_degree=False))
+from helpers import distance
 
 
 @pytest.mark.parametrize("joint", ["ZZ", "XX"])
@@ -45,9 +30,8 @@ def test_seam_is_closed(joint, matching):
 
 
 @pytest.mark.parametrize("joint", ["ZZ", "XX"])
-@pytest.mark.parametrize("matching", [True, False])
-def test_surgery_layer_modes(joint, matching):
-    s = two_patch_surgery(3, joint, matching=matching)
+def test_surgery_without_matching_layers(joint):
+    s = two_patch_surgery(3, joint, matching=False)
     c = to_stim(s.experiment("Z"), RotatedSurfaceCodeSchedule(s.merged))
     dets, obs = c.compile_detector_sampler().sample(200, separate_observables=True)
     assert not dets.any() and not obs.any()

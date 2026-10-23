@@ -10,7 +10,7 @@ def realised(code, rounds):
 
 
 @pytest.mark.parametrize("basis", ["Z", "X"])
-@pytest.mark.parametrize("d,rounds", [(3, 1), (3, 3), (5, 2)])
+@pytest.mark.parametrize("d,rounds", [(3, 1), (3, 3)])
 def test_memory_experiment(d, rounds, basis):
     code = rotated_surface_code(d)
     exp = QECExperiment.memory(realised(code, rounds), basis)

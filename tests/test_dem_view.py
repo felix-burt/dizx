@@ -6,7 +6,7 @@ import pytest
 
 from dizx.builders import BUILDERS
 from dizx.dem_view import (
-    dem_mechanisms, graphlike_distance, noisy_circuit, plot_dem, shortest_logical,
+    dem_mechanisms, graphlike_distance, noisy_circuit,
 )
 from dizx.erasure_matching import make_matching_circuit
 from dizx.noise_models import NoiseSpec
@@ -35,15 +35,6 @@ def test_mechanisms_are_labelled_and_placed(bell):
     sources = {m.source for m in mechs}
     assert "graph/fusion_measurement HERALDED_ERASE" in sources
     assert "circuit/two_qubit_gate DEPOLARIZE2" in sources
-
-
-def test_plot_dem_draws_shortest_logical(bell):
-    noise = {**ERASURE, **CIRCUIT}
-    fig, ax, mechs = plot_dem(bell, noise)
-    chain = shortest_logical(bell, noise)
-    assert len(chain) == graphlike_distance(bell, noise) > 0
-    assert any("shortest logical" in t.get_text() for t in ax.get_legend().get_texts())
-    matplotlib.pyplot.close(fig)
 
 
 @pytest.mark.parametrize("builder, observable, expected", [

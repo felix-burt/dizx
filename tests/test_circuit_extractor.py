@@ -7,39 +7,17 @@ from dizx.realisation import QECExperiment, RealisedSED
 from dizx.schedules import RotatedSurfaceCodeSchedule
 from dizx.transformations import dualise, split_boundary
 from dizx.zx_diagram import NodeType, SEDiagram
+from helpers import check_deterministic, distance
 
 ALLOWED = {"QUBIT_COORDS", "R", "RX", "H", "CX", "CZ", "M", "MX", "MPP", "TICK",
            "DETECTOR", "OBSERVABLE_INCLUDE", "I"}  # I: tagged idle / state-prep markers
-
-
-def noisy(c: stim.Circuit, p: float = 1e-3, gates: bool = True) -> stim.Circuit:
-    """Depolarising noise after CX/CZ (optional) and flips on every measurement."""
-    out = stim.Circuit()
-    for inst in c.flattened():
-        if inst.name in ("CX", "CZ") and gates:
-            out.append(inst)
-            out.append("DEPOLARIZE2", inst.targets_copy(), p)
-        elif inst.name in ("M", "MX", "MPP"):
-            out.append(inst.name, inst.targets_copy(), p)
-        else:
-            out.append(inst)
-    return out
-
-
-def distance(c: stim.Circuit, gates: bool = True) -> int:
-    return len(noisy(c, gates=gates).search_for_undetectable_logical_errors(
-        dont_explore_detection_event_sets_with_size_above=4,
-        dont_explore_edges_with_degree_above=4,
-        dont_explore_edges_increasing_symptom_degree=False))
 
 
 def check_valid(c: stim.Circuit, exp: QECExperiment) -> None:
     assert {inst.name for inst in c.flattened()} <= ALLOWED
     assert c.num_detectors == len(exp.detectors)
     assert c.num_observables == len(exp.observables)
-    dets, obs = c.compile_detector_sampler().sample(200, separate_observables=True)
-    assert not dets.any() and not obs.any()
-    c.detector_error_model()
+    check_deterministic(c)
     # No qubit is used twice within a tick.
     for layer in str(c.flattened()).split("TICK"):
         used = []
@@ -87,7 +65,7 @@ def test_measurement_based_memory(d, basis):
     check_valid(c, exp)
     assert {inst.name for inst in c.flattened()} <= ALLOWED - {"CX", "MPP"}
     # Resource-state preparation is not fault tolerant, so only measurement noise.
-    assert distance(c, gates=False) == d
+    assert distance(c, gates=()) == d
 
 
 def split_sed(dual: bool):

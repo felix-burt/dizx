@@ -1,3 +1,6 @@
+import shutil
+
+import pytest
 import sinter
 import stim
 
@@ -18,10 +21,19 @@ def _collect(path, max_shots):
                    decoders=['pymatching'], save_resume_filepath=path)
 
 
-def _collect_batched(path):
-    # Resume in increments so each task gets several appended rows.
+@pytest.fixture(scope='module')
+def batched_csv(tmp_path_factory):
+    """A sinter CSV collected in increments, so each task has several rows."""
+    path = tmp_path_factory.mktemp('batched') / 'stats.csv'
     for shots in (300, 600, 1000):
         _collect(path, shots)
+    return path
+
+
+@pytest.fixture
+def path(batched_csv, tmp_path):
+    """A private copy of ``batched_csv``."""
+    return shutil.copy(batched_csv, tmp_path / 'stats.csv')
 
 
 def _totals(path):
@@ -33,11 +45,14 @@ def _rows(path):
     return len(path.read_text().strip().splitlines()) - 1
 
 
-def test_compact_preserves_totals_and_resumes(tmp_path):
-    path = tmp_path / 'stats.csv'
-    _collect_batched(path)
+def test_compact_preserves_totals_and_resumes(path, tmp_path):
     before = _totals(path)
     assert _rows(path) > 2
+
+    # A dry run reports the saving but leaves the file untouched.
+    text = path.read_text()
+    b, a = compact_sinter_csv(path, apply=False)
+    assert a < b and path.read_text() == text
 
     compact_sinter_csv(path)
     assert _rows(path) == 2
@@ -51,9 +66,7 @@ def test_compact_preserves_totals_and_resumes(tmp_path):
     assert all(s.shots >= 3000 for s in sinter.read_stats_from_csv_files(path))
 
 
-def test_compact_keeps_concurrent_appender_attached(tmp_path):
-    path = tmp_path / 'stats.csv'
-    _collect_batched(path)
+def test_compact_keeps_concurrent_appender_attached(path):
     before = _totals(path)
     appender = open(path, 'a')  # as sinter holds save_resume_filepath
     extra = next(iter(sinter.read_stats_from_csv_files(path))).with_edits(shots=7, errors=1, seconds=0.0)
@@ -66,11 +79,3 @@ def test_compact_keeps_concurrent_appender_attached(tmp_path):
     sid = extra.strong_id
     assert after[sid] == (before[sid][0] + 7, before[sid][1] + 1, before[sid][2])
 
-
-def test_dry_run_leaves_file_untouched(tmp_path):
-    path = tmp_path / 'stats.csv'
-    _collect_batched(path)
-    text = path.read_text()
-    b, a = compact_sinter_csv(path, apply=False)
-    assert a < b
-    assert path.read_text() == text

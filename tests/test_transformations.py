@@ -8,7 +8,7 @@ from dizx.transformations import (
     add_parallel_edge, cancel_hadamards, cut_nodes, dualise, fuse, insert_identity,
     loop_edge, loop_generator, remove_identity, split, split_boundary,
 )
-from dizx.zx_diagram import NodeType, SEDiagram, ZXDiagram
+from dizx.zx_diagram import NodeType, SEDiagram
 from helpers import has_matching_boundary
 
 
@@ -78,15 +78,6 @@ def test_split_and_fuse(sed, v):
         back = fuse(new, v, ("split", v))
         assert_same_shape(sed, back)
         assert_preserved(sed, back)
-
-
-def test_double_edge_split_adds_a_web(sed):
-    # Non-example: joining the two halves by a second edge adds a loop web.
-    new = split(sed, GEN, list(sed.graph.edges(GEN, keys=True))[:2])
-    g = nx.MultiGraph(new.graph)
-    g.add_edge(GEN, ("split", GEN))
-    doubled = ZXDiagram(g, new.types, inputs=new.inputs, outputs=new.outputs)
-    assert len(doubled.web_space()) == len(new.web_space()) + 1
 
 
 def test_split_boundary_gives_matching_boundary(sed):

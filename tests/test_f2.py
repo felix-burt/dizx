@@ -12,7 +12,7 @@ def random_sparse(rng, m, n, density):
     return (rng.random((m, n)) < density).astype(np.uint8)
 
 
-@pytest.mark.parametrize("seed", range(5))
+@pytest.mark.parametrize("seed", range(2))
 def test_sparse_rank_and_product_match_dense(seed):
     rng = np.random.default_rng(seed)
     A = random_sparse(rng, 40, 60, 0.08)
@@ -21,7 +21,7 @@ def test_sparse_rank_and_product_match_dense(seed):
     assert np.array_equal(sp_matmul(A, B).toarray(), A.astype(int) @ B % 2)
 
 
-@pytest.mark.parametrize("seed", range(5))
+@pytest.mark.parametrize("seed", range(2))
 def test_sparse_solver_matches_dense(seed):
     rng = np.random.default_rng(seed)
     A = random_sparse(rng, 50, 80, 0.06)

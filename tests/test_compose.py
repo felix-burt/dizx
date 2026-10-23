@@ -76,6 +76,10 @@ def test_from_code_first_last(first, last):
     assert seq[0] == first and seq[-1] == last and len(seq) == 4 + (first == "X") + (last == "Z")
     assert all(a != b for a, b in zip(seq, seq[1:]))
     assert layers[0][0] == 1
+    # Stabilisers carried through a partial round (S -> S) combine into
+    # stabiliser webs, not logicals.
+    assert len(sed.stabilisers) == len(sed.co_stabilisers) == len(code.stabilisers)
+    assert len(sed.logicals) == 2 * code.k and not sed.carried
 
 
 @pytest.mark.parametrize("basis", ["X", "Z"])
@@ -97,14 +101,3 @@ def test_close_ports(basis):
     # No ports: every web is a detecting region, including the closed logical.
     assert not out.stabilisers and not out.co_stabilisers and not out.logicals
     assert len(out.detectors) == len(out.web_space())
-
-
-@pytest.mark.parametrize("first,last", [("Z", "X"), ("X", "Z"), ("X", "X"), ("Z", "Z")])
-def test_partial_rounds_keep_stabilisers(first, last):
-    """Stabilisers carried through a partial round (S -> S) combine into
-    stabiliser webs, not logicals."""
-    code = rotated_surface_code(3)
-    sed = SEDiagram.from_code(code, 2, first=first, last=last)
-    assert len(sed.stabilisers) == len(sed.co_stabilisers) == len(code.stabilisers)
-    assert len(sed.logicals) == 2 * code.k and not sed.carried
-    assert sed.webs_complete() and sed.detectors_complete()

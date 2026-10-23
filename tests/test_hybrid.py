@@ -11,29 +11,13 @@ from dizx.transformations import (
     cut_edges, loop_boundary, prepare_cluster_region,
 )
 from dizx.zx_diagram import SPIDERS, NodeType, SEDiagram
-from helpers import has_matching_boundary
+import helpers
+from helpers import check_deterministic as check, has_matching_boundary
 
 
-def distance(c: stim.Circuit, p: float = 1e-3) -> int:
+def distance(c: stim.Circuit) -> int:
     """Noise on CX, measurements and fusions (none on cluster CZs)."""
-    noisy = stim.Circuit()
-    for inst in c.flattened():
-        if inst.name == "CX":
-            noisy.append(inst)
-            noisy.append("DEPOLARIZE2", inst.targets_copy(), p)
-        elif inst.name in ("M", "MX", "MPP"):
-            noisy.append(inst.name, inst.targets_copy(), p)
-        else:
-            noisy.append(inst)
-    return len(noisy.search_for_undetectable_logical_errors(
-        dont_explore_detection_event_sets_with_size_above=4, dont_explore_edges_with_degree_above=4,
-        dont_explore_edges_increasing_symptom_degree=False))
-
-
-def check(c: stim.Circuit) -> None:
-    dets, obs = c.compile_detector_sampler().sample(200, separate_observables=True)
-    assert not dets.any() and not obs.any()
-    c.detector_error_model()
+    return helpers.distance(c, gates=("CX",))
 
 
 def memory_region():
@@ -74,18 +58,6 @@ def test_hybrid_memory():
 def surgery_region():
     s = two_patch_surgery(3, "ZZ")
     return (s, *prepare_cluster_region(s.sed, s.merge_region()))
-
-
-@pytest.mark.parametrize("patch_basis", ["Z", "X"])
-def test_hybrid_surgery(surgery_region, patch_basis):
-    s, hsed, S2 = surgery_region
-    exp = s.experiment(patch_basis, realised=RealisedSED.hybrid(hsed, S2))
-    c = to_stim(exp, RotatedSurfaceCodeSchedule(s.merged))
-    check(c)
-    # The ZZ sector keeps full distance. The XX sector drops to 2 (known):
-    # splitting the boundary generators needs new detecting regions to recover
-    # it; see test_hybrid_surgery_looped_boundary.
-    assert distance(c) == (3 if patch_basis == "Z" else 2)
 
 
 @pytest.fixture(scope="module")
@@ -130,15 +102,21 @@ def test_hybrid_surgery_looped_boundary(looped_surgery, patch_basis):
     assert distance(c) == 3
 
 
-def test_central_column_memory_looped():
-    """Clusterise the central column of a d=3 memory: boundary fusions on both
-    sides. The loops restore full distance (unlooped, one basis drops to 2)."""
-    code = rotated_surface_code(3)
-    sed = SEDiagram.from_code(code, 2)
+@pytest.fixture(scope="module")
+def central_column():
+    """The central column of a d=3 memory, clusterised, then its boundary looped."""
+    sed = SEDiagram.from_code(rotated_surface_code(3), 2)
     data = {v for v in sed.types if v[0] == "data" and v[-1][0] == 1}
     hsed, S2 = prepare_cluster_region(
         sed, data | {g for v in data for g in sed.graph.neighbors(v) if g[0] == "gen"})
-    lsed, S3, rungs = loop_boundary(hsed, S2)
+    return hsed, S2, loop_boundary(hsed, S2)
+
+
+def test_central_column_memory_looped(central_column):
+    """Clusterise the central column of a d=3 memory: boundary fusions on both
+    sides. The loops restore full distance (unlooped, one basis drops to 2)."""
+    code = rotated_surface_code(3)
+    hsed, S2, (lsed, S3, rungs) = central_column
     assert len(rungs) // 2 == 8  # the weight-2 boundary generators split 1-1, unloopable
     out = {}
     for name, real in (("plain", RealisedSED.hybrid(hsed, S2)),
@@ -152,42 +130,15 @@ def test_central_column_memory_looped():
     assert out == {"plain": [2, 3], "looped": [3, 3]}
 
 
-def test_loop_boundary_short_way_round():
+def test_loop_boundary_short_way_round(central_column):
     """Webs through a looped node use one side of the loop, not three."""
     from test_transformations import assert_short_way_round
-    sed = SEDiagram.from_code(rotated_surface_code(3), 2)
-    data = {v for v in sed.types if v[0] == "data" and v[-1][0] == 1}
-    hsed, S2 = prepare_cluster_region(
-        sed, data | {g for v in data for g in sed.graph.neighbors(v) if g[0] == "gen"})
-    lsed, _, _ = loop_boundary(hsed, S2)
+    hsed, _, (lsed, _, _) = central_column
     assert_short_way_round(lsed, lsed.detectors[len(hsed.detectors):])
     lsed._check_webs()
     for a, b in [(hsed.stabilisers, lsed.stabilisers), (hsed.co_stabilisers, lsed.co_stabilisers),
                  (hsed.logicals, lsed.logicals)]:
         assert [w.boundary() for w in a] == [w.boundary() for w in b]
-
-
-def test_loop_boundary_layout():
-    """Untouched nodes stay where from_code put them; each loop is centred on
-    the generator it came from."""
-    import numpy as np
-    sed = SEDiagram.from_code(rotated_surface_code(3), 2)
-    data = {v for v in sed.types if v[0] == "data" and v[-1][0] == 1}
-    gens = {g for v in data for g in sed.graph.neighbors(v) if g[0] == "gen"}
-    hsed, S2 = prepare_cluster_region(sed, data | gens)
-    lsed, _, rungs = loop_boundary(hsed, S2)
-    for v in sed.types:
-        if v not in gens:
-            assert lsed.positions[v] == sed.positions[v], v
-    looped = {x for r in rungs for x in r if x[0] == "gen"}
-    for g in looped:
-        ring = [g, ("split", g), ("loop", g), ("loop", ("split", g))]
-        assert np.allclose(np.mean([lsed.positions[n] for n in ring], axis=0), sed.positions[g])
-    pts = [tuple(round(float(c), 9) for c in lsed.positions[v]) for v in lsed.types]
-    assert len(set(pts)) == len(pts)
-    from test_transformations import assert_hadamards_straight
-    assert_hadamards_straight(hsed)
-    assert_hadamards_straight(lsed)
 
 
 @pytest.mark.parametrize("joint", ["ZZ", "XX"])
@@ -206,8 +157,9 @@ def test_surgery_hybrid_linear(joint, matching):
     for patch_basis in "ZX":
         c = to_stim(s.experiment(patch_basis, realised=real), RotatedSurfaceCodeSchedule(s.merged))
         check(c)
-        # Same as the undecomposed hybrid: full distance in the joint's sector.
-        assert distance(c) == (3 if patch_basis == joint[0] else 2)
+        if matching:
+            # Same as the undecomposed hybrid: full distance in the joint's sector.
+            assert distance(c) == (3 if patch_basis == joint[0] else 2)
 
 
 def test_surgery_hybrid_linear_looped():

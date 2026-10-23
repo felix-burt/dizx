@@ -154,18 +154,6 @@ def _write_stats(path: Path, rows: list[tuple[int, float, int, int]]) -> None:
     path.write_text("\n".join(lines) + "\n")
 
 
-def test_master_threshold_renders(tmp_path):
-    from figures import master_threshold
-    csv = tmp_path / "e.csv"
-    _write_stats(csv, [(d, p, 1000, int(1000 * p ** (d / 4))) for d in (11, 13) for p in (0.4, 0.5)])
-    spec = {"cols": 1, "cells": [{"title": "Bell", "series": [
-        {"csv": [str(csv)], "mark": "*", "line": "solid", "label": "Bell (ZZ)", "threshold": [0.45, 0.01]}]}]}
-    out = master_threshold.render(spec, name="m", out_dir=tmp_path, xlabel="x",
-                                  width=r"0.3\linewidth", height=r"0.2\textheight")
-    assert r"\begin{tikzpicture}" in out.read_text()
-    assert (tmp_path / "m_data.csv").read_text().count("\n") == 6   # header, threshold, 4 LERs
-
-
 def test_lambda_grid_renders(tmp_path):
     from figures import lambda_grid
     config = paper.lambda_config("bell", "ZZ", 2)

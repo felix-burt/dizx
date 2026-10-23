@@ -3,7 +3,7 @@ import pytest
 import scipy.sparse as sp
 
 from dizx._f2 import (
-    SparseEchelon, mask_indices, matmul, rank, solve, sp_canonical, sp_matmul, sp_rank, sp_row,
+    SparseEchelon, mask_indices, rank, solve, sp_canonical, sp_matmul, sp_rank, sp_row,
     sp_rows, sp_solver,
 )
 
@@ -18,7 +18,7 @@ def test_sparse_rank_and_product_match_dense(seed):
     A = random_sparse(rng, 40, 60, 0.08)
     B = random_sparse(rng, 60, 30, 0.1)
     assert sp_rank(sp_canonical(A)) == rank(A)
-    assert np.array_equal(sp_matmul(A, B).toarray(), matmul(A, B))
+    assert np.array_equal(sp_matmul(A, B).toarray(), A.astype(int) @ B % 2)
 
 
 @pytest.mark.parametrize("seed", range(5))
@@ -31,7 +31,7 @@ def test_sparse_solver_matches_dense(seed):
     solve_sp = sp_solver(M)
     for _ in range(10):
         x = (rng.random(len(rows)) < 0.3).astype(np.uint8)
-        t = matmul(x[None, :], A[rows])[0]
+        t = x.astype(int) @ A[rows] % 2
         assert np.array_equal(solve_sp(np.flatnonzero(t)), np.flatnonzero(x))
         assert np.array_equal(solve(A[rows], t), x)
     outside = np.zeros(80, np.uint8)

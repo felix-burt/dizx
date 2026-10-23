@@ -19,12 +19,11 @@ import numpy as np
 
 from dizx._f2 import sp_canonical
 from dizx.zx_diagram import (
-    PAULI, PAULI_BITS, SPIDERS, Edge, Node, NodeType, PauliWeb, SEDiagram, column_transport,
-    edge_transport, port_cols_bits, webs_from_matrix,
+    PAULI, PAULI_BITS, SPIDERS, Edge, Node, NodeType, SEDiagram, column_transport,
+    webs_from_matrix,
 )
 
 Bits = tuple[int, int]
-Labels = Callable[[PauliWeb], dict[Edge, Bits]]
 
 _SWAP = {NodeType.Z: NodeType.X, NodeType.X: NodeType.Z}
 
@@ -32,10 +31,6 @@ _SWAP = {NodeType.Z: NodeType.X, NodeType.X: NodeType.Z}
 # ---------------------------------------------------------------------------
 # Helpers
 # ---------------------------------------------------------------------------
-
-def _bits(w: PauliWeb, e: Edge) -> Bits:
-    return w.bits(e)
-
 
 def _matching(t: NodeType, xz: Bits) -> tuple[int, int]:
     """Split ``(x, z)`` into (matching, non-matching) components at a spider of type t."""
@@ -70,10 +65,6 @@ def _spider(sed: SEDiagram, v: Node) -> NodeType:
     return t
 
 
-def _start(sed: SEDiagram):
-    return nx.MultiGraph(sed.graph), dict(sed.types), dict(sed.positions)
-
-
 CHECK = "local"
 """How transformations check their output: ``"local"`` (the default) checks
 the web rules at the nodes the step touched, and each web's class;
@@ -92,61 +83,6 @@ def checking(mode: str):
         yield
     finally:
         CHECK = old
-
-
-def _rebuild(sed: SEDiagram, graph: nx.MultiGraph, types: dict, positions: dict,
-             new_labels: Labels, extra_detectors: Iterable[dict[Edge, str]] = ()) -> SEDiagram:
-    """New SED on ``graph``; each web keeps its labels on surviving edges and
-    takes ``new_labels(w)`` on created ones. ``extra_detectors`` (labels on
-    the new diagram) are appended to the detectors. Checked as ``CHECK``.
-
-    Every rule reads only the labels on the old legs of the nodes it touches
-    (those losing or gaining an edge, or changing type) and is linear in
-    them, so ``new_labels`` is only called for webs supported there; the
-    others are zero on every created or relabelled edge."""
-    new = SEDiagram(graph, types, sed.inputs, sed.outputs, positions=positions, check="none",
-                    closed=sed.closed)
-    n0, n1 = sed.n_edges, new.n_edges
-    pairs = [(i, new._index[e]) for i, e in enumerate(sed.edges) if e in new._index]
-    old_i = np.array([i for i, _ in pairs], dtype=np.int64)
-    new_j = np.array([j for _, j in pairs], dtype=np.int64)
-    kept, old_kept = set(new_j.tolist()), set(old_i.tolist())
-    changed = [new.edges[j] for j in range(n1) if j not in kept]
-    changed += [e for i, e in enumerate(sed.edges) if i not in old_kept]
-    touched = {v for e in changed for v in e[:2]}
-    touched |= {v for v, t in types.items() if sed.types.get(v) is not t}
-
-    webs = sed.webs
-    W0 = sed._matrix(webs)
-    legs = sorted({i for v in touched if v in sed.types for i in sed.legs(v)})
-    hit = np.flatnonzero(port_cols_bits(W0, legs + [n0 + i for i in legs]).any(axis=1))
-    rows, cols = [], []
-    relabelled: set[int] = set()
-    for r in hit:
-        for e, (x, z) in new_labels(webs[r]).items():
-            j = new.edge_index(e)
-            relabelled.add(j)
-            rows += [r] * (x + z)
-            cols += [j] * x + [n1 + j] * z
-    keep = np.array([j not in relabelled for j in new_j.tolist()], dtype=bool)
-    W = W0.astype(np.int32) @ edge_transport(old_i[keep], new_j[keep], n0, n1)
-    W = sp_canonical(W + column_transport(np.array(rows, dtype=np.int64), np.array(cols, dtype=np.int64),
-                                          len(webs), 2 * n1))
-
-    sizes = [len(sed.detectors), len(sed.stabilisers), len(sed.co_stabilisers), len(sed.logicals)]
-    ends = np.cumsum([0] + sizes)
-    fams = [webs_from_matrix(new, W[ends[k]:ends[k + 1]]) for k in range(4)]
-    new.detectors = fams[0] + [PauliWeb.from_paulis(new, d) for d in extra_detectors]
-    new.stabilisers, new.co_stabilisers, new.logicals = fams[1:]
-    new.carried = list(sed.carried)
-
-    if CHECK == "full":
-        new._check_webs()
-    elif CHECK == "local":
-        # Nodes whose legs, labels or type may have changed.
-        touched |= {v for j in relabelled for v in new.edges[j][:2]}
-        new._check_webs(nodes=[v for v in touched if v in new.types], independence=False)
-    return new
 
 
 def _toward(positions: dict, a: Node, b: Node, f: float):

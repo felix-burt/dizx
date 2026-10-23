@@ -93,10 +93,6 @@ class Surgery:
         return seam | {g for v in seam for g in self.sed.graph.neighbors(v)
                        if g[0] == "gen" and g[1] in self.merge_rounds}
 
-    @property
-    def seam_basis(self) -> str:
-        return SEAM_BASIS[self.joint]
-
     def split_seam(self, interface: Interface) -> SEDiagram:
         """The SED with every generator split along ``interface``; each half
         only touches qubits of its own unit."""

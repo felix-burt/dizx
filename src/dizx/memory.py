@@ -27,6 +27,7 @@ from dizx.circuit_extractor import to_stim
 from dizx.code import Code, rotated_surface_code
 from dizx.realisation import QECExperiment, RealisedSED
 from dizx.schedules import RotatedSurfaceCodeSchedule, Schedule
+from dizx.surgery import _through_h
 from dizx.transformations import SEDEditor, prepare_cluster_region
 from dizx.zx_diagram import SPIDERS, Node, NodeType, SEDiagram
 
@@ -120,12 +121,6 @@ def line_pattern(sed: SEDiagram, x_min: float = 0.0, tol: float = 1e-9
         x, _, z = pos[origin.get(n, n)]
         return 2 * x, z
 
-    def far(v: Node, u: Node) -> Node:
-        prev = v
-        while sed.types[u] is NodeType.H:
-            prev, u = u, next(w for w in sed.graph.neighbors(u) if w != prev)
-        return u
-
     spiders = sorted((v for v, t in sed.types.items() if t in SPIDERS),
                      key=lambda v: (frame(v), repr(v)))
     sed = SEDEditor(sed)  # edited in place from here
@@ -143,7 +138,7 @@ def line_pattern(sed: SEDiagram, x_min: float = 0.0, tol: float = 1e-9
             fx, fz = frame(n)
             return fx > x + tol or (data and fz > z + tol)
 
-        ends = [far(v, e[1]) for e in sed.graph.edges(v, keys=True)]
+        ends = [_through_h(sed, v, e[1]) for e in sed.graph.edges(v, keys=True)]
         real = [n for n in ends if sed.types[n] is not NodeType.P]
         n_ahead = sum(map(ahead, real))
         if n_ahead == 0 or n_ahead == len(real):
@@ -158,7 +153,7 @@ def line_pattern(sed: SEDiagram, x_min: float = 0.0, tol: float = 1e-9
                 sed.dualise([r])
             readouts.add(r)
             pos[r] = sed.positions[r]
-        keep = [e for e in sed.graph.edges(v, keys=True) if not ahead(far(v, e[1]))]
+        keep = [e for e in sed.graph.edges(v, keys=True) if not ahead(_through_h(sed, v, e[1]))]
         half: Hashable = ("line", v)
         sed.split(v, keep, name=half)
         origin[half] = v

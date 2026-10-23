@@ -6,8 +6,7 @@ Sinter integration for the pure-pymatching heralded-erasure decoder.
 :func:`dizx.erasure_matching.build_erasure_matching_data` (matching circuit +
 tag-driven erasure->edge map) instead of mwpf's heralded-DEM construction.
 
-Usage mirrors ``mwpf_dev.SinterMWPFDecoder`` — the decoder is bound to one
-(noisy) circuit, so use one instance per circuit::
+The decoder is bound to one (noisy) circuit, so use one instance per circuit::
 
     dec = PyMatchingHeraldedDecoder().with_circuit(circuit=noisy_circuit)
     sinter.collect(
@@ -27,11 +26,12 @@ the sampled detectors, with every herald an edgeless node.  The bit-packed
 sinter syndrome then goes to pymatching with only the herald bits cleared: no
 unpacking, and no slicing the heralds out.
 
-How the weights are applied depends on the installed pymatching.  Where
-``decode_batch`` accepts ``edge_reweights`` the whole batch goes over in one
-call and the weights are changed in place; otherwise each shot falls back to
-``Matching.add_edge(..., merge_strategy="replace")``, which invalidates the
-compiled graph and costs ~50x more.  See ``SUPPORTS_EDGE_REWEIGHTS``.
+How the weights are applied depends on the installed pymatching and the
+circuit.  Where ``decode_batch`` accepts ``edge_reweights`` the whole batch
+goes over in one call and the weights are changed in place; otherwise, or when
+erasing some edge would change which observables it flips (reweighting changes
+weights only), each shot falls back to ``_decode_legacy``, which invalidates
+the compiled graph and costs ~50x more.  See ``SUPPORTS_EDGE_REWEIGHTS``.
 """
 
 from __future__ import annotations
@@ -294,12 +294,7 @@ class PyMatchingHeraldedDecoder(sinter.Decoder):
         assert self.circuit is not None, (
             "PyMatchingHeraldedDecoder requires a circuit; call .with_circuit(...)"
         )
-        data = build_erasure_matching_data(
-            self.circuit,
-            decompose=self.decompose,
-            enable_correlations=self.enable_correlations,
-            keep_herald_detectors=True,
-        )
+        data = build_erasure_matching_data(self.circuit, decompose=self.decompose)
         num_dets = self.circuit.num_detectors
         # Erasure edges off; detectors numbered as sampled (module docstring).
         matching = pymatching.Matching.from_detector_error_model(

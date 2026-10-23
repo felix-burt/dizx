@@ -2,20 +2,14 @@
 
 from __future__ import annotations
 
-import numpy as np
-import pymatching
-import pytest
 import stim
 
 from dizx.erasure_matching import (
-    MEAS_OPS,
     _meas_count,
     build_erasure_matching_data,
-    identify_herald_detectors,
     make_matching_circuit,
-    simulate_logical_error_rate_heralded,
-    _reweighted_dem,
 )
+from dizx.noise_models import MEASUREMENT_GATES as MEAS_OPS
 
 
 def add_heralded_erasure(circuit: stim.Circuit, p_erasure: float) -> stim.Circuit:
@@ -71,7 +65,7 @@ def test_make_matching_circuit_strips_heralds():
         circuit
     )
 
-    herald_dets = identify_herald_detectors(circuit)
+    herald_dets = build_erasure_matching_data(circuit).herald_det_ids
     # add_heralded_erasure puts one herald detector per herald bit.
     assert n_erasures == len(herald_dets) == len(erase_to_herald_meas)
     # The matching circuit has the herald detectors removed.
@@ -88,76 +82,11 @@ def test_make_matching_circuit_strips_heralds():
 def test_erasure_data_alignment():
     circuit = add_heralded_erasure(_memory(p=0.01), 0.05)
     data = build_erasure_matching_data(circuit)
-    # Stripped-syndrome columns line up with the matching circuit detectors.
-    assert len(data.data_det_ids) == data.matching_circuit.num_detectors
+    # The matching graph keeps the sampling circuit's detector numbering.
+    assert data.base_dem.num_detectors == circuit.num_detectors
     # Every erasure is linked to an actual herald detector.
     assert all(h is not None for h in data.herald_det_for_erase)
     assert len(data.herald_det_for_erase) == data.n_erasures
-
-
-def test_no_erasure_matches_plain_decoder():
-    """With no heralds the pipeline graph must equal the plain stim DEM graph."""
-    circuit = _memory(p=0.02)
-    data = build_erasure_matching_data(circuit)
-    assert data.n_erasures == 0
-
-    dets, obs = circuit.compile_detector_sampler().sample(
-        4000, separate_observables=True
-    )
-    cols = np.asarray(data.data_det_ids)
-    # data_det_ids is the full detector set (no heralds), in order.
-    assert cols.tolist() == list(range(circuit.num_detectors))
-
-    pipeline = np.any(data.off_matching.decode_batch(dets[:, cols]) != obs, axis=1)
-    plain_matching = pymatching.Matching.from_detector_error_model(
-        circuit.detector_error_model(decompose_errors=True)
-    )
-    plain = np.any(plain_matching.decode_batch(dets) != obs, axis=1)
-    # Same graph, same shots -> identical predictions.
-    np.testing.assert_array_equal(pipeline, plain)
-
-
-@pytest.mark.parametrize("p_erase", [0.10, 0.25])
-def test_heralds_beat_blind_decoder(p_erase):
-    """Knowing erasure locations must strictly reduce the logical error rate."""
-    circuit = add_heralded_erasure(_memory(p=0.0), p_erase)
-    data = build_erasure_matching_data(circuit)
-
-    n = 3000
-    dets, obs = circuit.compile_detector_sampler().sample(
-        n, separate_observables=True
-    )
-    cols = np.asarray(data.data_det_ids)
-
-    heralded_fail = 0
-    blind_fail = 0
-    for i in range(n):
-        row = dets[i]
-        syndrome = row[cols]
-        fired = {
-            k
-            for k, hd in enumerate(data.herald_det_for_erase)
-            if hd is not None and row[hd]
-        }
-        if fired:
-            matching = pymatching.Matching.from_detector_error_model(
-                _reweighted_dem(data.base_dem, fired, 0.5)
-            )
-        else:
-            matching = data.off_matching
-        if np.any(matching.decode(syndrome) != obs[i]):
-            heralded_fail += 1
-        # Blind: erasures treated as ordinary depolarising edges, heralds ignored.
-        if np.any(data.base_matching.decode(syndrome) != obs[i]):
-            blind_fail += 1
-
-    assert heralded_fail < blind_fail
-
-
-def test_simulate_logical_error_rate_heralded_runs():
-    circuit = add_heralded_erasure(_memory(p=0.0), 0.10)
-    ler = simulate_logical_error_rate_heralded(circuit, num_shots=2000)
-    assert 0.0 <= ler <= 1.0
 
 
 def test_make_matching_circuit_preserves_exact_gate_args():

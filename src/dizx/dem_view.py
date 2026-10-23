@@ -22,7 +22,7 @@ from matplotlib.collections import LineCollection
 from mpl_toolkits.mplot3d.art3d import Line3DCollection
 
 from dizx.erasure_matching import make_matching_circuit
-from dizx.noise_models import HERALDING_INSTRUCTIONS, NoiseSpec, apply_tagged_noise_model
+from dizx.noise_models import HERALDING_INSTRUCTIONS, apply_tagged_noise_model
 
 ERASURE_COLOUR = "#e34948"
 PALETTE = ["#2a78d6", "#1baf7a", "#eda100", "#8a5cd1", "#e87ba4", "#008300", "#52514e"]
@@ -40,8 +40,7 @@ class Mechanism:
 
 def _kinds(value) -> list[str]:
     values = value if isinstance(value, list) else [value]
-    return [v.instruction if isinstance(v, NoiseSpec) else v[0] if isinstance(v, tuple) else "?"
-            for v in values]
+    return [v.instruction for v in values]
 
 
 def _label(key, value) -> str:

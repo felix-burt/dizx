@@ -32,14 +32,6 @@ def rref(A: np.ndarray) -> tuple[np.ndarray, list[int]]:
     return np.unpackbits(P[:row], axis=1, count=n, bitorder="little"), pivots
 
 
-def matmul(A: np.ndarray, B: np.ndarray) -> np.ndarray:
-    """A B over F2, as uint8. Goes through float BLAS (integer matmul in numpy
-    does not); the sums stay exact for inner dimensions below 2^24."""
-    A, B = np.asarray(A), np.asarray(B)
-    dtype = np.float32 if A.shape[-1] < 1 << 24 else np.float64
-    return (A.astype(dtype) @ B.astype(dtype) % 2).astype(np.uint8)
-
-
 def rank(A: np.ndarray) -> int:
     return len(rref(A)[1])
 

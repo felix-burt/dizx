@@ -1,6 +1,5 @@
 from itertools import combinations, product
 
-import numpy as np
 import pytest
 
 from dizx.code import Code, rotated_surface_code, symplectic

@@ -113,27 +113,21 @@ class Link:
         return tuple(("fusion", u, v, op) for op in self.ops)  # type: ignore[return-value]
 
 
-def _link_record(diagram: ZXDiagram, links: Iterable[Link], w: PauliWeb) -> set[Hashable]:
-    """Fusion outcomes in a web's record: the first operator's outcome when the
-    edge leaving ``ends[0]`` has an x component, the second's for z."""
-    return _records(diagram, list(links), [w], classical=False)[0]
-
-
-def _records(diagram: ZXDiagram, links: Sequence[Link], webs: Sequence[PauliWeb],
-             classical: bool = True) -> list[set[Hashable]]:
+def _records(diagram: ZXDiagram, links: Sequence[Link],
+             webs: Sequence[PauliWeb]) -> list[set[Hashable]]:
     """Each web's record (see ``RealisedSED.record``), all at once: the labels
-    of the classical outputs whose leg it highlights (if ``classical``) and
-    of the fusion outcomes it picks up."""
+    of the classical outputs whose leg it highlights and of the fusion
+    outcomes it picks up (the first operator's outcome when the edge leaving
+    ``ends[0]`` has an x component, the second's for z)."""
     n = diagram.n_edges
     cols: list[int] = []
     labels: list[Hashable] = []
-    if classical:
-        outs, legs = diagram.classical_legs()
-        for c, i in zip(outs, legs.tolist()):
-            p = diagram.phases[c]
-            if isinstance(p, Outcome):
-                cols += [i, n + i]
-                labels += [p.label, p.label]
+    outs, legs = diagram.classical_legs()
+    for c, i in zip(outs, legs.tolist()):
+        p = diagram.phases[c]
+        if isinstance(p, Outcome):
+            cols += [i, n + i]
+            labels += [p.label, p.label]
     for link in links:
         if link.kind == "fusion":
             i = diagram.edge_index(link.interaction.edges[0])

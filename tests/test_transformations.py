@@ -195,23 +195,17 @@ def test_loop_edge_through_hadamard(sed):
 def broken_identity(sed):
     """insert_identity with a wrong label on one half: invalid at the new spider."""
     e = next(e for e in sed.edges if sed.types[e[0]] is NodeType.Z and sed.types[e[1]] is NodeType.X)
-    u, v, k = e
-    graph, types, positions = T._start(sed)
-    types["s"] = NodeType.Z
-    graph.remove_edge(u, v, k)
-    e1, e2 = (u, "s", graph.add_edge(u, "s")), ("s", v, graph.add_edge("s", v))
-    positions["s"] = positions[u]
-
-    def labels(w):
-        x, z = T._bits(w, e)
-        return {e1: (x, z), e2: (x, 1 - z)}
-
-    return T._rebuild(sed, graph, types, positions, labels)
+    ed = T.SEDEditor(sed)
+    s = ed.insert_identity(e, "Z")
+    d = ed._on(next(f for f in ed.graph.edges(s, keys=True) if f[1] == e[1]))
+    for wid, (x, z) in d.items():
+        d[wid] = (x, 1 - z)
+    return ed.freeze()
 
 
 @pytest.mark.parametrize("mode", ["local", "full"])
 def test_checks_catch_a_broken_rule(sed, mode):
-    with T.checking(mode), pytest.raises(ValueError, match="invalid at nodes .*'s'"):
+    with T.checking(mode), pytest.raises(ValueError, match="invalid at nodes .*'id'"):
         broken_identity(sed)
 
 

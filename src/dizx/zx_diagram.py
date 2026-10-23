@@ -162,11 +162,8 @@ class ZXDiagram:
         ``(x_0..x_{n-1} | z_0..z_{n-1})``. Cached, since diagrams are immutable.
         """
         if self._constraints is None:
-            self._constraints = self._build_constraints()
+            self._constraints = self.constraints_at(self.types)
         return self._constraints
-
-    def _build_constraints(self) -> tuple[sp.csr_matrix, list[Node]]:
-        return self.constraints_at(self.types)
 
     def constraints_at(self, nodes: Iterable[Node]) -> tuple[sp.csr_matrix, list[Node]]:
         """The rows of ``web_constraints`` that come from ``nodes``."""
@@ -294,14 +291,6 @@ class PauliWeb:
         v[self.idx] = 1
         return v
 
-    @property
-    def x(self) -> np.ndarray:
-        return self.vec[: self.diagram.n_edges]
-
-    @property
-    def z(self) -> np.ndarray:
-        return self.vec[self.diagram.n_edges :]
-
     def _has(self, c: int) -> int:
         k = np.searchsorted(self.idx, c)
         return int(k < len(self.idx) and self.idx[k] == c)
@@ -417,9 +406,7 @@ def _port_cols(d: ZXDiagram, ports: Sequence[Node]) -> list[int]:
 
 def port_bits(d: ZXDiagram, W, ports: Sequence[Node]) -> np.ndarray:
     """Dense ``(x | z)`` bits of the rows of web matrix ``W`` on ``ports``."""
-    if not len(ports):
-        return np.zeros((W.shape[0], 0), dtype=np.uint8)
-    return (sp.csr_matrix(W)[:, _port_cols(d, ports)].toarray() % 2).astype(np.uint8)
+    return port_cols_bits(W, _port_cols(d, ports))
 
 
 # ---------------------------------------------------------------------------

@@ -95,16 +95,9 @@ class NoiseSpec:
         return self.total_probability > 0.0
 
 
-NoiseSpecLike = (
-    NoiseSpec
-    | tuple[str, float | Collection[float]]
-    | tuple[str, float | Collection[float], str | None]
-    | tuple[str, float | Collection[float], str | None, str]
-    | float
-)
 # A tag key may map to a single spec, or a list of specs applied in order
 # (e.g. both DEPOLARIZE2 and HERALDED_ERASE on the same tagged gate).
-NoiseSpecOrList = NoiseSpecLike | list[NoiseSpecLike]
+NoiseSpecOrList = NoiseSpec | list[NoiseSpec]
 NoiseKey = str | tuple[str, str] | tuple[str, str, str]
 
 
@@ -132,107 +125,18 @@ def _candidate_keys(
     return keys
 
 
-def _to_noise_spec(value: NoiseSpecLike, default_instruction: str) -> NoiseSpec:
-    if isinstance(value, NoiseSpec):
-        return value
-    if isinstance(value, tuple):
-        position = value[2] if len(value) > 2 else None
-        qubits = value[3] if len(value) > 3 else 'all'
-        return NoiseSpec(
-            instruction=value[0],
-            probability=value[1],
-            position=position,
-            qubits=qubits,
-        )
-    return NoiseSpec(instruction=default_instruction, probability=value)
-
-
-def _to_noise_specs(value: NoiseSpecOrList, default_instruction: str) -> list[NoiseSpec]:
+def _to_noise_specs(value: NoiseSpecOrList) -> list[NoiseSpec]:
     """Normalize a ``noise_by_type`` value to a list of specs, applied in order."""
-    if isinstance(value, list):
-        return [_to_noise_spec(v, default_instruction) for v in value]
-    return [_to_noise_spec(value, default_instruction)]
-
-
-def _coerce_scalar(raw: str) -> Any:
-    text = raw.strip()
-    if text == 'true':
-        return True
-    if text == 'false':
-        return False
-    if text.lstrip('-').isdigit():
-        try:
-            return int(text)
-        except ValueError:
-            return text
-    try:
-        return float(text)
-    except ValueError:
-        return text
+    return list(value) if isinstance(value, list) else [value]
 
 
 def parse_op_tag(tag: str) -> dict[str, Any]:
-    """Parse modern JSON tags and legacy key=value tag strings."""
-    if not tag:
-        return {}
-
+    """Parse a JSON instruction tag; anything else (e.g. ``erase_k``) is ``{}``."""
     try:
-        parsed = json.loads(tag)
-        if isinstance(parsed, dict):
-            return parsed
+        parsed = json.loads(tag) if tag else {}
     except json.JSONDecodeError:
-        pass
-
-    parsed: dict[str, Any] = {}
-    for token in tag.split():
-        if '=' in token:
-            key, value = token.split('=', maxsplit=1)
-            parsed[key] = _coerce_scalar(value)
-        else:
-            parsed[token] = True
-    return parsed
-
-
-def _tag_time(tag_data: Mapping[str, Any]) -> int | None:
-    t = tag_data.get('t')
-    if isinstance(t, int):
-        return t
-    if isinstance(t, float) and float(t).is_integer():
-        return int(t)
-    if isinstance(t, str) and t.lstrip('-').isdigit():
-        return int(t)
-    return None
-
-
-def find_max_time(circuit: stim.Circuit) -> int:
-    """Find the maximum time step in a circuit based on instruction tags."""
-    max_t = 0
-    for op in circuit.flattened():
-        t = _tag_time(parse_op_tag(op.tag))
-        if t is not None:
-            max_t = max(max_t, t)
-    return max_t
-
-
-def _is_boundary_round(
-    tag_data: Mapping[str, Any],
-    *,
-    max_t: int,
-    leading_rounds_to_skip: int,
-    trailing_rounds_to_skip: int,
-) -> bool:
-    # Data-qubit operations (init, final readout) are never skipped: their
-    # measurement errors directly affect the logical observable (analogous to
-    # Stim's before_measure_flip_probability on data qubits in a
-    # phenomenological model).
-    if tag_data.get('qubit_type') == 'data':
-        return False
-    t = _tag_time(tag_data)
-    if t is None:
-        return False
-    if t < leading_rounds_to_skip:
-        return True
-    return t >= (max_t - trailing_rounds_to_skip)
+        return {}
+    return parsed if isinstance(parsed, dict) else {}
 
 
 def _escape_tag(tag: str) -> str:
@@ -481,10 +385,6 @@ def apply_tagged_noise_model(
     circuit: stim.Circuit,
     *,
     noise_by_type: Mapping[NoiseKey, NoiseSpecOrList] | None = None,
-    skip_boundary_rounds: bool = False,
-    leading_rounds_to_skip: int = 2,
-    trailing_rounds_to_skip: int = 2,
-    excluded_tag_types: set[str] | None = None,
 ) -> stim.Circuit:
     """
     Apply a tag-driven noise model over the circuit.
@@ -494,8 +394,7 @@ def apply_tagged_noise_model(
     determined by instruction kind by default: measurement instructions receive
     noise immediately *before* them; all other gate instructions receive it
     *after*. A :class:`NoiseSpec` may override this per entry via its ``position``
-    field (``'before'``/``'after'``), or by passing a 3-tuple
-    ``(instruction, probability, position)`` as the mapping value.
+    field (``'before'``/``'after'``).
 
     ``noise_by_type`` maps any of:
 
@@ -503,8 +402,7 @@ def apply_tagged_noise_model(
     - ``(type, operation)`` tuples, or
     - ``(type, operation, qubit_type)`` tuples,
 
-    to :class:`NoiseSpec` (or a ``(instruction, probability)`` tuple / bare
-    float). Lookup is most-specific-first: the 3-tuple wins over the 2-tuple,
+    to :class:`NoiseSpec`. Lookup is most-specific-first: the 3-tuple wins over the 2-tuple,
     which wins over the type-only key, and only the first match applies.
     Instructions whose tag key is not in the map receive no noise.
 
@@ -533,8 +431,7 @@ def apply_tagged_noise_model(
     composition), then applied once.
 
     A spec may also restrict itself to *one qubit of each two-qubit gate* via
-    ``NoiseSpec.qubits='first'`` (or ``'second'``), or by passing a 4-tuple
-    ``(instruction, probability, position, qubits)``. This is resolved per
+    ``NoiseSpec.qubits='first'`` (or ``'second'``). This is resolved per
     gate rather than per instruction line, so a packed line such as
     ``CX 0 1 2 3 4 5`` yields noise on qubits 0, 2 and 4 — for example
     ``NoiseSpec('X_ERROR', p, qubits='first')`` puts an X error on every CNOT
@@ -553,10 +450,8 @@ def apply_tagged_noise_model(
     detector(s) on its herald measurement bit(s).
     """
     flat = list(circuit.flattened())
-    max_t = find_max_time(circuit)
-    excluded_types = excluded_tag_types or set()
     _noise_map: dict[NoiseKey, list[NoiseSpec]] = {
-        k: _to_noise_specs(v, 'DEPOLARIZE1') for k, v in (noise_by_type or {}).items()
+        k: _to_noise_specs(v) for k, v in (noise_by_type or {}).items()
     }
 
     def _resolve(inst: stim.CircuitInstruction) -> list[tuple[NoiseSpec, str]]:
@@ -567,19 +462,6 @@ def apply_tagged_noise_model(
         tag_data = parse_op_tag(inst.tag)
         op_type = tag_data.get('type')
         op_operation = tag_data.get('operation')
-
-        should_skip = (
-            (skip_boundary_rounds and _is_boundary_round(
-                tag_data,
-                max_t=max_t,
-                leading_rounds_to_skip=leading_rounds_to_skip,
-                trailing_rounds_to_skip=trailing_rounds_to_skip,
-            ))
-            or (isinstance(op_type, str) and op_type in excluded_types)
-        )
-        if should_skip:
-            return []
-
         default_position = 'before' if inst.name in ALL_MEASUREMENT_GATES else 'after'
 
         specs: list[NoiseSpec] = []
@@ -735,440 +617,3 @@ def apply_tagged_noise_model(
                 )
 
     return noisy.to_circuit()
-
-def count_noise_instructions(circuit: stim.Circuit) -> dict[str, int]:
-    """Count the number of noise instructions in a circuit by instruction name."""
-    counts: dict[str, int] = {}
-    for inst in circuit.flattened():
-        if inst.name in ALL_GATE_INSTRUCTIONS:
-            continue
-        if inst.name not in counts:
-            counts[inst.name] = 0
-        targets = inst.targets_copy()
-        counts[inst.name] += len(targets)
-    return counts
-
-
-# Reset instructions that leave their targets *alive* (ready to idle): plain
-# resets and the measure-and-reset family (which end in a reset).
-RESET_GATES = frozenset({'R', 'RX', 'RY', 'RZ'})
-RESET_MEASURE_GATES = frozenset({'MR', 'MRX', 'MRY', 'MRZ'})
-# Pure measurements leave their targets *dead* until the next reset.
-PURE_MEASUREMENT_GATES = (MEASUREMENT_GATES | PAIRED_MEASUREMENT_GATES) - RESET_MEASURE_GATES
-
-
-def _graph_qubits(circuit: stim.Circuit) -> set[int]:
-    """Qubit indices that ever appear in a ``type="graph"`` tagged instruction.
-
-    These are the resource/graph-state qubits: every such qubit is prepared by a
-    ``type="graph"`` reset in the synthesis layer, so this captures all of them.
-    """
-    graph_qs: set[int] = set()
-    for inst in circuit.flattened():
-        if inst.name not in ALL_GATE_INSTRUCTIONS:
-            continue
-        if parse_op_tag(inst.tag).get('type') == 'graph':
-            graph_qs.update(_op_qubits(inst))
-    return graph_qs
-
-
-def _is_round_idle_marker(inst: stim.CircuitInstruction) -> bool:
-    """Whether *inst* is a per-round ``"idle"`` identity from the synthesis layer.
-
-    Only these are dropped by ``strip_identities``; other tagged identities —
-    notably the ``"state_prep"`` resource-state markers — carry their own noise
-    channel and must survive the pass.
-    """
-    return inst.name == 'I' and parse_op_tag(inst.tag).get('operation') == 'idle'
-
-
-def add_idle_step_markers(
-    circuit: stim.Circuit,
-    *,
-    operation: str = "idle_step",
-    op_type: str = "circuit",
-    graph_op_type: str = "graph",
-    strip_identities: bool = False,
-) -> stim.Circuit:
-    """Insert per-timestep idle identity markers into a circuit.
-
-    Walks the circuit moment-by-moment (segments delimited by ``TICK``) and, for
-    every moment that contains at least one gate, appends a tagged ``I`` marker on
-    each qubit that is *alive* (reset and not yet measured) but *not* touched by a
-    gate in that moment. The markers carry the JSON tag
-    ``{"type": <type>, "operation": operation, "t": <round>}`` so that
-    :func:`apply_tagged_noise_model` can attach idle noise via the
-    ``(<type>, operation)`` key — independently of the per-round ``"idle"``
-    channel emitted by the synthesis layer.
-
-    Resource/graph-state qubits are tagged with ``graph_op_type`` ("graph");
-    all other (circuit data/ancilla) qubits with ``op_type`` ("circuit"). This
-    lets resource-state idling carry a different rate — or none at all, by simply
-    not registering the ``(graph_op_type, operation)`` key.
-
-    A qubit is considered alive once it is reset (``R``/``RX``/``RY``/``RZ`` or a
-    measure-and-reset ``MR*``) and dead again after a pure measurement. The ``t``
-    field is inherited from the timed tags present in the moment (the maximum seen)
-    so ``skip_boundary_rounds`` keeps working; it is omitted for moments with no
-    timed tags.
-
-    If ``strip_identities`` is True, the synthesis layer's per-round ``"idle"``
-    identity markers are dropped, and any moment that becomes empty as a result
-    has its trailing ``TICK`` collapsed. Use this to *replace* the coarse
-    per-round idle channel with this per-timestep one. Identities carrying a
-    different ``operation`` (notably the ``"state_prep"`` resource-state markers)
-    are kept, as is anything this pass itself inserts.
-
-    This pass must be run **once, on a clean circuit, before**
-    :func:`apply_tagged_noise_model`; it is not idempotent.
-    """
-    out = stim.Circuit()
-    alive: set[int] = set()
-    graph_qs = _graph_qubits(circuit)
-
-    moment: list[stim.CircuitInstruction] = []
-
-    def _emit_markers(qubits: list[int], qtype: str, max_t: int | None) -> None:
-        if not qubits:
-            return
-        tag_data: dict[str, Any] = {"type": qtype, "operation": operation}
-        if max_t is not None:
-            tag_data["t"] = max_t
-        out.append("I", qubits, tag=json.dumps(tag_data))
-
-    def _flush_moment(closed_by_tick: bool) -> None:
-        nonlocal alive
-        kept = [
-            inst for inst in moment
-            if not (strip_identities and _is_round_idle_marker(inst))
-        ]
-        touched: set[int] = set()
-        has_gate = False
-        max_t: int | None = None
-        for inst in kept:
-            out.append(inst)
-            if inst.name not in ALL_GATE_INSTRUCTIONS:
-                continue
-            has_gate = True
-            touched.update(_op_qubits(inst))
-            t = _tag_time(parse_op_tag(inst.tag))
-            if t is not None:
-                max_t = t if max_t is None else max(max_t, t)
-
-        # Idle markers only for genuine, TICK-terminated gate moments. Resource
-        # qubits are tagged separately so their idling can be priced (or zeroed)
-        # independently of circuit qubits.
-        if closed_by_tick and has_gate:
-            idle_qubits = sorted(alive - touched)
-            _emit_markers([q for q in idle_qubits if q not in graph_qs], op_type, max_t)
-            _emit_markers([q for q in idle_qubits if q in graph_qs], graph_op_type, max_t)
-
-        # Update liveness after computing idleness for this moment. (Stripped
-        # ``I`` gates never affect liveness, so ``kept`` and ``moment`` agree here.)
-        for inst in kept:
-            if inst.name in RESET_GATES or inst.name in RESET_MEASURE_GATES:
-                alive.update(_op_qubits(inst))
-            elif inst.name in PURE_MEASUREMENT_GATES:
-                alive.difference_update(_op_qubits(inst))
-
-        # Collapse a moment that became empty after stripping identities.
-        if closed_by_tick and not (strip_identities and not kept):
-            out.append("TICK")
-        moment.clear()
-
-    for inst in circuit.flattened():
-        if inst.name == 'TICK':
-            _flush_moment(closed_by_tick=True)
-        else:
-            moment.append(inst)
-    if moment:
-        _flush_moment(closed_by_tick=False)
-
-    return out
-
-
-# ---------------------------------------------------------------------------
-# Convenience wrappers with preset tag maps
-# ---------------------------------------------------------------------------
-
-def add_circuit_depolarizing_noise(
-    circuit: stim.Circuit,
-    p1: float,
-    p2: float,
-    *,
-    single_qubit_types: Collection[str] = (),
-    two_qubit_types: Collection[str] = (),
-    p_idle: float = 0.0,
-    idle_types: Collection[str] = ('circuit',),
-    p_idle_step: float = 0.0,
-    skip_boundary_rounds: bool = False,
-    leading_rounds_to_skip: int = 2,
-    trailing_rounds_to_skip: int = 2,
-    excluded_tag_types: set[str] | None = None,
-) -> stim.Circuit:
-    """
-    Add depolarizing noise to circuit gate operations by tag type.
-
-    ``single_qubit_types`` maps to ``DEPOLARIZE1(p1)``;
-    ``two_qubit_types`` maps to ``DEPOLARIZE2(p2)``.
-
-    ``p_idle`` (if > 0) attaches ``DEPOLARIZE1(p_idle)`` to per-round idle
-    identity markers emitted by the synthesis layer. ``idle_types`` controls
-    which tag ``type`` strings carry the idle marker (defaults to
-    ``('circuit',)``); the matching ``(type, 'idle')`` key is registered.
-
-    ``p_idle_step`` (if > 0) attaches ``DEPOLARIZE1(p_idle_step)`` to per-timestep
-    idle markers via the ``('circuit', 'idle_step')`` key. The caller must have run
-    :func:`add_idle_step_markers` on the circuit beforehand for this to take effect.
-    """
-    noise_by_type: dict[NoiseKey, NoiseSpec] = {t: NoiseSpec('DEPOLARIZE1', p1) for t in single_qubit_types}
-    noise_by_type.update({t: NoiseSpec('DEPOLARIZE2', p2) for t in two_qubit_types})
-    if p_idle > 0.0:
-        for t in idle_types:
-            noise_by_type[(t, 'idle')] = NoiseSpec('DEPOLARIZE1', p_idle)
-    if p_idle_step > 0.0:
-        noise_by_type[('circuit', 'idle_step')] = NoiseSpec('DEPOLARIZE1', p_idle_step)
-    return apply_tagged_noise_model(
-        circuit,
-        noise_by_type=noise_by_type,
-        skip_boundary_rounds=skip_boundary_rounds,
-        leading_rounds_to_skip=leading_rounds_to_skip,
-        trailing_rounds_to_skip=trailing_rounds_to_skip,
-        excluded_tag_types=excluded_tag_types,
-    )
-
-
-def add_depolarizing_to_measurements(
-    circuit: stim.Circuit,
-    p: float,
-    *,
-    measurement_types: Collection[str] = (),
-    skip_boundary_rounds: bool = False,
-    leading_rounds_to_skip: int = 2,
-    trailing_rounds_to_skip: int = 2,
-    excluded_tag_types: set[str] | None = None,
-) -> stim.Circuit:
-    """
-    Add ``DEPOLARIZE1(p)`` immediately before measurement instructions by tag type.
-
-    ``measurement_types`` lists the tag-type strings that should receive noise.
-    """
-    noise_by_type: dict[str, NoiseSpec] = {t: NoiseSpec('DEPOLARIZE1', p) for t in measurement_types}
-    return apply_tagged_noise_model(
-        circuit,
-        noise_by_type=noise_by_type,
-        skip_boundary_rounds=skip_boundary_rounds,
-        leading_rounds_to_skip=leading_rounds_to_skip,
-        trailing_rounds_to_skip=trailing_rounds_to_skip,
-        excluded_tag_types=excluded_tag_types,
-    )
-
-
-def add_selective_heralded_erasure(
-    circuit: stim.Circuit,
-    *,
-    p_fusion_meas: float,
-    p_graph_prep_step: float,
-    fusion_measurement_types: Collection[str] = ('fusion_meas',),
-    graph_prep_types: Collection[str] = ('graph_prep', 'graph_entangle'),
-    skip_boundary_rounds: bool = False,
-    leading_rounds_to_skip: int = 2,
-    trailing_rounds_to_skip: int = 2,
-) -> stim.Circuit:
-    """
-    Add ``HERALDED_ERASE`` noise by tag type.
-
-    - Measurement instructions whose type is in ``fusion_measurement_types``
-      receive ``HERALDED_ERASE(p_fusion_meas)`` inserted immediately before them.
-    - Gate instructions whose type is in ``graph_prep_types`` receive
-      ``HERALDED_ERASE(p_graph_prep_step)`` inserted immediately after them.
-
-    All ``rec(-)`` targets in DETECTOR and OBSERVABLE_INCLUDE instructions are
-    remapped automatically.
-    """
-    noise_by_type: dict[str, NoiseSpec] = {
-        t: NoiseSpec('HERALDED_ERASE', p_fusion_meas) for t in fusion_measurement_types
-    }
-    noise_by_type.update({
-        t: NoiseSpec('HERALDED_ERASE', p_graph_prep_step) for t in graph_prep_types
-    })
-    return apply_tagged_noise_model(
-        circuit,
-        noise_by_type=noise_by_type,
-        skip_boundary_rounds=skip_boundary_rounds,
-        leading_rounds_to_skip=leading_rounds_to_skip,
-        trailing_rounds_to_skip=trailing_rounds_to_skip,
-    )
-
-
-def add_heralded_pauli_channel(
-    circuit: stim.Circuit,
-    *,
-    p_x: float,
-    p_y: float,
-    p_z: float,
-    p_i: float = 0.0,
-    measurement_types: Collection[str] = (),
-    gate_types: Collection[str] = (),
-    skip_boundary_rounds: bool = False,
-    leading_rounds_to_skip: int = 2,
-    trailing_rounds_to_skip: int = 2,
-    excluded_tag_types: set[str] | None = None,
-) -> stim.Circuit:
-    """
-    Add ``HERALDED_PAULI_CHANNEL_1`` noise by tag type.
-
-    Unlike :func:`add_selective_heralded_erasure` — where a herald implies a
-    uniform depolarizing (I/X/Y/Z) error — this channel carries an independent
-    probability for each Pauli component. On each targeted qubit, exactly one of
-    the following happens:
-
-    - with probability ``p_i``: heralded, no error (identity),
-    - with probability ``p_x`` / ``p_y`` / ``p_z``: heralded X / Y / Z error,
-    - otherwise: nothing, and no herald.
-
-    A herald measurement bit (1 if any of the four cases fired) is produced per
-    qubit, exactly like ``HERALDED_ERASE``. ``HERALDED_ERASE(p)`` is the special
-    case ``p_i = p_x = p_y = p_z = p / 4``.
-
-    - Measurement instructions whose type is in ``measurement_types`` receive the
-      channel inserted immediately *before* them.
-    - Gate instructions whose type is in ``gate_types`` receive it immediately
-      *after* them.
-
-    All ``rec(-)`` targets in DETECTOR and OBSERVABLE_INCLUDE instructions are
-    remapped automatically.
-    """
-    # stim gate-arg order is (p_I, p_X, p_Y, p_Z).
-    spec = NoiseSpec(
-        'HERALDED_PAULI_CHANNEL_1',
-        probability=(float(p_i), float(p_x), float(p_y), float(p_z)),
-    )
-    noise_by_type: dict[NoiseKey, NoiseSpec] = {t: spec for t in measurement_types}
-    noise_by_type.update({t: spec for t in gate_types})
-    return apply_tagged_noise_model(
-        circuit,
-        noise_by_type=noise_by_type,
-        skip_boundary_rounds=skip_boundary_rounds,
-        leading_rounds_to_skip=leading_rounds_to_skip,
-        trailing_rounds_to_skip=trailing_rounds_to_skip,
-        excluded_tag_types=excluded_tag_types,
-    )
-
-
-def add_depolarizing_to_all(
-    circuit: stim.Circuit,
-    *,
-    p1: float,
-    p2: float,
-    pm: float,
-    p_idle: float = 0.0,
-    p_idle_step: float = 0.0,
-    p_state_prep: float = 0.0,
-    skip_boundary_rounds: bool = False,
-    leading_rounds_to_skip: int = 2,
-    trailing_rounds_to_skip: int = 2,
-) -> stim.Circuit:
-    """
-    Apply depolarizing noise to all known graph/circuit tagged operations.
-
-    Mapping used:
-
-    - ``(type, reset)`` and ``(type, single_qubit_gate)`` -> ``DEPOLARIZE1(p1)``
-    - ``(type, two_qubit_gate)`` -> ``DEPOLARIZE2(p2)``
-    - ``(type, single_qubit_measurement)`` and
-      ``(type, fusion_measurement)`` -> ``DEPOLARIZE1(pm)``
-    - ``(circuit, idle)`` -> ``DEPOLARIZE1(p_idle)`` (only when ``p_idle > 0``)
-    - ``(circuit, idle_step)`` -> ``DEPOLARIZE1(p_idle_step)`` (only when
-      ``p_idle_step > 0``; requires :func:`add_idle_step_markers` to have run)
-    - ``(type, state_prep)`` -> ``DEPOLARIZE1(p_state_prep)`` (only when
-      ``p_state_prep > 0``): one error per *qubit* of a finished resource
-      state, applied after the preparing entangling gates
-
-    for both ``type in {circuit, graph}``.
-    """
-    noise_by_type: dict[NoiseKey, NoiseSpec] = {}
-    for op_type in ('circuit', 'graph'):
-        noise_by_type[(op_type, 'reset')] = NoiseSpec('DEPOLARIZE1', p1)
-        noise_by_type[(op_type, 'single_qubit_gate')] = NoiseSpec('DEPOLARIZE1', p1)
-        noise_by_type[(op_type, 'two_qubit_gate')] = NoiseSpec('DEPOLARIZE2', p2)
-        noise_by_type[(op_type, 'single_qubit_measurement')] = NoiseSpec('DEPOLARIZE1', pm)
-        noise_by_type[(op_type, 'fusion_measurement')] = NoiseSpec('DEPOLARIZE1', pm)
-        if p_state_prep > 0.0:
-            noise_by_type[(op_type, 'state_prep')] = NoiseSpec('DEPOLARIZE1', p_state_prep)
-    if p_idle > 0.0:
-        noise_by_type[('circuit', 'idle')] = NoiseSpec('DEPOLARIZE1', p_idle)
-    if p_idle_step > 0.0:
-        noise_by_type[('circuit', 'idle_step')] = NoiseSpec('DEPOLARIZE1', p_idle_step)
-
-    return apply_tagged_noise_model(
-        circuit,
-        noise_by_type=noise_by_type,
-        skip_boundary_rounds=skip_boundary_rounds,
-        leading_rounds_to_skip=leading_rounds_to_skip,
-        trailing_rounds_to_skip=trailing_rounds_to_skip,
-    )
-
-
-def add_hybrid_depolarizing_erasure(
-    circuit: stim.Circuit,
-    *,
-    p1: float,
-    p2: float,
-    pm: float,
-    pl: float,
-    pf: float,
-    p_idle: float = 0.0,
-    p_idle_step: float = 0.0,
-    p_state_prep: float = 0.0,
-    skip_boundary_rounds: bool = False,
-    leading_rounds_to_skip: int = 2,
-    trailing_rounds_to_skip: int = 2,
-) -> stim.Circuit:
-    """
-    Mixed model:
-
-    - Circuit operations receive depolarizing noise:
-      ``reset``/``single_qubit_gate`` -> ``DEPOLARIZE1(p1)``
-      ``two_qubit_gate`` -> ``DEPOLARIZE2(p2)``
-      ``single_qubit_measurement`` -> ``DEPOLARIZE1(pm)``
-      ``idle`` -> ``DEPOLARIZE1(p_idle)`` (only when ``p_idle > 0``)
-      ``idle_step`` -> ``DEPOLARIZE1(p_idle_step)`` (only when ``p_idle_step > 0``;
-      requires :func:`add_idle_step_markers` to have run)
-    - Graph prep gates receive heralded erasure:
-      ``reset``/``single_qubit_gate``/``two_qubit_gate`` -> ``HERALDED_ERASE(pl)``
-    - Graph fusion measurements receive heralded erasure:
-      ``fusion_measurement`` -> ``HERALDED_ERASE(pf)``
-    - Finished resource states receive one heralded erasure *per qubit*
-      (only when ``p_state_prep > 0``):
-      ``(graph, state_prep)`` and ``(circuit, state_prep)`` ->
-      ``HERALDED_ERASE(p_state_prep)``. Prefer this over the per-gate
-      ``two_qubit_gate`` channel when the loss is a property of the prepared
-      state rather than of each entangling gate — a degree-``d`` qubit gets
-      one draw here instead of ``d``.
-    """
-    noise_by_type: dict[NoiseKey, NoiseSpec] = {
-        ('circuit', 'reset'): NoiseSpec('DEPOLARIZE1', p1),
-        ('circuit', 'single_qubit_gate'): NoiseSpec('DEPOLARIZE1', p1),
-        ('circuit', 'two_qubit_gate'): NoiseSpec('DEPOLARIZE2', p2),
-        ('circuit', 'single_qubit_measurement'): NoiseSpec('DEPOLARIZE1', pm),
-        ('graph', 'reset'): NoiseSpec('HERALDED_ERASE', pl),
-        ('graph', 'single_qubit_gate'): NoiseSpec('HERALDED_ERASE', pl),
-        ('graph', 'two_qubit_gate'): NoiseSpec('HERALDED_ERASE', pl),
-        ('graph', 'fusion_measurement'): NoiseSpec('HERALDED_ERASE', pf),
-    }
-    if p_state_prep > 0.0:
-        for op_type in ('graph', 'circuit'):
-            noise_by_type[(op_type, 'state_prep')] = NoiseSpec('HERALDED_ERASE', p_state_prep)
-    if p_idle > 0.0:
-        noise_by_type[('circuit', 'idle')] = NoiseSpec('DEPOLARIZE1', p_idle)
-    if p_idle_step > 0.0:
-        noise_by_type[('circuit', 'idle_step')] = NoiseSpec('DEPOLARIZE1', p_idle_step)
-
-    return apply_tagged_noise_model(
-        circuit,
-        noise_by_type=noise_by_type,
-        skip_boundary_rounds=skip_boundary_rounds,
-        leading_rounds_to_skip=leading_rounds_to_skip,
-        trailing_rounds_to_skip=trailing_rounds_to_skip,
-    )

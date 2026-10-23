@@ -398,8 +398,7 @@ def aggregate_identifier(config: dict) -> str:
     pymatching config), so the mwpf segment is dropped rather than filled in
     with a meaningless solver name. A config that sets *either* key keeps the
     legacy defaults for the other, so every mwpf name already on disk stays
-    byte-identical -- only the pymatching aggregates change, and
-    scripts/rename_aggregate_mwpf_suffix.py migrated the existing ones.
+    byte-identical -- only the pymatching aggregates change.
 
     Non-legacy configs use `result_names.aggregate_stem` instead.
     """

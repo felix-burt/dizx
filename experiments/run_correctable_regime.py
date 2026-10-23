@@ -283,7 +283,7 @@ def run_correctable_regime(config, plot_only=False):
         # window. If it doesn't (or can't be computed at all), don't skip --
         # fall through so the normal reuse_window/slide/bisection search
         # keeps looking instead of silently treating a stale window as
-        # converged (see conversation 2026-08-07).
+        # converged.
         window_reverified = False
         if (not plot_only and prev_refine is not None and prev_refine.get('found_in_region')
                 and prev_refine.get('probs') and cached is not None):
@@ -326,8 +326,7 @@ def run_correctable_regime(config, plot_only=False):
             # ones just computed) -- same fit used for the CRG plots, see
             # `_regime_common.fit_boundary_curve`. Used both to seed a search
             # when nothing is cached at this exact local_prob yet, and below
-            # to sanity-check a frozen refine window (conversation
-            # 2026-08-06).
+            # to sanity-check a frozen refine window.
             fit_params = fit_boundary_curve(resolved, x_max=boundary_x_max(config))
             curve_estimate = eval_boundary_curve(fit_params, l_prob) if fit_params is not None else None
             if curve_estimate is not None and curve_estimate <= 0:
@@ -349,7 +348,7 @@ def run_correctable_regime(config, plot_only=False):
                 # from there and brackets in a handful of edge probes. As
                 # `resolved` grows during the run this is the *previous*
                 # local_prob, i.e. the search continues from the threshold it
-                # just found (see conversation 2026-08-07).
+                # just found.
                 #
                 # Deliberately gated on there being no curve *at all*, rather
                 # than on curve_estimate being None: a fitted curve that
@@ -379,7 +378,7 @@ def run_correctable_regime(config, plot_only=False):
             # the union of the old and new windows, means old points are free
             # (already collected -- run_threshold's own per-(distance,p)
             # cache skips them) while new ones extend coverage toward where
-            # the curve now points (see conversation 2026-08-06).
+            # the curve now points.
             frac = float(local_sweep['refine_frac']) if local_sweep.get('refine_around_threshold') else None
             # Only reuse a frozen window that still *brackets* the threshold under
             # the current distances/estimator (window_reverified, computed above).
@@ -388,7 +387,7 @@ def run_correctable_regime(config, plot_only=False):
             # run -- fine when re-runs are cheap, useless when the whole
             # collection has to converge inside one job. Falling through to the
             # slide branch instead lets slide_refine_window walk the window onto
-            # the threshold within this run (see conversation 2026-08-07).
+            # the threshold within this run.
             # plot_only never re-verifies (it collects nothing), so it keeps the
             # old behaviour of re-rendering whatever window was last recorded.
             reuse_window = (local_sweep.get('refine_around_threshold') and prev_refine is not None
@@ -429,7 +428,7 @@ def run_correctable_regime(config, plot_only=False):
                 # out of it (the partly-collected-d=11 case). Rather than recording
                 # the miss and leaving it for a later run, slide onto the threshold
                 # and sweep again now -- a single retry, so a pathological curve
-                # can't loop (see conversation 2026-08-07).
+                # can't loop.
                 if not plot_only and (threshold is None
                                       or not (probs[0] <= threshold <= probs[-1])):
                     print(f"local_prob={l_prob}: threshold "

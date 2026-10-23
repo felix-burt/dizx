@@ -1,9 +1,6 @@
-"""Shared helpers for correctable-regime / pseudo-threshold pgfplots scripts.
+"""Shared helpers for the correctable-regime runner and figures.
 
-Both `correctable_regime_to_pgfplots.py` and `pseudo_threshold_to_pgfplots.py`
-consume the same kind of experiment config (e.g.
-`experiments/configs/hybrid_correctable_regime_local_noise_cg_photon_loss.yaml`)
-and the same per-`local_prob` sinter `.csv` files written by
+They read the per-`local_prob` sinter `.csv` files written by
 `experiments/run_threshold_experiment.py` / `run_correctable_regime.py`. This
 module centralises the path convention, CSV loading, and the
 distance-crossing threshold estimate (mirrors
@@ -96,8 +93,8 @@ def flat_csv_path_for(config: dict[str, Any], *, results_dir: Path) -> Path:
 
     Honours an explicit `csv_path` override (relative to the repo root) if
     present -- needed when the on-disk file was produced by a different
-    collection script (e.g. `run_photon_loss_threshold.py`'s boost-level
-    sweep) and so doesn't follow the plain `csv_path_for` convention.
+    collection script and so doesn't follow the plain `csv_path_for`
+    convention.
     Otherwise falls back to `csv_path_for` at local_prob=0.0.
     """
     if "csv_path" in config:
@@ -241,7 +238,7 @@ def read_crg_data(path: Path) -> dict[float, tuple[float, float | None, str]]:
     # Some imported files have a stray space after every comma (not the
     # format write_crg_data ever produces) -- strip whitespace on every field
     # so that doesn't make the 'ported' check silently miss a row and fall
-    # through to parsing " " as a float (see conversation 2026-08-07).
+    # through to parsing " " as a float.
     with open(path, newline="") as f:
         for raw_row in csv.DictReader(f):
             row = {k: v.strip() for k, v in raw_row.items()}
@@ -275,7 +272,7 @@ def write_crg_data(
 # circuit-and-erasure/circuit-and-loss variants. Pinning this as a fixed
 # vanishing point (rather than fitting it) removes a free parameter from
 # `fit_boundary_curve` -- important now that several variants only have 3-4
-# real points to fit against (see conversation 2026-08-06).
+# real points to fit against.
 LOCAL_NOISE_THRESHOLD = 0.0065
 
 
@@ -288,7 +285,7 @@ def boundary_x_max(config: dict[str, Any]) -> float | None:
     channel over a different range: `crg_prep_bell` reaches p=0.02, three times
     LOCAL_NOISE_THRESHOLD, so pinning made `fit_boundary_curve` bail out through
     its `x_known_max >= x_max` guard and that config could never get a curve
-    seed or a fitted boundary at all (see conversation 2026-08-07).
+    seed or a fitted boundary at all.
 
     Keyed on `noise_model_name` rather than :func:`local_prob_label` on purpose.
     That label picks the *filename* prefix from the first channel's tag and has
@@ -322,10 +319,10 @@ def fit_boundary_curve(
     alone -- so there's no physical reason for one end to land tangentially
     smooth while the other cusps; an earlier version of this fit pinned the
     p_l-axis exponent to 1 (always smooth there) and only fit the p_nl-axis
-    exponent, which was an arbitrary asymmetry, not a physical one (see
-    conversation 2026-08-06). m < 1 gives a vertical-tangent cusp at both
-    ends, m = 1 is the straight budget-sharing line p_l/x_max + p_nl/y0 = 1,
-    m > 1 bows outward at both ends.
+    exponent, which was an arbitrary asymmetry, not a physical one. m < 1
+    gives a vertical-tangent cusp at both ends, m = 1 is the straight
+    budget-sharing line p_l/x_max + p_nl/y0 = 1, m > 1 bows outward at both
+    ends.
 
     If `x_max` is given, it's pinned to that value and only m is fit --
     appropriate when the vanishing point is known independently (e.g.

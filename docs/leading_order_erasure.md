@@ -266,9 +266,6 @@ within the table in §5: Λ/Λ_LO = 0.97–0.99 for 3d-Chain, 0.90–0.98 for
 8-Chain, and 0.82–0.92 for 5-Chain. That is the quantitative basis for trusting
 the chains' leading-order bands where no direct data exist.
 
-Prototype code: the session scratchpad (`perc_split.py`). To be moved into
-`scripts/` if the method goes into the paper.
-
 ## 7. Limits
 
 * **Loss only.** With circuit or resource-state noise ($p_c, p_r > 0$), Pauli

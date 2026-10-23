@@ -304,8 +304,7 @@ def _run_subthreshold_point(config: dict, label: str = '') -> list[sinter.TaskSt
     PNG (log LER vs distance) at ``<results_dir>/<alpha_plot_stem>.png``
     (legacy configs: ``<results_dir>/alpha_plot_<id>[_<label>].png``)
     -- mirroring the incremental plotting of ``run_correctable_regime`` so a
-    long run can be eyeballed as it progresses. For the publication figure
-    across systems use ``scripts/alpha_plot_to_pgfplots.py``.
+    long run can be eyeballed as it progresses.
     """
     distances = list(config['sweep']['distances'])
     title = f'{config_prefix(config)} ({label})' if label else config_prefix(config)

@@ -11,7 +11,7 @@ distance bends away from the linear regime sooner. So the window is
 
 recentred on the fitted (p_th, nu) until it stops moving (starting from the
 smallest-pair crossing and nu = 1.5). Scanning the window width on the crg
-data (conversation 2026-10-01) found three regimes: too narrow (<= ~6 points)
+data found three regimes: too narrow (<= ~6 points)
 gives degenerate fits (nu ~ 0.4, chi2/dof ~ 0, error bars of 1e-4 or 0.1),
 a plateau where p_th is stable to ~0.001 with nu ~ 1.5-2 and chi2/dof ~ 1, and
 too wide (chi2/dof 2-10, p_th drifting). x_max = 0.15 is inside the plateau

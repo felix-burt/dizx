@@ -263,18 +263,8 @@ def _config_for_local_prob(config: dict, l_prob: float) -> dict:
     subthreshold config -- and ``extract_local_prob`` then keys its sinter CSVs
     by *l_prob*, giving each value its own file.
     """
-    mapped = []
-    for ch in config['noise_model']:
-        prob = ch.get('probability')
-        if prob == 'p_l':
-            mapped.append({**ch, 'probability': l_prob})
-        elif prob == 'p_nl':
-            ch = {k: v for k, v in ch.items() if k != 'probability'}
-            mapped.append({**ch, 'scale': 1.0})
-        else:
-            mapped.append(ch)
     run_config = copy.deepcopy(config)
-    run_config['noise_model'] = mapped
+    run_config['noise_model'] = result_names.resolve_local_prob(config['noise_model'], l_prob)
     del run_config['sweep']['local_probs']
     return run_config
 

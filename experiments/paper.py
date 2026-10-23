@@ -36,6 +36,8 @@ import copy
 import math
 from dataclasses import dataclass
 
+from dizx import result_names
+
 # ---------------------------------------------------------------------------
 # Families
 # ---------------------------------------------------------------------------
@@ -286,17 +288,8 @@ def resolve(config: dict, local_prob: float, probs: list[float]) -> dict:
     (`scale: 1.0`), anything else (fixed rates, p_e) passes through -- the
     convention of run_correctable_regime and run_subthreshold, so the sinter
     CSV is the one the figures read for (config, local_prob)."""
-    noise = []
-    for ch in config["noise_model"]:
-        prob = ch.get("probability")
-        if prob == "p_l":
-            noise.append({**ch, "probability": local_prob})
-        elif prob == "p_nl":
-            noise.append({**{k: v for k, v in ch.items() if k != "probability"}, "scale": 1.0})
-        else:
-            noise.append(dict(ch))
     run = copy.deepcopy(config)
-    run["noise_model"] = noise
+    run["noise_model"] = result_names.resolve_local_prob(config["noise_model"], local_prob)
     for key in ("local_probs", "local_prob_sweeps", "min", "max", "step"):
         run["sweep"].pop(key, None)
     run["sweep"]["probs"] = list(probs)

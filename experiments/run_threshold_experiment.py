@@ -436,7 +436,7 @@ def run_stem(config: dict, noise_channels: list[dict], merge_types: list, observ
 
     `noise_channels` are the channels actually run, i.e. with any local_prob
     already substituted. Several merge types / observables only occur for the
-    combined plot of `plot_threshold_curves`; a CSV always has one of each.
+    combined plot of `save_threshold_plot`; a CSV always has one of each.
     Legacy configs name the combined plot merge{None}_observable{None}.
     """
     if not result_names.is_legacy(config):
@@ -456,31 +456,6 @@ def run_stem(config: dict, noise_channels: list[dict], merge_types: list, observ
 def sinter_csv_path(config: dict, noise_channels: list[dict], merge_type, observable,
                     *, out_dir: str) -> str:
     return f'{out_dir}/sinter/{run_stem(config, noise_channels, [merge_type], [observable])}.csv'
-
-
-def plot_threshold_curves(results: list[sinter.TaskStats], stem: str, builder_name: str,
-                           decoder_name: str, local_prob: float | None, prefix: str = 'pl',
-                           *, out_dir: str = DEFAULT_RESULTS_DIR) -> None:
-    fig, ax = plt.subplots(1, 1, figsize=(12, 5), sharey=True)
-    sinter.plot_error_rate(
-        ax=ax,
-        stats=results,
-        x_func=lambda stat: stat.json_metadata['p'],
-        group_func=lambda stat: f"d={stat.json_metadata['distance']}, merge={stat.json_metadata['merge_type']}, observable={stat.json_metadata['observable']}, {prefix}={local_prob}",
-        failure_units_per_shot_func=lambda stat: 1,
-    )
-
-    ax.set_xlabel('Physical error rate')
-    ax.set_ylabel('Logical error rate')
-    ax.set_title(decoder_name)
-    ax.legend()
-    ax.set_yscale('log')
-    ax.grid(True, which='both', alpha=0.3)
-    fig.suptitle(f'Rotated surface code - {builder_name}', fontsize=13)
-    fig.tight_layout()
-    Path(f'{out_dir}/plots/').mkdir(parents=True, exist_ok=True)
-    plt.savefig(f'{out_dir}/plots/{stem}.png')
-    plt.close(fig)
 
 
 def save_threshold_plot(stats: list[sinter.TaskStats], stem: str, prefix: str, local_prob: float | None,
@@ -540,15 +515,15 @@ def load_threshold_stats(config: dict) -> list[sinter.TaskStats]:
         if Path(csv_path).exists():
             results.extend(sinter.read_stats_from_csv_files(csv_path))
 
-    # plot_threshold_curves combines every (merge_type, observable) pair into
-    # one plot -- with only one pair swept (the common case) that's identical
-    # to the single save_threshold_plot output already written during
+    # The combined plot puts every (merge_type, observable) pair into one
+    # plot -- with only one pair swept (the common case) that's identical
+    # to the single per-pair plot already written during
     # collection, just under a misleading merge{None}_observable{None} name.
     # Only worth the extra file when there's actually more than one pair to
     # combine.
     if results and len(merge_types) * len(observables) > 1:
-        plot_threshold_curves(results, run_stem(config, noise_channels, merge_types, observables),
-                              builder_name, decoder_name, local_prob, prefix, out_dir=out_dir)
+        save_threshold_plot(results, run_stem(config, noise_channels, merge_types, observables),
+                            prefix, local_prob, builder_name, decoder_name, out_dir=out_dir)
     return results
 
 
@@ -805,15 +780,7 @@ def run_threshold_bisection(config: dict, *, persist: bool = True) -> tuple[floa
         stats = run_threshold(point_config, persist=persist)
         all_stats.extend(stats)
 
-        ler_by_distance: dict[int, float] = {}
-        for s in stats:
-            md = s.json_metadata or {}
-            d = int(md.get('distance', -1))
-            shots = s.shots - s.discards
-            if shots > 0:
-                ler_by_distance[d] = s.errors / shots
-
-        above = _is_above_threshold(ler_by_distance, distances)
+        above = _is_above_threshold(_ler_by_distance(stats), distances)
         if above is None:
             raise RuntimeError(
                 f"Insufficient data at p={mid:g} to determine threshold direction "
@@ -834,6 +801,16 @@ def run_threshold_bisection(config: dict, *, persist: bool = True) -> tuple[floa
     return threshold, all_stats
 
 
+def _ler_by_distance(stats: list[sinter.TaskStats]) -> dict[int, float]:
+    """Logical error rate per distance of single-probability stats."""
+    out: dict[int, float] = {}
+    for s in stats:
+        shots = s.shots - s.discards
+        if shots > 0:
+            out[int((s.json_metadata or {}).get('distance', -1))] = s.errors / shots
+    return out
+
+
 def _probe_point(config: dict, prob: float, distances: list[int],
                  *, persist: bool = True) -> tuple[bool | None, list[sinter.TaskStats]]:
     """Collect a single probability at all distances and report above/below.
@@ -852,14 +829,7 @@ def _probe_point(config: dict, prob: float, distances: list[int],
         ps.pop(key, None)
     ps['probs'] = [prob]
     stats = run_threshold(point_config, persist=persist)
-    ler_by_distance: dict[int, float] = {}
-    for s in stats:
-        md = s.json_metadata or {}
-        d = int(md.get('distance', -1))
-        shots = s.shots - s.discards
-        if shots > 0:
-            ler_by_distance[d] = s.errors / shots
-    return _is_above_threshold(ler_by_distance, distances), stats
+    return _is_above_threshold(_ler_by_distance(stats), distances), stats
 
 
 def slide_refine_window(config: dict, center: float, frac: float, n_points: int,

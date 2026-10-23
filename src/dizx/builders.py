@@ -82,9 +82,28 @@ def build_surgery_circuit(distance: int, n_cycles: int, merge_type: str = "ZZ",
     return _finish(s, RealisedSED.circuit_based(s.sed), observable, schedule)
 
 
-def bell_prep_gadgets(sed: SEDiagram) -> tuple[SEDiagram, set[Node], dict[frozenset, str]]:
-    """Replace each edge between the halves of a split generator (``split``
-    nodes from ``Surgery.split_seam``) by a matter-photon Bell-prep chain
+def _gadget_chains(sed: SEDiagram, colours) -> tuple[SEDEditor, list[tuple[Node, Node, list[Node]]]]:
+    """Insert identity spiders on the edge from each split generator's
+    original half ``n1`` to its ``split`` half (``Surgery.split_seam``), with
+    colours ``colours(c)`` for a half of colour c. Returns the editor and
+    ``(n1, half, chain)`` for each split generator."""
+    halves = [v for v in sed.types if isinstance(v, tuple) and v[0] == "split"]
+    ed = SEDEditor(sed)
+    out = []
+    for half in halves:
+        n1 = half[1]
+        chain = []
+        u = n1
+        for colour in colours(ed.types[n1]):
+            chain.append(u := ed.insert_identity(
+                next(f for f in ed.graph.edges(u, keys=True) if f[1] == half), colour))
+        out.append((n1, half, chain))
+    return ed, out
+
+
+def bell_prep_gadgets(sed: SEDiagram) -> tuple[SEDiagram, set[Node]]:
+    """Replace each edge between the halves of a split generator by a
+    matter-photon Bell-prep chain
 
         n1 -- m1 -- f1 == f2 -- m2 -- n2
 
@@ -94,73 +113,20 @@ def bell_prep_gadgets(sed: SEDiagram) -> tuple[SEDiagram, set[Node], dict[frozen
     between the photons. Against an X-spider half the interface is a CX;
     against a Z-spider half the chain is dualised, so it is a CZ.
 
-    Returns the SED, the gadget spiders (resource-state qubits) and the
-    fusions.
+    Returns the SED and the gadget spiders (resource-state qubits).
     """
-    graph_nodes: set[Node] = set()
-    fusions: dict[frozenset, str] = {}
-    halves = [v for v in sed.types if isinstance(v, tuple) and v[0] == "split"]
-    ed = SEDEditor(sed)
-    for half in halves:
-        n1 = half[1]
-        c = ed.types[n1]
-        # Identity spiders n1 - a - b - b' - a' - n2, colours chosen so that
-        # after dualising them for a Z half they read Z X X Z.
-        colours = ["Z", "X", "X", "Z"] if c is NodeType.X else ["X", "Z", "Z", "X"]
-        chain = []
-        u, w = n1, half
-        for colour in colours:
-            s = ed.insert_identity(next(f for f in ed.graph.edges(u, keys=True) if f[1] == w), colour)
-            chain.append(s)
-            u = s
-        if c is NodeType.Z:
+    # Colours chosen so that after dualising them for a Z half they read Z X X Z.
+    ed, chains = _gadget_chains(
+        sed, lambda c: ["Z", "X", "X", "Z"] if c is NodeType.X else ["X", "Z", "Z", "X"])
+    for n1, _, chain in chains:
+        if ed.types[n1] is NodeType.Z:
             ed.dualise(chain)
-        m1, f1, f2, m2 = chain
-        graph_nodes |= set(chain)
-        fusions[frozenset((f1, f2))] = "fusion"
-    return ed.freeze(), graph_nodes, fusions
+    return ed.freeze(), {v for _, _, chain in chains for v in chain}
 
 
-def _bell_prep_fusion(distance: int, n_cycles: int, merge_type: str, observable: str,
-                      add_noiseless_rounds: bool, zigzag: bool,
-                      schedule: Schedule | None) -> SEDBuild:
-    """Two units joined by Bell pairs made from matter-photon emissions and
-    a photon fusion (``experiments.build_surgery_bell_prep_fusion``).
-
-    The zigzag seam is ``zigzag_interface`` with phase 1, which keeps full
-    distance in both sectors with the default schedule, as the previous
-    pipeline's zigzag did (phase 0 loses one in the X sector at d = 3)."""
-    _check(merge_type, observable)
-    s = two_patch_surgery(distance, merge_type,
-                          layers=surgery_layers(n_cycles, add_noiseless_rounds))
-    iface = zigzag_interface(distance, 1) if zigzag else straight_interface(distance)
-    sed, region, fusions = bell_prep_gadgets(s.split_seam(iface))
-    real = RealisedSED.circuit_based(sed, links="fusion")
-    real.graph_region = region
-    return _finish(s, real, observable, schedule)
-
-
-def build_surgery_bell_prep_fusion(distance: int, n_cycles: int, merge_type: str = "ZZ",
-                                   observable: str = "ZZ", add_noiseless_rounds: bool = False,
-                                   schedule: Schedule | None = None) -> SEDBuild:
-    """Bell-pair surgery (``_bell_prep_fusion``) across a straight seam."""
-    return _bell_prep_fusion(distance, n_cycles, merge_type, observable, add_noiseless_rounds,
-                             False, schedule)
-
-
-def build_surgery_bell_prep_fusion_zigzag(distance: int, n_cycles: int, merge_type: str = "ZZ",
-                                          observable: str = "ZZ",
-                                          add_noiseless_rounds: bool = False,
-                                          schedule: Schedule | None = None) -> SEDBuild:
-    """Bell-pair surgery (``_bell_prep_fusion``) across a zigzag seam."""
-    return _bell_prep_fusion(distance, n_cycles, merge_type, observable, add_noiseless_rounds,
-                             True, schedule)
-
-
-def resource_pair_gadgets(sed: SEDiagram) -> tuple[SEDiagram, set[Node], dict[frozenset, str]]:
-    """Replace each edge between the halves of a split generator (``split``
-    nodes from ``Surgery.split_seam``) by two two-qubit resource states and
-    three fusions
+def resource_pair_gadgets(sed: SEDiagram) -> tuple[SEDiagram, set[Node]]:
+    """Replace each edge between the halves of a split generator by two
+    two-qubit resource states and three fusions
 
         n1 == g1 -- g2 == g3 -- g4 == n2
 
@@ -169,67 +135,72 @@ def resource_pair_gadgets(sed: SEDiagram) -> tuple[SEDiagram, set[Node], dict[fr
     ``(g1, g2)``, ``(g3, g4)`` is a Bell pair made with a CX, and every
     fusion is between like colours (``XX``/``ZZ``).
 
-    Returns the SED, the gadget spiders (resource-state qubits) and the
-    fusions.
+    Returns the SED and the gadget spiders (resource-state qubits).
     """
-    graph_nodes: set[Node] = set()
-    fusions: dict[frozenset, str] = {}
-    halves = [v for v in sed.types if isinstance(v, tuple) and v[0] == "split"]
-    ed = SEDEditor(sed)
-    for half in halves:
-        n1 = half[1]
-        c = ed.types[n1].value
-        other = "X" if c == "Z" else "Z"
-        chain = []
-        u, w = n1, half
-        for colour in (c, other, other, c):
-            s = ed.insert_identity(next(f for f in ed.graph.edges(u, keys=True) if f[1] == w), colour)
-            chain.append(s)
-            u = s
-        g1, g2, g3, g4 = chain
-        graph_nodes |= set(chain)
-        for a, b in ((n1, g1), (g2, g3), (g4, half)):
-            fusions[frozenset((a, b))] = "fusion"
-    return ed.freeze(), graph_nodes, fusions
+    other = {NodeType.Z: "X", NodeType.X: "Z"}
+    ed, chains = _gadget_chains(sed, lambda c: (c.value, other[c], other[c], c.value))
+    return ed.freeze(), {v for _, _, chain in chains for v in chain}
 
 
-def _bell_meas_fusion(distance: int, n_cycles: int, merge_type: str, observable: str,
-                      add_noiseless_rounds: bool, zigzag: bool,
-                      schedule: Schedule | None) -> SEDBuild:
-    """Two units joined, across each split generator, by two Bell-pair
-    resource states and three fusions (``resource_pair_gadgets``; the
-    previous pipeline's ``experiments.build_surgery_fusion_resource_split``).
-
-    The zigzag seam is ``zigzag_interface`` with phase 0, which keeps full
-    distance in both sectors, as the previous pipeline's did; phase 1 loses
-    the X sector (ceil(d/2)), the reverse of ``_bell_prep_fusion``, whose
-    gadget meets Z halves with a CZ. The straight seam has distance
-    ceil(d/2) in the X sector, as before."""
+def _seam_gadget_surgery(distance: int, n_cycles: int, merge_type: str, observable: str,
+                         add_noiseless_rounds: bool, gadgets, zigzag_phase: int | None,
+                         schedule: Schedule | None) -> SEDBuild:
+    """Two units joined across each split generator by ``gadgets`` (e.g.
+    ``bell_prep_gadgets``); the seam is ``zigzag_interface`` with
+    ``zigzag_phase``, or straight if ``None``."""
     _check(merge_type, observable)
     s = two_patch_surgery(distance, merge_type,
                           layers=surgery_layers(n_cycles, add_noiseless_rounds))
-    iface = zigzag_interface(distance, 0) if zigzag else straight_interface(distance)
-    sed, region, fusions = resource_pair_gadgets(s.split_seam(iface))
+    iface = (straight_interface(distance) if zigzag_phase is None
+             else zigzag_interface(distance, zigzag_phase))
+    sed, region = gadgets(s.split_seam(iface))
     real = RealisedSED.circuit_based(sed, links="fusion")
     real.graph_region = region
     return _finish(s, real, observable, schedule)
 
 
+def build_surgery_bell_prep_fusion(distance: int, n_cycles: int, merge_type: str = "ZZ",
+                                   observable: str = "ZZ", add_noiseless_rounds: bool = False,
+                                   schedule: Schedule | None = None) -> SEDBuild:
+    """Two units joined by Bell pairs made from matter-photon emissions and
+    a photon fusion (``bell_prep_gadgets``; the previous pipeline's
+    ``experiments.build_surgery_bell_prep_fusion``), across a straight seam."""
+    return _seam_gadget_surgery(distance, n_cycles, merge_type, observable, add_noiseless_rounds,
+                                bell_prep_gadgets, None, schedule)
+
+
+def build_surgery_bell_prep_fusion_zigzag(distance: int, n_cycles: int, merge_type: str = "ZZ",
+                                          observable: str = "ZZ",
+                                          add_noiseless_rounds: bool = False,
+                                          schedule: Schedule | None = None) -> SEDBuild:
+    """``build_surgery_bell_prep_fusion`` across a zigzag seam of phase 1, which
+    keeps full distance in both sectors with the default schedule, as the
+    previous pipeline's zigzag did (phase 0 loses one in the X sector at d = 3)."""
+    return _seam_gadget_surgery(distance, n_cycles, merge_type, observable, add_noiseless_rounds,
+                                bell_prep_gadgets, 1, schedule)
+
+
 def build_surgery_bell_meas_fusion(distance: int, n_cycles: int, merge_type: str = "ZZ",
                                    observable: str = "ZZ", add_noiseless_rounds: bool = False,
                                    schedule: Schedule | None = None) -> SEDBuild:
-    """Resource-pair surgery (``_bell_meas_fusion``) across a straight seam."""
-    return _bell_meas_fusion(distance, n_cycles, merge_type, observable, add_noiseless_rounds,
-                             False, schedule)
+    """Two units joined, across each split generator, by two Bell-pair
+    resource states and three fusions (``resource_pair_gadgets``; the previous
+    pipeline's ``experiments.build_surgery_fusion_resource_split``), across a
+    straight seam. That has distance ceil(d/2) in the X sector, as before."""
+    return _seam_gadget_surgery(distance, n_cycles, merge_type, observable, add_noiseless_rounds,
+                                resource_pair_gadgets, None, schedule)
 
 
 def build_surgery_bell_meas_fusion_zigzag(distance: int, n_cycles: int, merge_type: str = "ZZ",
                                           observable: str = "ZZ",
                                           add_noiseless_rounds: bool = False,
                                           schedule: Schedule | None = None) -> SEDBuild:
-    """Resource-pair surgery (``_bell_meas_fusion``) across a zigzag seam."""
-    return _bell_meas_fusion(distance, n_cycles, merge_type, observable, add_noiseless_rounds,
-                             True, schedule)
+    """``build_surgery_bell_meas_fusion`` across a zigzag seam of phase 0, which
+    keeps full distance in both sectors, as the previous pipeline's did; phase
+    1 loses the X sector (ceil(d/2)), the reverse of the Bell-prep gadget,
+    which meets Z halves with a CZ."""
+    return _seam_gadget_surgery(distance, n_cycles, merge_type, observable, add_noiseless_rounds,
+                                resource_pair_gadgets, 0, schedule)
 
 
 def _hybrid_linear(distance: int, n_cycles: int, merge_type: str, observable: str,

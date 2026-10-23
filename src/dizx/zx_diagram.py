@@ -344,11 +344,6 @@ class PauliWeb:
         lit = np.isin(legs, self.idx) | np.isin(legs + self.diagram.n_edges, self.idx)
         return [outs[k] for k in np.flatnonzero(lit)]
 
-    def outcome_parity(self, m: Mapping[Hashable, int]) -> int:
-        """mu(w) given outcomes ``m`` keyed by Outcome label."""
-        phases = self.diagram.phases
-        return sum(m[p.label] for c in self.outcomes() if isinstance(p := phases[c], Outcome)) % 2
-
     # -- algebra ------------------------------------------------------------
 
     def __add__(self, other: PauliWeb) -> PauliWeb:
@@ -453,7 +448,6 @@ class SEDiagram(ZXDiagram):
         self.positions = dict(positions or {})
         # Closed port -> the spider now ending its wire (see close_ports).
         self.closed: dict[Node, Node] = {p: v for p, v in (closed or {}).items() if v in self.types}
-        self.repetition: Repetition | None = None
         self.detectors = self._adopt_all(detectors)
         self.stabilisers = self._adopt_all(stabilisers)
         self.co_stabilisers = self._adopt_all(co_stabilisers)
@@ -463,15 +457,6 @@ class SEDiagram(ZXDiagram):
         self.carried: list[int] = sorted(carried)
         if check == "full":
             self._check_webs()
-
-    @classmethod
-    def from_diagram(cls, diagram: ZXDiagram, **kwargs) -> SEDiagram:
-        """Wrap a phase-free diagram; ``kwargs`` are the web lists and ``positions``."""
-        if any(a != 0 for a in diagram.phases.values()):
-            raise ValueError("an SED must be phase-free")
-        if isinstance(diagram, SEDiagram):
-            kwargs.setdefault("positions", diagram.positions)
-        return cls(diagram.graph, diagram.types, diagram.inputs, diagram.outputs, **kwargs)
 
     @classmethod
     def from_code(
@@ -503,55 +488,29 @@ class SEDiagram(ZXDiagram):
         (filed with the logicals: their class is ``S -> S``).
 
         Nodes, webs and positions are as described in ``_from_code_unrolled``
-        (which builds the same diagram directly). For full rounds only, the
-        result records its periodic structure in ``repetition``: the body, and
-        for each round the map from body nodes to nodes of the composite.
+        (which builds the same diagram directly).
         """
         if first not in ("Z", "X") or last not in ("Z", "X"):
             raise ValueError("first and last must be 'Z' or 'X'")
-        if (first, last) != ("Z", "X"):
-            plan = (["X"] if first == "X" else []) + ["ZX"] * rounds + (["Z"] if last == "Z" else [])
-            if not plan:
-                raise ValueError("no layers")
-            bodies = {lv: cls._from_code_unrolled(code, 1, qubit_positions, levels=lv) for lv in set(plan)}
-            sed = None
-            z = 2.0 * first_round + (first == "X") if z0 is None else float(z0)
-            for k, lv in enumerate(plan):
-                r = first_round + k
-                # A body's Z layer is at height 0 and its X layer at 1.
-                dz = z - (1.0 if lv == "X" else 0.0)
-                part = relabel(bodies[lv], lambda v, r=r: _shift_round(v, r), shift=(0.0, 0.0, dz))
-                sed = part if sed is None else compose(sed, part, check="none")[0]
-                z += len(lv)
-            for p in sed.inputs + sed.outputs:  # ports one unit beyond their wire's end
-                (n,) = sed.graph.neighbors(p)
-                x, y, zn = sed.positions[n]
-                sed.positions[p] = (sed.positions[p][0], sed.positions[p][1],
-                                    zn - 1.0 if p in sed.inputs else zn + 1.0)
-            sed._check_webs()
-            return sed
-        if rounds < 1:
-            raise ValueError("rounds must be at least 1")
-        body = cls._from_code_unrolled(code, 1, qubit_positions)
-
-        dz = 0.0 if z0 is None else float(z0) - 2.0 * first_round
-
-        def round_r(r: int) -> SEDiagram:
-            r += first_round
-            return relabel(body, lambda v: _shift_round(v, r), shift=(0.0, 0.0, 2.0 * r + dz))
-
-        sed, renames = round_r(0), [{}]
-        for r in range(1, rounds):
-            sed, rename = compose(sed, round_r(r), check="none")
-            renames.append(rename)
+        plan = (["X"] if first == "X" else []) + ["ZX"] * rounds + (["Z"] if last == "Z" else [])
+        if not plan:
+            raise ValueError("no layers")
+        bodies = {lv: cls._from_code_unrolled(code, 1, qubit_positions, levels=lv) for lv in set(plan)}
+        sed = None
+        z = 2.0 * first_round + (first == "X") if z0 is None else float(z0)
+        for k, lv in enumerate(plan):
+            r = first_round + k
+            # A body's Z layer is at height 0 and its X layer at 1.
+            dz = z - (1.0 if lv == "X" else 0.0)
+            part = relabel(bodies[lv], lambda v, r=r: _shift_round(v, r), shift=(0.0, 0.0, dz))
+            sed = part if sed is None else compose(sed, part, check="none")[0]
+            z += len(lv)
+        for p in sed.inputs + sed.outputs if sed.positions else ():
+            # Ports one unit beyond their wire's end.
+            (n,) = sed.graph.neighbors(p)
+            zn = sed.positions[n][2]
+            sed.positions[p] = (*sed.positions[p][:2], zn - 1.0 if p in sed.inputs else zn + 1.0)
         sed._check_webs()
-        spiders = [v for v, t in body.types.items() if t in SPIDERS]
-        # A node fused into an earlier round keeps that round's label.
-        copies = []
-        for r in range(rounds):
-            label = {v: _shift_round(v, first_round + r) for v in spiders}
-            copies.append({v: renames[r].get(u, u) for v, u in label.items()})
-        sed.repetition = Repetition(body, copies)
         return sed
 
     @classmethod
@@ -754,18 +713,6 @@ class SEDiagram(ZXDiagram):
     def draw(self, web: PauliWeb | None = None, ax=None, title: str | None = None):
         """Draw the diagram in 3D at ``self.positions``; see ``draw_diagram``."""
         return draw_diagram(self, self.positions, web, ax, title)
-
-
-@dataclass
-class Repetition:
-    """Periodic structure of an SED built as ``B ; B ; ... ; B``.
-
-    ``copies[r]`` maps each spider of ``body`` to the node it became in copy
-    ``r``. Several body spiders of different copies may map to one node when
-    neighbouring same-colour spiders were fused across copies.
-    """
-    body: SEDiagram
-    copies: list[dict[Node, Node]]
 
 
 def _shift_round(v: Node, r: int) -> Node:

@@ -8,9 +8,10 @@ from dizx.realisation import QECExperiment, RealisedSED, interactions, resource_
 from dizx.schedules import RotatedSurfaceCodeSchedule
 from dizx.surgery import surgery_hybrid_linear, two_patch_surgery
 from dizx.transformations import (
-    cut_edges, has_matching_boundary, loop_boundary, prepare_cluster_region,
+    cut_edges, loop_boundary, prepare_cluster_region,
 )
-from dizx.zx_diagram import NodeType, SEDiagram
+from dizx.zx_diagram import SPIDERS, NodeType, SEDiagram
+from helpers import has_matching_boundary
 
 
 def distance(c: stim.Circuit, p: float = 1e-3) -> int:
@@ -58,9 +59,11 @@ def test_hybrid_memory():
     real = RealisedSED.hybrid(hsed, S2)
     assert {link.kind for link in real.links} == {"fusion"}
     assert {link.ops for link in real.links} == {("XX", "ZZ"), ("XZ", "ZX")}
+    # Every clusterised Z spider is a world-line of its own.
     for v in S2:
         if real.types[v] is NodeType.Z:
-            assert real.is_singleton(real.worldline_of(v))
+            (path,) = (p for p in real.worldlines if v in p)
+            assert [u for u in path if real.types[u] in SPIDERS] == [v]
     exp = QECExperiment.memory(real)
     c = to_stim(exp, RotatedSurfaceCodeSchedule(code))
     check(c)

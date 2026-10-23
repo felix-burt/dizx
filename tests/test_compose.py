@@ -35,26 +35,6 @@ def test_composed_matches_direct(code, rounds):
             assert np.allclose(composed.positions[v], pos), v
 
 
-def test_repetition_record():
-    sed = SEDiagram.from_code(rotated_surface_code(3), 3)
-    rep = sed.repetition
-    assert len(rep.copies) == 3
-    for r, copy in enumerate(rep.copies):
-        for v, u in copy.items():
-            assert u == (v[0], r, *v[2:])
-    # Every spider of the composite is the image of exactly one body spider.
-    images = [u for copy in rep.copies for u in copy.values()]
-    assert sorted(map(repr, images)) == sorted(repr(v) for v, t in sed.types.items() if t.value in "ZX")
-
-
-def test_repetition_record_with_fusion():
-    # Repetition-code data spiders fuse across rounds: every copy maps to round 0.
-    rep = SEDiagram.from_code(REP, 3).repetition
-    for copy in rep.copies:
-        for q in range(3):
-            assert copy[("data", 0, "Z", q)] == ("data", 0, "Z", q)
-
-
 def test_compose_without_fusion():
     body = SEDiagram._from_code_unrolled(REP, 1)
     two, rename = compose(body, relabel(body, lambda v: ("b", v)), fuse=False)

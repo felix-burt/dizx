@@ -404,12 +404,6 @@ class RealisedSED(ZXDiagram):
     def webs(self) -> list[PauliWeb]:
         return self.detectors + self.stabilisers + self.co_stabilisers + self.logicals
 
-    def worldline_of(self, v: Node) -> tuple[Node, ...] | None:
-        return next((p for p in self.worldlines if v in p), None)
-
-    def is_singleton(self, path: Sequence[Node]) -> bool:
-        return sum(self.types[v] in SPIDERS for v in path) == 1
-
     def record(self, w: PauliWeb) -> set[Hashable]:
         """Outcome labels whose parity is ``mu(w)``: a parity check for a
         detector, the sign of a stabiliser or logical. Includes fusion outcomes."""

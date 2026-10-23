@@ -656,17 +656,11 @@ class SEDEditor:
 # Each takes an SED and returns a new one (one editor session); to apply many
 # rules, use an SEDEditor directly.
 
-def duality(sed: SEDiagram, v: Node) -> SEDiagram:
-    """D_v: swap the colour of spider v and put an H node on each of its legs.
-
-    The H-neighbour edge keeps the old label; the v-H edge has x and z swapped.
-    """
-    return dualise(sed, [v])
-
-
 def dualise(sed: SEDiagram, nodes: Iterable[Node]) -> SEDiagram:
-    """Apply D_v to every spider in ``nodes`` at once, cancelling the H pair
-    that would appear on an edge between two of them (that edge just has its
+    """Apply D_v to every spider in ``nodes`` at once. D_v swaps the colour of
+    spider v and puts an H node on each of its legs: the H-neighbour edge keeps
+    the old label, the v-H edge has x and z swapped. The H pair that would
+    appear on an edge between two of the nodes cancels (that edge just has its
     label's x and z swapped)."""
     ed = SEDEditor(sed)
     ed.dualise(nodes)
@@ -836,10 +830,7 @@ def cut_nodes(sed: SEDiagram | SEDEditor, S: Iterable[Node]) -> set[Node]:
     return {u if u in S else v for u, v, _ in cut_edges(sed, S)}
 
 
-def has_matching_boundary(sed: SEDiagram | SEDEditor, S: Iterable[Node]) -> bool:
-    """Whether dE(S) is a matching: no two cut edges share an endpoint."""
-    ends = [x for u, v, _ in cut_edges(sed, S) for x in (u, v)]
-    return len(ends) == len(set(ends))
+
 
 
 def split_boundary(sed: SEDiagram, S: Iterable[Node]) -> SEDiagram:

@@ -21,7 +21,6 @@ def test_circuit_based_rotated_surface_code(d, rounds):
     assert all(v[0] != "gen" for p in data for v in p)
     singles = [p for p in real.worldlines if len(p) == 1]
     assert {p[0] for p in singles} == set(real.classical) == {v for v in sed.types if v[0] == "gen"}
-    assert all(real.is_singleton(p) for p in singles)
 
     # Webs carry over with the same classes and boundaries.
     for a, b in zip(sed.webs, real.webs):
@@ -37,14 +36,6 @@ def test_circuit_based_rotated_surface_code(d, rounds):
         assert real.record(cs) == {("gen", 0, i)}
     # Logicals pass generators in the non-matching colour only: no outcomes.
     assert all(real.record(w) == set() for w in real.logicals)
-
-
-def test_detector_parity():
-    real = RealisedSED.circuit_based(SEDiagram.from_code(REP, 2))
-    (det,) = real.detectors
-    a, b = ("gen", 0, 0), ("gen", 1, 0)
-    assert det.outcome_parity({a: 1, b: 1}) == 0
-    assert det.outcome_parity({a: 1, b: 0}) == 1
 
 
 def test_classical_outputs_added():

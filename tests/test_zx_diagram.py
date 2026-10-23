@@ -129,8 +129,6 @@ def test_repetition_code_detector():
     assert det.is_valid(), det.violations()
     assert det.kind() is WebKind.DETECTOR
     assert set(det.outcomes()) == {"c0", "c1"}
-    assert det.outcome_parity({0: 1, 1: 1}) == 0
-    assert det.outcome_parity({0: 1, 1: 0}) == 1
     (only,) = d.detector_space()
     assert only == det
 
@@ -151,9 +149,9 @@ def gens_touched(w):
             if g[0] == "gen" and all(w.pauli(i) in own[t] for i in d.legs(g))}
 
 
-def test_se_diagram_is_phase_free():
-    with pytest.raises(ValueError, match="phase-free"):
-        SEDiagram.from_diagram(measured_repetition_code())
+def rewrap(se, **webs):
+    """``se``'s diagram as a new SED with only the given webs."""
+    return SEDiagram(se.graph, se.types, se.inputs, se.outputs, **webs)
 
 
 def test_se_diagram_classes():
@@ -168,7 +166,7 @@ def test_se_diagram_classes():
 
 def test_se_diagram_adopts_webs_from_other_diagram():
     se = SEDiagram.from_code(REP, 2)
-    copy = SEDiagram.from_diagram(se, detectors=se.detectors)
+    copy = rewrap(se, detectors=se.detectors)
     assert copy.detectors[0].diagram is copy
     assert copy.detectors[0].support() == se.detectors[0].support()
 
@@ -176,24 +174,24 @@ def test_se_diagram_adopts_webs_from_other_diagram():
 def test_se_diagram_rejects_wrong_class():
     se = SEDiagram.from_code(REP, 2)
     with pytest.raises(ValueError, match="detector 0 is a stabiliser"):
-        SEDiagram.from_diagram(se, detectors=se.stabilisers)
+        rewrap(se, detectors=se.stabilisers)
 
 
 def test_se_diagram_rejects_invalid_web():
     se = SEDiagram.from_code(REP, 2)
     with pytest.raises(ValueError, match="invalid"):
-        SEDiagram.from_diagram(se, detectors=[{se.edges[0]: "Z"}])
+        rewrap(se, detectors=[{se.edges[0]: "Z"}])
 
 
 def test_se_diagram_rejects_dependent_webs():
     se = SEDiagram.from_code(REP, 2)
     with pytest.raises(ValueError, match="independent"):
-        SEDiagram.from_diagram(se, logicals=[se.logicals[0]] * 2)
+        rewrap(se, logicals=[se.logicals[0]] * 2)
 
 
 def test_se_diagram_incomplete_detectors():
     se = SEDiagram.from_code(REP, 2)
-    assert not SEDiagram.from_diagram(se).detectors_complete()
+    assert not rewrap(se).detectors_complete()
 
 
 # -- SEDiagram.from_code -----------------------------------------------------

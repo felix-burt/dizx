@@ -10,12 +10,12 @@ code keeps the slots of its missing corners, so it stays in step with the bulk.
 from __future__ import annotations
 
 from abc import ABC, abstractmethod
-from typing import Iterable, Mapping, Sequence
+from typing import Mapping, Sequence
 
 import numpy as np
 
 from dizx.code import Code, Qubit
-from dizx.zx_diagram import Edge, Node, NodeType, ZXDiagram
+from dizx.zx_diagram import Node, NodeType
 
 Point = Sequence[float]
 
@@ -106,52 +106,3 @@ class RotatedSurfaceCodeSchedule(Schedule):
         if len(set(out.values())) != len(out):
             raise ValueError(f"two neighbours of {gen!r} share a corner")
         return out
-
-
-# ---------------------------------------------------------------------------
-# Assignment
-# ---------------------------------------------------------------------------
-
-def generator_legs(diagram: ZXDiagram, gen: Node) -> list[Edge]:
-    """Legs of ``gen`` as ``(gen, v, key)``, excluding its classical output."""
-    outputs = set(diagram.classical_outputs())
-    return [e for e in diagram.graph.edges(gen, keys=True) if e[1] not in outputs]
-
-
-def assign_slots(
-    diagram: ZXDiagram,
-    schedule: Schedule,
-    generators: Iterable[Node],
-    positions: Mapping[Node, Point] | None = None,
-    layer: int = 0,
-) -> dict[Edge, int]:
-    """Slot of every leg ``(gen, v, key)`` of each generator spider."""
-    positions = positions if positions is not None else getattr(diagram, "positions", {})
-    out: dict[Edge, int] = {}
-    for g in generators:
-        legs = generator_legs(diagram, g)
-        nbs = [v for _, v, _ in legs]
-        if len(set(nbs)) != len(nbs):
-            raise ValueError(f"{g!r} has parallel legs; schedules assign one slot per neighbour")
-        slots = schedule.slots(g, nbs, positions, diagram.types[g], layer)
-        if len(set(slots.values())) != len(slots):
-            raise ValueError(f"schedule gives two legs of {g!r} the same slot")
-        if not all(0 <= k < schedule.n_slots for k in slots.values()):
-            raise ValueError(f"schedule slot out of range for {g!r}")
-        out.update({e: slots[e[1]] for e in legs})
-    return out
-
-
-def conflicts(slots: Mapping[Edge, int], groups: Iterable[Iterable[Node]]) -> list[tuple[Node, int]]:
-    """``(qubit node, slot)`` pairs used by more than one gate within a group
-    of generators executed together (e.g. one layer)."""
-    bad = []
-    for group in groups:
-        group = set(group)
-        seen: set[tuple[Node, int]] = set()
-        for (g, v, _), k in slots.items():
-            if g in group:
-                if (v, k) in seen:
-                    bad.append((v, k))
-                seen.add((v, k))
-    return bad

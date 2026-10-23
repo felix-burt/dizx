@@ -5,10 +5,11 @@ import pytest
 from dizx.code import rotated_surface_code
 import dizx.transformations as T
 from dizx.transformations import (
-    add_parallel_edge, cancel_hadamards, cut_nodes, duality, fuse, has_matching_boundary, insert_identity,
+    add_parallel_edge, cancel_hadamards, cut_nodes, dualise, fuse, insert_identity,
     loop_edge, loop_generator, remove_identity, split, split_boundary,
 )
 from dizx.zx_diagram import NodeType, SEDiagram, ZXDiagram
+from helpers import has_matching_boundary
 
 
 @pytest.fixture
@@ -40,14 +41,14 @@ GEN = next(v for v in SEDiagram.from_code(rotated_surface_code(3), 2).graph.neig
 
 @pytest.mark.parametrize("v", [GEN, DATA, ("data", 1, "X", (1, 1))])
 def test_duality(sed, v):
-    new = duality(sed, v)
+    new = dualise(sed, [v])
     assert new.types[v] is not sed.types[v]
     assert sum(t is NodeType.H for t in new.types.values()) == sed.graph.degree(v)
     assert_preserved(sed, new)
 
 
 def test_duality_twice_then_cancel_restores(sed):
-    new = duality(duality(sed, GEN), GEN)
+    new = dualise(dualise(sed, [GEN]), [GEN])
     for h in list(new.graph.neighbors(GEN)):  # inner H of each H-H pair
         (h2,) = [x for x in new.graph.neighbors(h) if x != GEN]
         new = cancel_hadamards(new, h, h2)
@@ -101,7 +102,7 @@ def test_split_boundary_gives_matching_boundary(sed):
 
 def test_rules_reject_bad_targets(sed):
     with pytest.raises(ValueError, match="not a spider"):
-        duality(sed, ("in", (0, 0)))
+        dualise(sed, [("in", (0, 0))])
     with pytest.raises(ValueError, match="legs"):
         split(sed, GEN, [(("in", (0, 0)), DATA, 0)])
     with pytest.raises(ValueError, match="exactly one edge"):
@@ -175,7 +176,7 @@ def test_loop_edge_plain(sed):
 def test_loop_edge_through_hadamard(sed):
     g = weight4_generator(sed)
     legs = list(sed.graph.edges(g, keys=True))
-    s1 = duality(split(sed, g, legs[:2]), ("split", g))  # g -H- ("split", g)
+    s1 = dualise(split(sed, g, legs[:2]), [("split", g)])  # g -H- ("split", g)
     h = ("split", g)
     assert s1.types[g] is not s1.types[h]
     s2 = loop_edge(s1, g, h)
@@ -274,7 +275,7 @@ def test_loop_generator_layout(sed):
 def test_loop_edge_is_a_rectangle(sed):
     g = weight4_generator(sed)
     legs = list(sed.graph.edges(g, keys=True))
-    s1 = duality(split(sed, g, legs[:2]), ("split", g))
+    s1 = dualise(split(sed, g, legs[:2]), [("split", g)])
     h = ("split", g)
     out = loop_edge(s1, g, h)
     P = {v: np.asarray(p, float) for v, p in out.positions.items()}

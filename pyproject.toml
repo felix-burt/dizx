@@ -1,0 +1,33 @@
+[project]
+name = "dizx"
+version = "0.1.0"
+description = "Distributed quantum error correction from syndrome extraction ZX diagrams"
+requires-python = ">=3.12,<3.13"
+dependencies = [
+    "stim>=1.15",
+    "sinter>=1.15.0,<2.0.0",
+    "numpy",
+    "networkx",
+    "matplotlib",
+    "pyyaml>=6.0,<7.0",
+    "scipy",
+    # Stock pymatching works; the edge-reweighting fork
+    # (github.com/felix-burt/PyMatching) makes the heralded decoder much faster
+    # (see dizx.sinter_decoders.SUPPORTS_EDGE_REWEIGHTS).
+    "pymatching>=2.2",
+]
+
+[dependency-groups]
+dev = [
+    "pytest>=8",
+    "ipykernel",
+    "nbconvert>=7.17.2,<8.0.0",
+    "ipympl (>=0.10.0,<0.11.0)",
+]
+
+[tool.poetry]
+packages = [{ include = "dizx", from = "src" }]
+
+[build-system]
+requires = ["poetry-core>=2.0"]
+build-backend = "poetry.core.masonry.api"

@@ -106,3 +106,40 @@ class RotatedSurfaceCodeSchedule(Schedule):
         if len(set(out.values())) != len(out):
             raise ValueError(f"two neighbours of {gen!r} share a corner")
         return out
+
+
+class UnrotatedSurfaceCodeSchedule(Schedule):
+    """Hook-safe orders for an unrotated surface code, in any orientation.
+
+    Slot ``k`` is the gate to the data qubit in direction ``orders[type][k]``
+    from the generator (the sign of the larger of the x and y offsets);
+    missing neighbours of weight-3 generators leave their slots empty.
+
+    Every order ends on one horizontal and one vertical neighbour, so a hook
+    error is a diagonal pair. A minimum-weight logical runs straight along
+    one of the axes and gains nothing from it, so the orders need not depend
+    on the boundaries: E N S W for X-type generators and E S N W for Z-type
+    ones.
+    """
+
+    X_ORDER = [(1, 0), (0, 1), (0, -1), (-1, 0)]
+    Z_ORDER = [(1, 0), (0, -1), (0, 1), (-1, 0)]
+    n_slots = 4
+
+    def __init__(self, code: Code | None = None) -> None:
+        # X-type generators are Z spiders and vice versa.
+        self.orders = {NodeType.Z: self.X_ORDER, NodeType.X: self.Z_ORDER}
+
+    def slots(self, gen, neighbours, positions, gen_type, layer=0):
+        g = np.asarray(positions[gen][:2], dtype=float)
+        order = self.orders[gen_type]
+        out = {}
+        for v in neighbours:
+            dx, dy = np.asarray(positions[v][:2], dtype=float) - g
+            step = (int(np.sign(dx)), 0) if abs(dx) > abs(dy) else (0, int(np.sign(dy)))
+            if np.isclose(abs(dx), abs(dy)):
+                raise ValueError(f"neighbour {v!r} of {gen!r} is not on an axis")
+            out[v] = order.index(step)
+        if len(set(out.values())) != len(out):
+            raise ValueError(f"two neighbours of {gen!r} share a direction")
+        return out

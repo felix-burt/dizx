@@ -21,21 +21,23 @@ the preparation or measurement basis.
 
 Every operation carries a JSON tag in the format of the previous synthesiser
 (see ``noise_models.apply_tagged_noise_model``): ``type`` is ``"circuit"`` or
-``"graph"`` (spiders of ``realised.graph_region``), or ``"circuit-graph"`` for
+``"graph"`` (spiders of ``exp.graph_region``), or ``"circuit-graph"`` for
 a fusion between the two; ``operation`` is ``reset``, ``single_qubit_gate``,
 ``two_qubit_gate``, ``single_qubit_measurement``, ``fusion_gate``,
 ``fusion_measurement``, ``bell_prep_reset``, ``bell_prep_two_qubit``,
 ``state_prep`` (an ``I`` on each resource-state qubit before its readout) or
 ``idle`` (an ``I`` on each live data qubit after each layer); ``qubit_type`` is ``data``/``ancilla`` for circuit qubits and
 ``matter`` (touching a circuit qubit) / ``flying`` for graph qubits; ``t`` is
-the step.
+the layer.
 
 Ordering: spiders sharing a scheduled generator (or any unscheduled gate) form
-a **step**; steps are ordered by the world-lines. Within a step, gates of
-scheduled generators run in ``TICK`` = slot (shifted to avoid clashes), and
-other gates are packed greedily. Qubits are prepared just before their first
-step and measured right after their last, and physical qubits are reused per
-(x, y) position.
+a **step**; steps are ordered by the world-lines. Consecutive steps at one
+height on disjoint world-lines (e.g. the same round on two patches) form a
+**layer**, and run side by side: their preparations, gates and measurements
+share ``TICK``s. Within a step, gates of scheduled generators run in ``TICK`` =
+slot (shifted to avoid clashes), and other gates are packed greedily. Qubits
+are prepared just before their first layer and measured right after their
+last, and physical qubits are reused per (x, y) position.
 """
 from __future__ import annotations
 
@@ -146,7 +148,7 @@ class _Extractor:
                        if self.types[v] is NodeType.X and any(g.hadamards % 2 for g in gs)}
 
         # Roles for tags: graph (resource-state) or circuit world-lines.
-        region = getattr(exp.realised, "graph_region", set())
+        region = exp.graph_region
         self.graph = {i for i, p in enumerate(self.lines) if any(v in region for v in p)}
         touching = {(self.line_of[g.ends[0]], self.line_of[g.ends[1]]) for g in self.gates}
         touching |= {tuple(self.line_of[v] for v in link.interaction.ends) for link in self.links}
@@ -192,7 +194,9 @@ class _Extractor:
 
     # -- steps --------------------------------------------------------------
 
-    def steps(self) -> tuple[list[list[Node]], dict[Node, int]]:
+    def steps(self) -> tuple[list[list[list[Node]]], dict[Node, int]]:
+        """The layers, each a list of steps (blocks of spiders), in order, and
+        the layer of every gated spider."""
         parent: dict[Node, Node] = {}
 
         def find(v: Node) -> Node:
@@ -236,8 +240,21 @@ class _Extractor:
                     heapq.heappush(heap, (key[j], j))
         if len(order) != len(blocks):
             raise ValueError("steps are cyclically ordered by the world-lines; not a circuit")
-        rank = {b: r for r, b in enumerate(order)}
-        return [blocks[i] for i in order], {v: rank[block_of[v]] for v in block_of}
+        # Consecutive steps at one height on disjoint world-lines share a layer.
+        # Any path between two steps runs through a step ordered between them,
+        # so consecutive steps sharing no world-line are independent.
+        layers: list[list[int]] = []
+        used: set[int] = set()
+        for i in order:
+            lines = {self.line_of[v] for v in blocks[i]}
+            if layers and key[i][0] == key[layers[-1][0]][0] and not lines & used:
+                layers[-1].append(i)
+                used |= lines
+            else:
+                layers.append([i])
+                used = lines
+        rank = {b: r for r, layer in enumerate(layers) for b in layer}
+        return [[blocks[i] for i in layer] for layer in layers], {v: rank[block_of[v]] for v in block_of}
 
     def ticks(self, block: list[Node], layers: dict[NodeType, set[float]],
               ) -> tuple[list[list[Interaction]], set[tuple[NodeType, float]]]:
@@ -251,7 +268,7 @@ class _Extractor:
         ancillas: list[Node] = []
         if self.schedule is not None:
             # An ancilla is scheduled on its gates to data qubits. Its gates to
-            # other single-spider qubits (e.g. the matter qubit of a Bell-prep
+            # other single-spider qubits (e.g. the photon of a Bell-prep
             # gadget) are pre-gates, run before the scheduled ones.
             def data_gates(v: Node) -> list[Interaction]:
                 return [g for g in self.gates_at[v]
@@ -318,8 +335,8 @@ class _Extractor:
     # -- emission -----------------------------------------------------------
 
     def run(self) -> stim.Circuit:
-        blocks, step_of = self.steps()
-        n_steps = max(len(blocks), 1)
+        layer_steps, step_of = self.steps()
+        n_steps = max(len(layer_steps), 1)
         first, last = {}, {}
         for i, line in enumerate(self.lines):
             g = self.gated(line)
@@ -482,7 +499,16 @@ class _Extractor:
                     circ.append("TICK")
 
             # -- gates --
-            ticks, scheduled = self.ticks(blocks[s], layers) if s < len(blocks) else ([], set())
+            # The steps of a layer touch disjoint qubits: their k-th ticks run together.
+            ticks: list[list[Interaction]] = []
+            scheduled: set[tuple[NodeType, float]] = set()
+            for block in (layer_steps[s] if s < len(layer_steps) else []):
+                block_ticks, block_scheduled = self.ticks(block, layers)
+                ticks += [[] for _ in range(len(block_ticks) - len(ticks))]
+                for k, tick in enumerate(block_ticks):
+                    ticks[k] += tick
+                scheduled |= block_scheduled
+            ticks = [sorted(tick, key=lambda g: repr(g.ends)) for tick in ticks]
             for t, h in scheduled:
                 layers.setdefault(t, set()).add(h)
             for tick in ticks:
@@ -529,6 +555,15 @@ class _Extractor:
             done = sorted(i for i in ending if i in self.graph)
             if done:
                 emit_tagged("I", [(op_tag(i, "state_prep", s), [phys[i]]) for i in done])
+            if self.fusion_gates and fusions:
+                # CX: XX on qa (MX), ZZ on qb (M). CZ: XZ on qa, ZX on qb (both MX).
+                for link in fusions:
+                    la, lb = (self.line_of[v] for v in link.interaction.ends)
+                    kind = self.pair_kind(la, lb)
+                    circ.append("CZ" if link.ops == ("XZ", "ZX") else "CX", [phys[la], phys[lb]],
+                                tag=_tag(type="circuit-graph" if kind == "mixed" else kind,
+                                         operation="fusion_gate", t=s))
+                circ.append("TICK")
             m, mx = [], []
             for i in sorted(ending, key=lambda i: phys[i]):
                 if i in fusion:
@@ -554,10 +589,7 @@ class _Extractor:
                 kind = self.pair_kind(la, lb)
                 kind = "circuit-graph" if kind == "mixed" else kind
                 if self.fusion_gates:
-                    # CX: XX on qa (MX), ZZ on qb (M). CZ: XZ on qa, ZX on qb (both MX).
                     hadamard = link.ops == ("XZ", "ZX")
-                    circ.append("CZ" if hadamard else "CX", [qa, qb],
-                                tag=_tag(type=kind, operation="fusion_gate", t=s))
                     for q, op, name in ((qa, link.ops[0], "MX"),
                                         (qb, link.ops[1], "MX" if hadamard else "M")):
                         circ.append(name, [q], tag=_tag(type=kind, operation="fusion_measurement",
@@ -580,8 +612,10 @@ class _Extractor:
                     release(self.line_of[v])
 
             # -- one idle marker per live data qubit after each layer --
-            height = min(self.z(v) for v in blocks[s]) if s < len(blocks) else None
-            following = min(self.z(v) for v in blocks[s + 1]) if s + 1 < len(blocks) else None
+            height = (min(self.z(v) for b in layer_steps[s] for v in b)
+                      if s < len(layer_steps) else None)
+            following = (min(self.z(v) for b in layer_steps[s + 1] for v in b)
+                         if s + 1 < len(layer_steps) else None)
             if height is not None and following != height:
                 live = sorted(phys[i] for i in phys
                               if i not in self.graph and self.qubit_type(i) == "data")

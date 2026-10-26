@@ -212,6 +212,64 @@ def rotated_surface_code(
     return Code(stabilisers, qubits, logicals, positions)
 
 
+def unrotated_surface_code(
+    dx: int,
+    dy: int | None = None,
+    rotation: int = 0,
+    origin: tuple[float, float] = (0, 0),
+) -> Code:
+    """Unrotated (planar) surface code with distances ``dx`` and ``dy``.
+
+    Before rotation, the patch is the ``(2 dx - 1) x (2 dy - 1)`` grid of
+    points ``(x, y)``: data qubits where ``x + y`` is even, generators where it
+    is odd, each acting on its (up to four) horizontal and vertical neighbours.
+    A generator is of type X if ``x`` is odd and Z if ``x`` is even, so the
+    weight-3 X generators sit on the top/bottom boundaries and the weight-3 Z
+    ones on the left/right, as for ``rotated_surface_code``. Logical X runs
+    down column 0 (weight ``dy``), logical Z along row 0 (weight ``dx``).
+
+    Each stabiliser is positioned at its generator's point. ``rotation`` and
+    ``origin`` act as for ``rotated_surface_code``; offsets should be even to
+    keep the checkerboard.
+    """
+    dy = dx if dy is None else dy
+    if dx < 2 or dy < 2:
+        raise ValueError("dx and dy must be at least 2")
+    if rotation % 90:
+        raise ValueError("rotation must be a multiple of 90")
+    w, h = 2 * dx - 1, 2 * dy - 1
+    stabilisers, positions = [], []
+    for y in range(h):
+        for x in range(w):
+            if (x + y) % 2 == 0:
+                continue
+            support = [(x + ex, y + ey) for ex, ey in ((1, 0), (0, 1), (-1, 0), (0, -1))
+                       if 0 <= x + ex < w and 0 <= y + ey < h]
+            p = "X" if x % 2 else "Z"
+            stabilisers.append({q: p for q in support})
+            positions.append((x, y))
+    logicals: list[tuple[Pauli, Pauli]] = [
+        ({(0, y): "X" for y in range(0, h, 2)}, {(x, 0): "Z" for x in range(0, w, 2)})
+    ]
+
+    turns = (rotation // 90) % 4
+
+    def place(pt):
+        x, y = pt
+        cw, ch = w, h
+        for _ in range(turns):
+            x, y = ch - 1 - y, x
+            cw, ch = ch, cw
+        return (x + origin[0], y + origin[1])
+
+    qubits = sorted((place((x, y)) for x in range(w) for y in range(h) if (x + y) % 2 == 0),
+                    key=lambda q: (q[1], q[0]))
+    stabilisers = [{place(q): c for q, c in s.items()} for s in stabilisers]
+    logicals = [tuple({place(q): c for q, c in op.items()} for op in pair) for pair in logicals]
+    positions = [place(p) for p in positions]
+    return Code(stabilisers, qubits, logicals, positions)
+
+
 def disjoint_union(*codes: Code) -> Code:
     """Codes on disjoint qubits side by side: stabilisers, logicals and
     positions concatenated."""

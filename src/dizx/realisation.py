@@ -276,26 +276,18 @@ class RealisedSED(ZXDiagram):
     @classmethod
     def measurement_based(cls, sed: SEDiagram) -> RealisedSED:
         """Duality on every X spider makes the diagram graph-like; then every
-        spider is its own world-line and is measured, except spiders next to an
-        output port, whose world-lines continue to that output unmeasured. A
-        spider next to an input port continues the input's world-line."""
+        spider is a resource-state qubit on its own world-line, measured unless
+        it is next to an output port. Ports stay open legs of the resource
+        state, on no world-line; ``QECExperiment`` closes them onto graph
+        qubits."""
         from dizx.transformations import dualise
 
         xs = [v for v, t in sed.types.items() if t is NodeType.X]
         sed = dualise(sed, xs) if xs else sed
-        worldlines, measured = [], []
-        for v, t in sed.types.items():
-            if t is not NodeType.Z:
-                continue
-            path = [v]
-            for port, front in [(p, True) for p in sed.inputs] + [(p, False) for p in sed.outputs]:
-                route = _port_route(sed, port, v)
-                if route is not None:
-                    path = route + path if front else path + route[::-1]
-            if path[-1] == v:
-                measured.append(v)
-            worldlines.append(tuple(path))
-        return cls(sed, measured, worldlines)
+        spiders = [v for v, t in sed.types.items() if t is NodeType.Z]
+        at_output = {_port_spider(sed, p)[1] for p in sed.outputs}
+        return cls(sed, [v for v in spiders if v not in at_output], [(v,) for v in spiders],
+                   graph_region=spiders)
 
     @classmethod
     def hybrid(cls, sed: SEDiagram, S: Iterable[Node],
@@ -476,6 +468,18 @@ def _port_route(sed: SEDiagram, port: Node, v: Node) -> list[Node] | None:
         route.append(cur)
 
 
+def _port_spider(diagram: ZXDiagram, port: Node) -> tuple[list[Node], Node]:
+    """``([port, H nodes...], spider)``: the walk from a port to its spider."""
+    route, prev, cur = [port], None, port
+    while True:
+        (cur, prev), = [(u, cur) for u in diagram.graph.neighbors(cur) if u != prev]
+        if diagram.types[cur] is not NodeType.H:
+            if diagram.types[cur] not in SPIDERS:
+                raise ValueError(f"port {port!r} does not lead to a spider")
+            return route, cur
+        route.append(cur)
+
+
 # ---------------------------------------------------------------------------
 # QECExperiment
 # ---------------------------------------------------------------------------
@@ -503,6 +507,7 @@ def _natural_basis(diagram: ZXDiagram, port: Node) -> Basis:
 Origin = tuple[tuple[str, int], ...]  # ((family, index), ...) of realised-SED webs
 
 _CLOSER = {"Z": NodeType.X, "X": NodeType.Z}  # spider type closing a port in a basis
+_OTHER = {NodeType.Z: NodeType.X, NodeType.X: NodeType.Z}
 FAMILIES = ("detector", "stabiliser", "co-stabiliser", "logical")
 
 
@@ -519,7 +524,13 @@ class QECExperiment(ZXDiagram):
     worldlines : list[tuple[Node, ...]]
         ``realised.worldlines`` with each input port replaced by its
         preparation spider ``("prep", p)`` and each output port by its
-        measurement spider ``("readout", p)``.
+        measurement spider ``("readout", p)``. A port on no world-line is an
+        open leg of a resource state: its closing merges into the port's
+        spider when the colours match, and is otherwise a measured graph qubit
+        ``("prep", p)`` / ``("readout", p)`` of that spider's colour behind an
+        H node, on a world-line of its own.
+    graph_region : set[Node]
+        ``realised.graph_region`` plus the graph qubits added by closings.
     classical : dict[Node, Node]
         Measured spider -> classical output, including the readouts.
     detectors, observables : list[PauliWeb]
@@ -553,38 +564,83 @@ class QECExperiment(ZXDiagram):
         types = dict(realised.types)
         phases = dict(realised.phases)
         self.classical: dict[Node, Node] = dict(realised.classical)
+        self.graph_region = set(realised.graph_region)
         positions = dict(realised.positions)
+        on_line = {v for path in realised.worldlines for v in path}
         closers: dict[Node, Node] = {}
-        for p, basis in self.preps.items():
-            s = ("prep", p)
-            (u,) = realised.graph.neighbors(p)
-            graph.remove_node(p)
-            graph.add_edge(s, u)
-            del types[p]
-            types[s] = _CLOSER[basis]
-            closers[p] = s
+        new_lines: list[tuple[Node, ...]] = []
+        # How a realised edge's labels reach a new edge: (realised edge index,
+        # new edge, "copy" | "swap" (x <-> z) | "match" (the matching component
+        # of the spider, as on a classical leg)).
+        moves: list[tuple[int, tuple[Node, Node], str]] = []
+        dropped: set[Node] = set()
+
+        def measure(v: Node) -> Node:
+            c = ("meas", v)
+            graph.add_edge(v, c)
+            types[c] = types[v]
+            phases[c] = Outcome(v)
+            self.classical[v] = c
             if positions:
-                positions[s] = positions.pop(p)
-        for p, basis in self.measurements.items():
-            r = ("readout", p)
-            c = ("meas", r)
-            (u,) = realised.graph.neighbors(p)
-            graph.remove_node(p)
-            graph.add_edge(u, r)
-            graph.add_edge(r, c)
-            del types[p]
-            types[r] = types[c] = _CLOSER[basis]
-            phases[c] = Outcome(r)
-            self.classical[r] = c
-            closers[p] = r
-            if positions:
-                x, y, z = positions.pop(p)
-                positions[r] = (x, y, z)
+                x, y, z = positions[v]
                 positions[c] = (x, y, z + 0.35)
+            return c
+
+        for p, basis, closes_output in ([(p, b, False) for p, b in self.preps.items()]
+                                        + [(p, b, True) for p, b in self.measurements.items()]):
+            pos = positions.pop(p, None)
+            if p in on_line:
+                # The port's world-line starts at a preparation spider or ends
+                # at a readout spider.
+                (u,) = realised.graph.neighbors(p)
+                (i,) = realised.legs(p)
+                s = ("readout" if closes_output else "prep", p)
+                graph.remove_node(p)
+                graph.add_edge(u, s)
+                del types[p]
+                types[s] = _CLOSER[basis]
+                closers[p] = s
+                dropped.add(p)
+                moves.append((i, (s, u), "copy"))
+                if pos is not None:
+                    positions[s] = pos
+                if closes_output:
+                    moves.append((i, (s, measure(s)), "copy"))
+                continue
+            # An open leg of a resource state (see RealisedSED.measurement_based):
+            # a closing spider of v's colour merges into v; one of the other
+            # colour is a graph qubit of v's colour behind an H node, measured.
+            route, v = _port_spider(realised, p)
+            (e,) = [e for e in realised.graph.edges(route[-1], keys=True) if e[1] == v]
+            i = realised.edge_index(e)
+            graph.remove_nodes_from(route)
+            for u in route:
+                del types[u]
+                positions.pop(u, None)
+            dropped |= set(route)
+            colour = _CLOSER[basis] if len(route) % 2 else _OTHER[_CLOSER[basis]]
+            if closes_output and v not in self.classical:
+                moves.append((i, (v, measure(v)), "match"))
+            if colour is types[v]:
+                continue
+            g = ("readout" if closes_output else "prep", p)
+            h = ("H", g)
+            types[g], types[h] = types[v], NodeType.H
+            graph.add_edge(v, h)
+            graph.add_edge(h, g)
+            if positions:
+                positions[g] = pos
+                positions[h] = tuple((np.asarray(positions[v]) + np.asarray(pos)) / 2)
+            moves += [(i, (v, h), "copy"), (i, (h, g), "swap"), (i, (g, measure(g)), "swap")]
+            new_lines.append((g,))
+            if v in self.graph_region:
+                self.graph_region.add(g)
         super().__init__(graph, types, phases)
         self.positions = positions
-        self._closers = closers
+        self._moves = moves
+        self._dropped = dropped
         self.worldlines = [tuple(closers.get(v, v) for v in p) for p in realised.worldlines]
+        self.worldlines += new_lines
         self.links = realised.links
         self._check_worldlines()
         self._find_webs()
@@ -628,20 +684,23 @@ class QECExperiment(ZXDiagram):
         n, m = self.n_edges, r.n_edges
         src, dst = [], []
         for i, e in enumerate(r.edges):
-            if not ({e[0], e[1]} & set(self._closers)):
-                src.append(i)
-                dst.append(self.edge_index(e))
-        for p, s in self._closers.items():
-            (e,) = r.graph.edges(p, keys=True)
-            i = r.edge_index(e)
-            src.append(i)
-            dst.append(self.edge_index((s, e[1], 0)))
-            if p in self.measurements:
-                # Classical-output leg takes the readout spider's matching component.
-                src.append(i)
-                dst.append(self.edge_index((s, self.classical[s], 0)))
-        src_a, dst_a = np.array(src, dtype=np.int64), np.array(dst, dtype=np.int64)
-        P = column_transport(np.concatenate([src_a, m + src_a]), np.concatenate([dst_a, n + dst_a]),
+            if not ({e[0], e[1]} & self._dropped):
+                j = self.edge_index(e)
+                src += [i, m + i]
+                dst += [j, n + j]
+        for i, (a, b), how in self._moves:
+            j = self.edge_index((a, b, 0))
+            if how == "copy":
+                src += [i, m + i]
+                dst += [j, n + j]
+            elif how == "swap":
+                src += [i, m + i]
+                dst += [n + j, j]
+            else:
+                k = 0 if self.types[a] is NodeType.Z else 1
+                src.append(k * m + i)
+                dst.append(k * n + j)
+        P = column_transport(np.array(src, dtype=np.int64), np.array(dst, dtype=np.int64),
                              2 * m, 2 * n)
         out = sp_matmul(V, P)
         assert not any(self.violations(out)), "closing a surviving web failed"

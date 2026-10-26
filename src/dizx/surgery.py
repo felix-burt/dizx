@@ -29,7 +29,7 @@ from __future__ import annotations
 from dataclasses import dataclass
 from typing import Callable, Hashable
 
-from dizx.code import Code, Qubit, disjoint_union, rotated_surface_code
+from dizx.code import Code, Qubit, disjoint_union, rotated_surface_code, unrotated_surface_code
 from dizx.transformations import SEDEditor, loop_boundary, prepare_cluster_region, split_by_side
 from dizx.realisation import LinkKind, QECExperiment, RealisedSED
 from dizx.zx_diagram import Node, NodeType, SEDiagram, close_ports, compose
@@ -197,7 +197,7 @@ class Surgery:
 
 def two_patch_surgery(d: int, joint: str = "ZZ", rounds: tuple[int, int, int] | None = None,
                       matching: bool = True, layers: tuple[int, int, int] | None = None,
-                      ) -> Surgery:
+                      unrotated: bool = False) -> Surgery:
     """``rounds`` = (before, merged, after), each ``d`` by default. With
     ``matching`` (the default) the merge starts and ends with a layer of the
     joint's type, so it has one layer more than ``2 * merged``.
@@ -205,14 +205,21 @@ def two_patch_surgery(d: int, joint: str = "ZZ", rounds: tuple[int, int, int] | 
     ``layers`` overrides ``rounds`` with the number of layers in each phase:
     the patches' layers end, and resume, with the type opposite to the merge's
     first and last layers; the merge's last layer follows from its count.
+
+    With ``unrotated`` the patches are ``unrotated_surface_code``s, each
+    ``2 d - 1`` wide: the right one starts at ``x = 2 d`` and the seam column
+    at ``x = 2 d - 1`` holds ``d - 1`` qubits and the ``d`` new generators of
+    the joint's type (rather than ``d`` qubits, as for rotated patches).
     """
     if joint not in SEAM_BASIS:
         raise ValueError("joint must be 'ZZ' or 'XX'")
     rot = 90 if joint == "ZZ" else 0
+    make, width = (unrotated_surface_code, 2 * d - 1) if unrotated else (rotated_surface_code, d)
     # Each patch's joint-type logical on its outer boundary, away from the seam.
-    left = _outer_logical(rotated_surface_code(d, rotation=rot), joint[0], 0)
-    right = _outer_logical(rotated_surface_code(d, rotation=rot, origin=(d + 1, 0)), joint[0], 2 * d)
-    merged = rotated_surface_code(*((2 * d + 1, d) if rot == 0 else (d, 2 * d + 1)), rotation=rot)
+    left = _outer_logical(make(d, rotation=rot), joint[0], 0)
+    right = _outer_logical(make(d, rotation=rot, origin=(width + 1, 0)), joint[0], 2 * width)
+    merged_d = 2 * d if unrotated else 2 * d + 1
+    merged = make(*((merged_d, d) if rot == 0 else (d, merged_d)), rotation=rot)
     both = disjoint_union(left, right)
     first = joint[0] if matching else "Z"
     if layers is None:

@@ -2,7 +2,7 @@ import pytest
 
 from dizx.code import Code, rotated_surface_code
 from dizx.realisation import QECExperiment, RealisedSED
-from dizx.zx_diagram import SEDiagram
+from dizx.zx_diagram import SPIDERS, NodeType, SEDiagram
 
 
 def realised(code, rounds):
@@ -80,3 +80,24 @@ def test_infers_unspecified_bases():
     assert set(exp.preps.values()) == {"X"}
     with pytest.raises(ValueError, match="preparations must be on inputs"):
         QECExperiment(r, {r.outputs[0]: "Z"})
+
+
+@pytest.mark.parametrize("prep,meas,closer", [("Z", "Z", "prep"), ("X", "X", "readout")])
+def test_measurement_based_experiment_is_one_resource_state(prep, meas, closer):
+    """Ports close onto graph qubits: a closing that the port's spider absorbs
+    merges into it; the other basis (here Z on the inputs, X on the outputs)
+    adds a measured Z spider behind an H node."""
+    real = RealisedSED.measurement_based(SEDiagram.from_code(rotated_surface_code(3), 3))
+    assert not any(v in real.inputs + real.outputs for p in real.worldlines for v in p)
+    exp = QECExperiment(real, {p: prep for p in real.inputs}, {p: meas for p in real.outputs})
+    outputs = set(exp.classical.values())
+    spiders = {v for v, t in exp.types.items() if t in SPIDERS and v not in outputs}
+    assert all(exp.types[v] is NodeType.Z for v in spiders)
+    assert spiders == exp.graph_region == {v for p in exp.worldlines for v in p}
+    assert set(exp.classical) == spiders
+    added = [v for v in spiders if v[0] in ("prep", "readout")]
+    assert len(added) == 9 and all(v[0] == closer for v in added)
+    for g in added:
+        (h,) = [u for u in exp.graph.neighbors(g) if u != exp.classical[g]]
+        assert exp.types[h] is NodeType.H and exp.graph.degree(h) == 2
+    assert exp.webs_complete() and len(exp.observables) == 1

@@ -37,3 +37,22 @@ def check_deterministic(c: stim.Circuit) -> None:
     dets, obs = c.compile_detector_sampler().sample(200, separate_observables=True)
     assert not dets.any() and not obs.any()
     c.detector_error_model()
+
+
+def check_ticks(c: stim.Circuit) -> None:
+    """No qubit is reset, gated or measured twice within one tick."""
+    for layer in str(c.without_tags().flattened()).split("TICK"):
+        used = []
+        for line in layer.strip().splitlines():
+            name, *targets = line.split()
+            if name in ("CX", "CZ", "H", "R", "RX", "M", "MX"):
+                used += targets
+            elif name == "MPP":
+                # A fusion measures two products (XX, ZZ) of one pair: count it once.
+                previous = None
+                for target in targets:
+                    qubits = sorted(t.lstrip("!XYZ") for t in target.split("*"))
+                    if qubits != previous:
+                        used += qubits
+                    previous = qubits
+        assert len(used) == len(set(used)), layer

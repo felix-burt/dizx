@@ -5,6 +5,8 @@ import pytest
 
 from dizx import builders as B
 from dizx.noise_models import NoiseSpec, apply_tagged_noise_model, parse_op_tag
+from dizx.zx_diagram import NodeType
+from helpers import check_deterministic, check_ticks, distance
 
 D = 3
 BUILDS = {
@@ -17,8 +19,10 @@ BUILDS = {
     "bell_meas_fusion_zigzag": lambda o: B.build_surgery_bell_meas_fusion_zigzag(D, D, "ZZ", o),
 }
 # Measurements and detectors of the previous pipeline's circuits at d = 3
-# (merge ZZ, either observable).
-OLD = {"circuit": (213, 188), "bell": (236, 156), "bell_zigzag": (271, 156),
+# (merge ZZ, either observable). Its circuit surgery ran two extra layers per
+# patch phase (213, 188); here every builder has the same layers. Its Bell-prep
+# gadgets had an extra measured matter qubit per half (236, 156 and 271, 156).
+OLD = {"circuit": (181, 156), "bell": (214, 156), "bell_zigzag": (235, 156),
        "linear_kinf": (242, 156), "linear_k1": (278, 156),
        "bell_meas_fusion": (236, 156), "bell_meas_fusion_zigzag": (271, 156)}
 OPS = {"reset", "single_qubit_gate", "two_qubit_gate", "single_qubit_measurement", "fusion_gate",
@@ -59,6 +63,32 @@ def test_every_operation_is_tagged(build):
         assert kinds["graph", "reset", "R"] + kinds["graph", "reset", "RX"] > 0
     if name.startswith("linear"):
         assert kinds["circuit-graph", "fusion_gate", "CX"] + kinds["circuit-graph", "fusion_gate", "CZ"] > 0
+
+
+def test_patches_share_ticks(build):
+    """The patches run their rounds side by side: the first stabiliser gates
+    act on both, and no tick touches a qubit twice."""
+    c = build[1]["ZZ"].circuit
+    check_ticks(c)
+    x = {q: xy[0] for q, xy in c.get_final_qubit_coordinates().items()}
+    seam = (min(x.values()) + max(x.values())) / 2
+    first = next(inst for inst in c.flattened() if inst.name == "CX")
+    sides = {x[t.value] < seam for t in first.targets_copy()}
+    assert sides == {True, False}
+
+
+def test_bell_prep_gadget_is_emission_and_fusion():
+    """n1 -- f1 == f2 -- n2: one photon of the other colour per half, no H."""
+    split = B.two_patch_surgery(D, "ZZ", layers=B.surgery_layers(1)).split_seam(
+        B.straight_interface(D))
+    sed, photons = B.bell_prep_gadgets(split)
+    assert not any(t is NodeType.H for t in sed.types.values())
+    halves = [v for v in split.types if isinstance(v, tuple) and v[0] == "split"]
+    assert len(photons) == 2 * len(halves)
+    for f in photons:
+        (n,) = [u for u in sed.graph.neighbors(f) if u not in photons]
+        (g,) = [u for u in sed.graph.neighbors(f) if u in photons]
+        assert sed.types[f] is not sed.types[n] and sed.types[g] is sed.types[f]
 
 
 def test_config_noise_attaches(build):
@@ -114,3 +144,21 @@ def test_distance_matches_previous_pipeline(name):
                                                      canonicalize_circuit_errors=False)))
     assert tuple(got) == OLD_DISTANCE[name]
 
+
+
+@pytest.mark.parametrize("basis", ["X", "Z"])
+def test_unrotated_memory_has_full_distance(basis):
+    c = B.BUILDERS["memory_unrotated_circuit"](D, D, basis).circuit
+    check_deterministic(c)
+    check_ticks(c)
+    assert c.num_observables == 1 and distance(c) == D
+
+
+@pytest.mark.parametrize("merge_type", ["XX", "ZZ"])
+def test_unrotated_surgery_has_full_distance(merge_type):
+    for o in ("XX", "ZZ"):
+        b = B.build_surgery_unrotated_circuit(D, D, merge_type, o)
+        check_deterministic(b.circuit)
+        check_ticks(b.circuit)
+        assert len(b.surgery.seam) == D - 1
+        assert distance(b.circuit) == D

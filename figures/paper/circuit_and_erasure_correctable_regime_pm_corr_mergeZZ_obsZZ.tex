@@ -1,0 +1,48 @@
+\begin{tikzpicture}
+\begin{axis}[width=\linewidth,
+  xlabel={Circuit noise probability $p_c$ (\%)},
+  ylabel={Erasure threshold $p^{*}_{e}$},
+  grid=both,
+  minor grid style={gray!15},
+  major grid style={gray!30},
+  legend pos=south west,
+  legend cell align=left,
+  legend style={font=\footnotesize},
+  every axis plot/.append style={thick},
+  ymin=0,
+  ymax=0.55,
+  restrict y to domain=0:0.55,
+  xmin=0,
+  xmax=0.9,
+  xtick distance=0.1,
+  scaled x ticks=false,
+  scaled y ticks=false,
+  y tick label style={/pgf/number format/fixed},
+  x tick label style={/pgf/number format/fixed, /pgf/number format/precision=2}]
+  \addplot[color=blue, mark=diamond*, name path=upper] coordinates {
+        (0,0.504322)
+        (0.1,0.49224)
+        (0.2,0.466285)
+        (0.3,0.444495)
+        (0.4,0.423971)
+        (0.5,0.40398)
+        (0.6,0.390749)
+        (0.8,0.365347)
+        (0.9,0.341272)
+  };
+  \addlegendentry{\textsc{Bell}}
+  \path[name path=lower] (axis cs:0,0) -- (axis cs:0.9,0);
+  \addplot[opacity=0.2, blue, forget plot] fill between [of=upper and lower];
+  \addplot[only marks, mark=diamond*, color=blue, forget plot, error bars/.cd, y dir=both, y explicit] coordinates {
+        (0,0.504322) +- (0,0.000859975)
+        (0.1,0.49224) +- (0,0.00123097)
+        (0.2,0.466285) +- (0,0.00186551)
+        (0.3,0.444495) +- (0,0.00197457)
+        (0.4,0.423971) +- (0,0.00200574)
+        (0.5,0.40398) +- (0,0.00178968)
+        (0.6,0.390749) +- (0,0.00213694)
+        (0.8,0.365347) +- (0,0.0031125)
+        (0.9,0.341272) +- (0,0.00293429)
+  };
+\end{axis}
+\end{tikzpicture}

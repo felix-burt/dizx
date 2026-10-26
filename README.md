@@ -42,12 +42,14 @@ Every builder takes `(distance, n_cycles, merge_type, observable)` and returns a
 | Name | Experiment |
 |---|---|
 | `surgery_circuit` | circuit-based two-patch ZZ/XX surgery |
+| `surgery_unrotated_circuit` | the same with unrotated surface code patches |
 | `surgery_bell_prep_fusion`, `_zigzag` | patches joined by Bell pairs from matter–photon emission, across a straight or zigzag seam |
 | `surgery_bell_meas_fusion`, `_zigzag` | patches joined by pairs of Bell-pair resource states and fusions |
 | `surgery_hybrid_linear_3dchain` | hybrid surgery with untruncated linear resource states |
 | `surgery_hybrid_linear_5chain`, `_8chain` | the same with every first or second time edge cut |
 | `surgery_hybrid_linear_looped` | untruncated, with a looped clusterised region |
 | `memory_circuit` / `_cluster` / `_fusion` | single-patch memory, circuit-based, one cluster state, or fused line states |
+| `memory_unrotated_circuit` | circuit-based memory on an unrotated surface code patch |
 
 ```python
 from dizx.builders import BUILDERS
@@ -84,6 +86,37 @@ Data goes to `results/sinter/*.csv`. Figures go to `figures/paper/<paper file na
 Collection resumes. Every task is keyed by sinter's `strong_id` (circuit, noise and decoder), so an interrupted run, a repeated run or a curve shared by two figures never samples a shot twice. A low-budget preview is topped up by a later full run. Circuits are cached in `results/circuits/` as `<builder>_d<d>_merge<merge>_obs<obs>.stim`, e.g. `surgery_bell_prep_fusion_d5_mergeZZ_obsZZ.stim` (memory circuits have no merge segment). The name doesn't track the code, so delete a builder's files after changing what it builds.
 
 Defaults are deliberately light: 2 workers, under `nice`. Pass `--workers` and `--no-nice` on a machine to spare.
+
+### On a PBS cluster
+
+`experiments/cluster.py` submits the same collection as separate PBS jobs. It takes the same targets as `reproduce.py`.
+
+```bash
+python experiments/cluster.py plan all --results-dir results/cluster      # jobs, ncpus, memory, walltime
+python experiments/cluster.py submit all --results-dir results/cluster --plot \
+    --setup 'module load Python/3.12.3-GCCcore-13.3.0; source .venv/bin/activate'
+python experiments/cluster.py status                                      # progress, PBS state
+```
+
+How jobs are split:
+- By default each job is one curve. A curve that would run past `--target-hours` (12) on `--max-cpus` (64) is split into one job per run (one sinter CSV). At full budget this applies to the crg_local curves. The full plan comes to about 150 jobs and about 7,000 expected core-hours.
+- No two jobs write the same CSV.
+
+How resources are sized:
+- `experiments/cluster_costs.json` holds the expected core-seconds of every task, measured from the DISQEC collection behind the paper. Rebuild it with `cluster.py calibrate <results dir>`.
+- Work already in `--results-dir` is subtracted.
+- `ncpus` aims for `--target-hours`. Memory comes from the circuit size at the job's largest distance. Walltime is scaled by `--safety` (×2).
+- `--max-mem-gb`, `--max-hours`, `--queue`, `--account` (`#PBS -P`) and `--pbs '<directive>'` adapt the jobs to your cluster. `DIZX_PBS_SETUP`, `DIZX_PBS_QUEUE` and `DIZX_PBS_ACCOUNT` set defaults.
+
+Resubmitting:
+- Collection resumes, so a job that hits its walltime only loses its current batch. Resubmit the same targets to finish.
+- On resubmission, complete jobs are skipped, and jobs still queued or running from an earlier batch are left alone.
+- Each batch keeps its scripts, job specs, manifest and logs under `results/pbs/<timestamp>/`.
+
+Before submitting:
+- `submit` refuses to run without the edge-reweighting pymatching fork, which the cost model assumes.
+- Jobs run the code checked out when they start, not when they were submitted, so don't change the working tree while a batch is queued.
+- `--plot` adds a job that runs after the batch and draws the figures into `<results-dir>/figures/`. To draw them yourself instead: `reproduce.py all --plot-only --results-dir results/cluster`.
 
 ## Running other experiments
 

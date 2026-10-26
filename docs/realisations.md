@@ -42,9 +42,9 @@ Arrows fix the order of the projector gadgets along each data qubit, but not the
 ## Measurement-based realisation
 
 1. Apply duality $\mathcal{D}_v$ to every $X$ spider, making the diagram **graph-like** (only $Z$ spiders, joined via $H$ nodes).
-2. Put every spider on its own singleton world-line and give it a classical output. Spiders adjacent to output ports may be left unmeasured if the aim is to prepare a state.
+2. Put every spider on its own singleton world-line and give it a classical output, except spiders adjacent to output ports. Ports stay open legs of the resource state, on no world-line.
 
-The result is a **cluster state**: each spider is a qubit prepared in $|+\rangle$ and each internal edge is a $CZ$. Compared with the circuit-based realisation, each bulk detecting region also includes the outcomes of the data spiders it passes through (four for a weight-4 generator), and each logical gains $d$ outcomes per round (surface code).
+The result is a **cluster state**: each spider is a qubit prepared in $|+\rangle$ and each internal edge is a $CZ$. The QEC experiment keeps it one resource state (see below). Compared with the circuit-based realisation, each bulk detecting region also includes the outcomes of the data spiders it passes through (four for a weight-4 generator), and each logical gains $d$ outcomes per round (surface code).
 
 ## QEC experiment
 
@@ -53,6 +53,8 @@ A **QEC experiment** is a realisation with every port closed, so that every qubi
 - each input $p$ is replaced by a degree-1 **preparation** spider: $X$ for $|0\rangle$, $Z$ for $|+\rangle$;
 - each output $p$ is replaced by a **measurement** spider ($X$ for a $Z$ measurement, $Z$ for an $X$ measurement) with a classical output;
 - every spider lies on a world-line, and every world-line ends at a measured spider.
+
+An open port of a resource state (one on no world-line, as in the measurement-based realisation) is closed onto graph qubits instead. The closing spider meets the port's spider $v$ through the H nodes between them. If its effective colour matches $v$ (an $X$-basis closing on a $Z$ spider), it merges into $v$. Otherwise it becomes a new $Z$ spider $g$ joined to $v$ through an H node (a $CZ$), with a classical output, on its own world-line. A spider adjacent to an output port is measured when the port is closed, in both cases.
 
 Closing port $p$ with a spider of type $T$ forces the non-matching component of $T$ on its boundary edge $e$ to vanish:
 

@@ -7,7 +7,7 @@ from dizx.realisation import QECExperiment, RealisedSED
 from dizx.schedules import RotatedSurfaceCodeSchedule
 from dizx.transformations import dualise, split_boundary
 from dizx.zx_diagram import NodeType, SEDiagram
-from helpers import check_deterministic, distance
+from helpers import check_deterministic, check_ticks, distance
 
 ALLOWED = {"QUBIT_COORDS", "R", "RX", "H", "CX", "CZ", "M", "MX", "MPP", "TICK",
            "DETECTOR", "OBSERVABLE_INCLUDE", "I"}  # I: tagged idle / state-prep markers
@@ -18,14 +18,7 @@ def check_valid(c: stim.Circuit, exp: QECExperiment) -> None:
     assert c.num_detectors == len(exp.detectors)
     assert c.num_observables == len(exp.observables)
     check_deterministic(c)
-    # No qubit is used twice within a tick.
-    for layer in str(c.flattened()).split("TICK"):
-        used = []
-        for line in layer.strip().splitlines():
-            name, *targets = line.split()
-            if name in ("CX", "CZ", "H", "R", "RX", "M", "MX"):
-                used += targets
-        assert len(used) == len(set(used)), layer
+    check_ticks(c)
 
 
 def surface(d, rounds, rotation=0, basis="Z", mode="circuit"):

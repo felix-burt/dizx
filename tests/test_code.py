@@ -2,7 +2,7 @@ from itertools import combinations, product
 
 import pytest
 
-from dizx.code import Code, rotated_surface_code, symplectic
+from dizx.code import Code, rotated_surface_code, symplectic, unrotated_surface_code
 
 
 def min_logical_weight(code, max_w):
@@ -29,6 +29,17 @@ def test_rotated_surface_code_parameters(d):
 @pytest.mark.parametrize("d", [2, 3])
 def test_rotated_surface_code_distance(d):
     assert min_logical_weight(rotated_surface_code(d), d) == d
+
+
+@pytest.mark.parametrize("d", [2, 3])
+def test_unrotated_surface_code(d):
+    code = unrotated_surface_code(d)
+    n = d * d + (d - 1) ** 2
+    assert (code.n, code.k, len(code.stabilisers)) == (n, 1, n - 1)
+    assert code.is_css()
+    weights = sorted(len(s) for s in code.stabilisers)
+    assert weights.count(3) == 4 * (d - 1) and weights.count(4) == 2 * (d - 1) * (d - 2)
+    assert min_logical_weight(code, d) == d
 
 
 def test_logicals_found_when_not_given():

@@ -1254,9 +1254,10 @@ windows-terminal = ["colorama (>=0.4.6)"]
 name = "pymatching"
 version = "2.4.0"
 description = "A package for decoding quantum error correcting codes using minimum-weight perfect matching."
-optional = false
+optional = true
 python-versions = ">=3.8"
 groups = ["main"]
+markers = "extra == \"stock-pymatching\""
 files = [
     {file = "pymatching-2.4.0-cp310-cp310-macosx_11_0_arm64.whl", hash = "sha256:c51ee0ffa161f35ae6b887a0bebdf85e3fa456139e56d5e070823ef0434f692f"},
     {file = "pymatching-2.4.0-cp310-cp310-macosx_11_0_x86_64.whl", hash = "sha256:8778d0a06b606b169f8517279f01d4c0f9bf1725085f7a3d1ddcb24a53952fdd"},
@@ -1296,6 +1297,56 @@ scipy = "*"
 
 [package.extras]
 test = ["pytest (>=6.0)"]
+
+[[package]]
+name = "PyMatching"
+version = "2.4.0"
+description = "A package for decoding quantum error correcting codes using minimum-weight perfect matching."
+optional = true
+python-versions = ">=3.8"
+groups = ["main"]
+markers = "sys_platform == \"darwin\""
+files = [
+    {file = "pymatching-2.4.0-cp312-cp312-macosx_11_0_arm64.whl", hash = "sha256:7d8ec9966edb8a3f1a3c9e0e51e86bbc28bba855f0532cd578ef7a2ed109dbea"},
+]
+
+[package.dependencies]
+matplotlib = "*"
+networkx = "*"
+numpy = "*"
+scipy = "*"
+
+[package.extras]
+test = ["pytest (>=6.0)"]
+
+[package.source]
+type = "url"
+url = "https://github.com/felix-burt/PyMatching/releases/download/v2.4.0-reweight1/pymatching-2.4.0-cp312-cp312-macosx_11_0_arm64.whl"
+
+[[package]]
+name = "PyMatching"
+version = "2.4.0"
+description = "A package for decoding quantum error correcting codes using minimum-weight perfect matching."
+optional = true
+python-versions = ">=3.8"
+groups = ["main"]
+markers = "sys_platform == \"linux\""
+files = [
+    {file = "pymatching-2.4.0-cp312-cp312-manylinux_2_27_x86_64.manylinux_2_28_x86_64.whl", hash = "sha256:3d7c9ba58fc9015483fabaed8140800474767fa0e5a740a5ed096c19a9662416"},
+]
+
+[package.dependencies]
+matplotlib = "*"
+networkx = "*"
+numpy = "*"
+scipy = "*"
+
+[package.extras]
+test = ["pytest (>=6.0)"]
+
+[package.source]
+type = "url"
+url = "https://github.com/felix-burt/PyMatching/releases/download/v2.4.0-reweight1/pymatching-2.4.0-cp312-cp312-manylinux_2_27_x86_64.manylinux_2_28_x86_64.whl"
 
 [[package]]
 name = "pyparsing"
@@ -1792,7 +1843,10 @@ files = [
     {file = "widgetsnbextension-4.0.16.tar.gz", hash = "sha256:adeea0ae78f0856ee4945f413299801b82a0a01416303301f39a704282a37b73"},
 ]
 
+[extras]
+stock-pymatching = []
+
 [metadata]
 lock-version = "2.1"
 python-versions = ">=3.12,<3.13"
-content-hash = "d31eba11dd389b2cac49b6bb6ce4d735473a4e6f43fbb1d615e35dff2b218a89"
+content-hash = "9f2cba6f0583d0de7f383798a1610dd11552591928ca14eed378acdc69a45e41"

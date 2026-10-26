@@ -11,7 +11,7 @@ poetry install          # Python 3.12
 poetry run pytest -q
 ```
 
-Stock `pymatching` works. The heralded-erasure decoder is much faster with the edge-reweighting fork ([felix-burt/PyMatching](https://github.com/felix-burt/PyMatching), branch `edge-reweight-table`), installed into the same environment. `dizx.sinter_decoders.SUPPORTS_EDGE_REWEIGHTS` reports whether the fork is present.
+`poetry install` takes `pymatching` from the edge-reweighting fork ([felix-burt/PyMatching](https://github.com/felix-burt/PyMatching), prebuilt wheels from release `v2.4.0-reweight1` for Linux x86_64 and macOS arm64), which makes the heralded-erasure decoder much faster; `poetry install -E stock-pymatching` takes PyPI's instead, which also works. `dizx.sinter_decoders.SUPPORTS_EDGE_REWEIGHTS` reports whether the fork is present.
 
 ## Pipeline
 

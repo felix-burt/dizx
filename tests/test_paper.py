@@ -18,6 +18,13 @@ import reproduce  # noqa: E402
 import run_threshold_experiment as rte  # noqa: E402
 from dizx.builders import BUILDERS  # noqa: E402
 
+
+@pytest.fixture(autouse=True)
+def _base_plan():
+    """These test the paper's base plan, not the frozen crg refinement rounds."""
+    with paper.refinement_rounds([]):
+        yield
+
 # The figure files the paper \input's (DLEFBQC sections/7_results.tex).
 PAPER_STEMS = {
     "master_threshold_pm_corr_mergeZZ_obsZZ-XX",

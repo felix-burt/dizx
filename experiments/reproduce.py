@@ -135,6 +135,7 @@ def _crg(fig: Figure, out_dir: Path, results_dir: Path) -> Path:
     curves = [{"label": FAMILIES[c.family].label, "color": FAMILIES[c.family].color,
                "mark": FAMILIES[c.family].mark,
                "config": paper.crg_config(kind, c.family, c.observable),
+               "fit_distances": paper.crg_fit_distances(),
                "erasure": paper.erasure_config(c.family, c.observable)} for c in fig.curves]
     if kind == "crg_local":
         # Bottom left: at the paper's figure size the top-right legend covers

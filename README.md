@@ -44,6 +44,7 @@ Every builder takes `(distance, n_cycles, merge_type, observable)` and returns a
 | `surgery_circuit` | circuit-based two-patch ZZ/XX surgery |
 | `surgery_unrotated_circuit` | the same with unrotated surface code patches |
 | `surgery_bell_prep_fusion`, `_zigzag` | patches joined by Bell pairs from matter–photon emission, across a straight or zigzag seam |
+| `surgery_unrotated_bell_prep_fusion` | Bell-pair surgery with unrotated patches, across a straight seam |
 | `surgery_bell_meas_fusion`, `_zigzag` | patches joined by pairs of Bell-pair resource states and fusions |
 | `surgery_hybrid_linear_3dchain` | hybrid surgery with untruncated linear resource states |
 | `surgery_hybrid_linear_5chain`, `_8chain` | the same with every first or second time edge cut |

@@ -162,3 +162,15 @@ def test_unrotated_surgery_has_full_distance(merge_type):
         check_ticks(b.circuit)
         assert len(b.surgery.seam) == D - 1
         assert distance(b.circuit) == D
+
+
+@pytest.mark.parametrize("merge_type", ["XX", "ZZ"])
+def test_unrotated_bell_prep_surgery_has_full_distance(merge_type):
+    for o in ("XX", "ZZ"):
+        b = B.build_surgery_unrotated_bell_prep_fusion(D, D, merge_type, o)
+        check_deterministic(b.circuit)
+        check_ticks(b.circuit)
+        halves = [v for v in b.experiment.types if isinstance(v, tuple) and v[0] == "split"]
+        # One per seam row in each merge cycle, plus the closing joint-type layer.
+        assert len(halves) == D * (2 * D - 1) + D
+        assert distance(b.circuit) == D

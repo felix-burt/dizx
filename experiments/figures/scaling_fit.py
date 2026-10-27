@@ -187,9 +187,11 @@ def scaling_threshold(stats: list[sinter.TaskStats], distances: list[int]) -> Sc
     return ScalingFit(p_th, total, stat_scaled, sys_err, nu, chi2, len(keys), not reason, reason)
 
 
-def crg_points(config: dict, *, results_dir: Path) -> dict[float, ScalingFit]:
-    """{local_prob: fit} over every local_prob a crg config has data for."""
-    distances = config["sweep"]["distances"]
+def crg_points(config: dict, *, results_dir: Path,
+               distances: list[int] | None = None) -> dict[float, ScalingFit]:
+    """{local_prob: fit} over every local_prob a crg config has data for, over
+    `distances` (default: the config's own)."""
+    distances = distances or config["sweep"]["distances"]
     return {l_prob: scaling_threshold(stats, distances) for l_prob, stats
             in sorted(load_stats_by_local_prob(config, results_dir=results_dir).items())}
 

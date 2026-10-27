@@ -271,6 +271,11 @@ class Cost:
 
 
 
+def _budget_ratio(run: dict) -> float:
+    """A run's error budget relative to the plan's base budget for its kind."""
+    return run["sinter"]["max_errors"] / paper.base_budget(run)[1]
+
+
 def job_cost(job: Job, costs: dict, progress: Progress) -> Cost:
     todo = tasks = 0
     core_s = overhead_s = 0.0
@@ -282,8 +287,9 @@ def job_cost(job: Job, costs: dict, progress: Progress) -> Cost:
             if frac <= 0:
                 continue
             todo += 1
-            # Calibrated at the full plan budget; a scaled budget scales the cost.
-            core_s += task_cost(costs, task) * job.budget_scale * frac
+            # Calibrated at the plan's base budget; a scaled budget (--budget-scale
+            # or a crg refinement round) scales the cost.
+            core_s += task_cost(costs, task) * _budget_ratio(run) * frac
             overhead_s += max(_TASK_OVERHEAD_S_FLOOR, _TASK_OVERHEAD_S_D19 * (task.distance / 19) ** 3)
     return Cost(todo, tasks, core_s / 3600, overhead_s / 3600)
 
@@ -316,14 +322,20 @@ class Resources:
 
 
 def split_oversized(jobs: list[Job], costs: dict, progress: Progress, limits: Limits) -> list[Job]:
-    """Curve jobs too long for `target_hours` even at `max_cpus`, one job per run."""
+    """Curve jobs too long for `target_hours` even at `max_cpus`, one job per CSV."""
     out = []
     for job in jobs:
         res = resources(job, job_cost(job, costs, progress), limits)
         if res.needs_hours <= limits.target_hours or len(job.runs) == 1:
             out.append(job)
             continue
-        out += [Job(_run_name(job.name, run), job.budget_scale, [run]) for run in job.runs]
+        # One job per CSV: a crg point's base window and its refinement runs
+        # share one, and must not be written by two jobs at once.
+        parts: dict[str, Job] = {}
+        for run in job.runs:
+            name = _run_name(job.name, run)
+            parts.setdefault(name, Job(name, job.budget_scale)).runs.append(run)
+        out += parts.values()
     return out
 
 
@@ -616,12 +628,13 @@ def cmd_calibrate(args) -> None:
                 shots, errors, seconds = progress.of(task)
                 if shots:
                     found += 1
-                    cost = expected_shots(shots, errors, si["max_shots"], si["max_errors"]) * seconds / shots
+                    cost = (expected_shots(shots, errors, si["max_shots"], si["max_errors"]) * seconds
+                            / shots / _budget_ratio(run))
                 elif rate := _seconds_per_shot(progress, task):
                     # Not collected there (e.g. outside its refine window):
                     # the full shot budget at that CSV's rate at this distance.
                     estimated += 1
-                    cost = si["max_shots"] * rate
+                    cost = si["max_shots"] * rate / _budget_ratio(run)
                 else:
                     continue
                 out.setdefault(task.stem, {}).setdefault(str(task.distance), {})[repr(task.p)] = \

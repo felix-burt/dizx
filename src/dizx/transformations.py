@@ -603,26 +603,36 @@ class SEDEditor:
 
     # -- regions ------------------------------------------------------------------
 
-    def split_boundary(self, S: Iterable[Node]) -> None:
+    def split_boundary(self, S: Iterable[Node], fusions: Iterable[frozenset] = ()) -> None:
         """See :func:`split_boundary`."""
         S = set(S)
+        fusions = set(fusions)
         for v in sorted(cut_nodes(self, S), key=repr):
+            out = [u for _, u, _ in _legs(self, v) if u not in S]
+            # A single plain edge to a same-colour spider is already a split
+            # edge; a single edge chosen as a fusion stays as it is.
+            if len(out) == 1 and (self.types.get(out[0]) is self.types[v]
+                                  or frozenset((v, out[0])) in fusions):
+                continue
             self.split(v, [e for e in _legs(self, v) if e[1] in S])
 
     def split_by_side(self, side: Callable[[Node], Hashable], spiders: Iterable[Node]) -> None:
         """See :func:`split_by_side`."""
         for v in sorted(spiders, key=repr):
             home = side(v)
-            away = sorted({side(u) for _, u, _ in _legs(self, v)} - {home}, key=repr)
+            # Sides of the original legs: the legs to earlier halves stay with v.
+            sides = {e: side(e[1]) for e in _legs(self, v)}
+            away = sorted(set(sides.values()) - {home}, key=repr)
             for s in away:
-                keep = [e for e in _legs(self, v) if side(e[1]) != s]
+                keep = [e for e in _legs(self, v) if sides.get(e) != s]
                 self.split(v, keep, name=("split", v, s))
 
-    def prepare_cluster_region(self, S: Iterable[Node]) -> set[Node]:
+    def prepare_cluster_region(self, S: Iterable[Node],
+                               fusions: Iterable[frozenset] = ()) -> set[Node]:
         """See :func:`prepare_cluster_region`; returns the region."""
         S = set(S)
         S |= {p for p in self.inputs + self.outputs if set(self.graph.neighbors(p)) <= S}
-        self.split_boundary(S)
+        self.split_boundary(S, fusions)
         xs = [v for v in S if self.types.get(v) is NodeType.X]
         if xs:
             self.dualise(xs)
@@ -833,12 +843,16 @@ def cut_nodes(sed: SEDiagram | SEDEditor, S: Iterable[Node]) -> set[Node]:
 
 
 
-def split_boundary(sed: SEDiagram, S: Iterable[Node]) -> SEDiagram:
+def split_boundary(sed: SEDiagram, S: Iterable[Node],
+                   fusions: Iterable[frozenset] = ()) -> SEDiagram:
     """Split each spider of dV(S) into an inside half (keeping its label and its
     legs into S) and an outside half ``("split", v)``, joined by one edge.
-    Afterwards S has a matching boundary."""
+    A spider whose only outside leg is a plain edge to a spider of its own
+    colour, or an edge in ``fusions`` (``frozenset`` of its two spiders), is
+    left alone: that edge is already the fusion. Afterwards S has a matching
+    boundary."""
     ed = SEDEditor(sed)
-    ed.split_boundary(S)
+    ed.split_boundary(S, fusions)
     return ed.freeze()
 
 
@@ -852,14 +866,17 @@ def split_by_side(sed: SEDiagram, side: Callable[[Node], Hashable],
     return ed.freeze()
 
 
-def prepare_cluster_region(sed: SEDiagram, S: Iterable[Node]) -> tuple[SEDiagram, set[Node]]:
+def prepare_cluster_region(sed: SEDiagram, S: Iterable[Node],
+                           fusions: Iterable[frozenset] = ()) -> tuple[SEDiagram, set[Node]]:
     """Web-preserving steps of clusterisation: split the boundary of S (so it
     is a matching) and dualise S's X spiders (so D[S] is graph-like).
 
     Ports attached only to S join S, so a strand that starts or ends inside the
-    region keeps its port. Returns the new SED and the region (inside halves
-    keep their labels; outside halves are ``("split", v)``).
+    region keeps its port. Boundary edges in ``fusions`` are not split (see
+    ``split_boundary``); pass them to ``RealisedSED.hybrid`` as fusions.
+    Returns the new SED and the region (inside halves keep their labels;
+    outside halves are ``("split", v)``).
     """
     ed = SEDEditor(sed)
-    S = ed.prepare_cluster_region(S)
+    S = ed.prepare_cluster_region(S, fusions)
     return ed.freeze(), S

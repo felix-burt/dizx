@@ -151,18 +151,24 @@ def resource_pair_gadgets(sed: SEDiagram) -> tuple[SEDiagram, set[Node]]:
 
 
 def _seam_gadget_surgery(distance: int, n_cycles: int, merge_type: str, observable: str,
-                         gadgets, zigzag_phase: int | None, schedule: Schedule | None) -> SEDBuild:
+                         gadgets, zigzag_phase: int | None, schedule: Schedule | None,
+                         unrotated: bool = False) -> SEDBuild:
     """Two units joined across each split generator by ``gadgets`` (e.g.
     ``bell_prep_gadgets``); the seam is ``zigzag_interface`` with
-    ``zigzag_phase``, or straight if ``None``."""
+    ``zigzag_phase``, or straight if ``None`` (the only choice for
+    ``unrotated`` patches)."""
     _check(merge_type, observable)
+    if unrotated and zigzag_phase is not None:
+        raise ValueError("unrotated patches only have a straight interface")
     s = two_patch_surgery(distance, merge_type,
-                          layers=surgery_layers(n_cycles))
-    iface = (straight_interface(distance) if zigzag_phase is None
+                          layers=surgery_layers(n_cycles), unrotated=unrotated)
+    iface = (straight_interface(s.seam[0][0]) if zigzag_phase is None
              else zigzag_interface(distance, zigzag_phase))
     sed, region = gadgets(s.split_seam(iface))
     real = RealisedSED.circuit_based(sed, links="fusion")
     real.graph_region = region
+    if unrotated:
+        schedule = schedule or UnrotatedSurfaceCodeSchedule()
     return _finish(s, real, observable, schedule)
 
 
@@ -186,6 +192,18 @@ def build_surgery_bell_prep_fusion_zigzag(distance: int, n_cycles: int, merge_ty
     previous pipeline's zigzag did (phase 0 loses the X sector)."""
     return _seam_gadget_surgery(distance, n_cycles, merge_type, observable,
                                 bell_prep_gadgets, 1, schedule)
+
+
+def build_surgery_unrotated_bell_prep_fusion(distance: int, n_cycles: int, merge_type: str = "ZZ",
+                                             observable: str = "ZZ",
+                                             schedule: Schedule | None = None) -> SEDBuild:
+    """``build_surgery_bell_prep_fusion`` with unrotated surface code patches,
+    across a straight seam (the seam column on the right). Each row of the
+    seam has one split generator, d of the joint's type and d - 1 of the
+    other, and with ``UnrotatedSurfaceCodeSchedule`` both sectors keep full
+    distance. No counterpart in the previous pipeline."""
+    return _seam_gadget_surgery(distance, n_cycles, merge_type, observable,
+                                bell_prep_gadgets, None, schedule, unrotated=True)
 
 
 def build_surgery_bell_meas_fusion(distance: int, n_cycles: int, merge_type: str = "ZZ",
@@ -268,7 +286,7 @@ BUILDERS = {
     **memory.BUILDERS,
     **_registry(build_surgery_circuit, build_surgery_unrotated_circuit,
                 build_surgery_bell_prep_fusion, build_surgery_bell_prep_fusion_zigzag,
-                build_surgery_bell_meas_fusion, build_surgery_bell_meas_fusion_zigzag,
+                build_surgery_unrotated_bell_prep_fusion, build_surgery_bell_meas_fusion, build_surgery_bell_meas_fusion_zigzag,
                 build_surgery_hybrid_linear_3dchain, build_surgery_hybrid_linear_5chain,
                 build_surgery_hybrid_linear_8chain, build_surgery_hybrid_linear_looped),
 }

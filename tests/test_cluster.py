@@ -4,6 +4,8 @@ from __future__ import annotations
 import sys
 from pathlib import Path
 
+import pytest
+
 import sinter
 
 _REPO_ROOT = Path(__file__).resolve().parents[1]
@@ -13,6 +15,13 @@ sys.path.insert(0, str(_REPO_ROOT / "scripts"))
 import cluster  # noqa: E402
 import paper  # noqa: E402
 import reproduce  # noqa: E402
+
+
+@pytest.fixture(autouse=True)
+def _base_plan():
+    """These test the paper's base plan, not the frozen crg refinement rounds."""
+    with paper.refinement_rounds([]):
+        yield
 
 
 def _plan(targets, split="curve", results_dir="unused"):

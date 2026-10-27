@@ -1,11 +1,16 @@
+from collections import Counter
+
 import pytest
 
 from dizx.circuit_extractor import to_stim
-from dizx.schedules import RotatedSurfaceCodeSchedule
-from dizx.realisation import RealisedSED
+from dizx.schedules import RotatedSurfaceCodeSchedule, UnrotatedSurfaceCodeSchedule
+from dizx.realisation import RealisedSED, interactions
 from dizx.code import disjoint_union
-from dizx.surgery import _other, straight_interface, two_patch_surgery, zigzag_interface
-from helpers import distance
+from dizx.transformations import prepare_cluster_region
+from dizx.zx_diagram import SPIDERS, NodeType
+from dizx.surgery import (_other, seam_column_interface, straight_interface, two_patch_surgery,
+                          zigzag_interface)
+from helpers import check_deterministic, distance, has_matching_boundary
 
 
 @pytest.mark.parametrize("joint", ["ZZ", "XX"])
@@ -108,6 +113,64 @@ def test_split_seam_units(surgery):
             # The interface is in the unsplit diagram's coordinates.
             sides = {iface(*surgery.sed.positions[u][:2]) for u in sed.graph.neighbors(v) if u[0] == "data"}
             assert len(sides) == 1
+
+
+@pytest.mark.parametrize("joint", ["ZZ", "XX"])
+def test_seam_column_interface_unrotated(joint):
+    """Joint-type generators on the seam split into three pieces, the other
+    type's generators on the boundary columns split once; every piece touches
+    one unit's qubits."""
+    d = 3
+    s = two_patch_surgery(d, joint, unrotated=True)
+    x_seam = s.seam[0][0]
+    iface = seam_column_interface(x_seam)
+    sed = s.split_seam(iface)
+    assert sed.webs_complete() and sed.detectors_complete()
+    halves = [v for v in sed.types if v[0] == "split"]
+    pieces = Counter(h[1] for h in halves)
+    pos = s.sed.positions
+    joint_spider = sed.types[next(g for g in pieces if pos[g][0] == x_seam)]
+    for g, n in pieces.items():
+        on_seam = pos[g][0] == x_seam
+        assert n == (2 if on_seam else 1)
+        assert (sed.types[g] is joint_spider) == on_seam
+        assert abs(pos[g][0] - x_seam) <= 1
+    # d seam generators per joint-type merge layer, 2 (d - 1) boundary ones
+    # per other layer.
+    n_joint = len({pos[g][2] for g in pieces if pos[g][0] == x_seam})
+    n_other = len({pos[g][2] for g in pieces if pos[g][0] != x_seam})
+    assert len(pieces) == d * n_joint + 2 * (d - 1) * n_other
+    for v in halves + list(pieces):
+        sides = {iface(*pos[u][:2]) for u in sed.graph.neighbors(v) if u[0] == "data"}
+        assert len(sides) == 1
+
+
+@pytest.mark.parametrize("joint", ["ZZ", "XX"])
+def test_seam_column_region_clusterises(joint):
+    """The seam unit clusterises into a graph state whose every boundary edge
+    is a fusion, and the hybrid realisation keeps full distance."""
+    d = 3
+    s = two_patch_surgery(d, joint, unrotated=True)
+    sed, region, fusions = s.seam_column_region()
+    ids = [v for v in region if v[0] == "id"]
+    three_way = {v[1] for v in sed.types if v[0] == "split" and v[2] != "seam"}
+    assert len(ids) == 2 * len(three_way)  # one per boundary leg
+    hsed, S = prepare_cluster_region(sed, region, fusions)
+    assert has_matching_boundary(hsed, S)
+    # Each fusion joins a cluster node directly to a generator piece: the
+    # boundary adds no outside copies, in either layer type.
+    assert not any(v[0] == "split" and len(v) == 2 for v in hsed.types)
+    boundary = {frozenset(it.ends) for it in interactions(hsed, []) if (it.ends[0] in S) != (it.ends[1] in S)}
+    assert boundary == set(fusions)
+    assert hsed.webs_complete() and hsed.detectors_complete()
+    assert all(hsed.types[v] is NodeType.Z for v in S if hsed.types[v] in SPIDERS)
+    assert not any(u in S and v in S and hsed.types[u] in SPIDERS and hsed.types[v] in SPIDERS
+                   for u, v, _ in hsed.edges)
+    real = RealisedSED.hybrid(hsed, S, fusions)
+    for basis in "XZ":
+        c = to_stim(s.experiment(basis, realised=real), UnrotatedSurfaceCodeSchedule())
+        check_deterministic(c)
+        assert distance(c) == d
 
 
 @pytest.mark.parametrize("patch_basis", ["Z", "X"])

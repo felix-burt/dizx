@@ -16,7 +16,7 @@ runner configs with every noise level fixed). Collection goes through
 `run_threshold`, whose CSVs resume by strong_id (circuit + noise + decoder),
 so a curve shared by two figures, or a re-run, never collects a shot twice.
 
-The sampling plan is fixed, not adaptive:
+The sampling plan is fixed:
 
   * erasure sweeps: the paper's grids, step 0.01;
   * crg points: a window of `CRG_WINDOW_POINTS` erasure rates at
@@ -26,15 +26,22 @@ The sampling plan is fixed, not adaptive:
     closed) gets only `CRG_CLOSING_PROBE`, which the prep figure uses to stop
     its dashed extrapolation;
   * Lambda points: exactly the (boost level, loss rate) points the paper
-    plots (`LAMBDA_POINTS`), at d = 5, 7, each to `LAMBDA_BUDGET`.
+    plots (`LAMBDA_POINTS`), at d = 5, 7, each to `LAMBDA_BUDGET`;
+  * crg refinement rounds (`REFINEMENT_FILE`): extra points and larger
+    budgets inside each crg point's scaling window, planned from the data by
+    `refine_crg.py` but frozen here once planned, so a rerun from scratch
+    collects exactly the same tasks.
 
 `reproduce.py` is the command-line front end.
 """
 from __future__ import annotations
 
+import contextlib
 import copy
+import json
 import math
 from dataclasses import dataclass
+from pathlib import Path
 
 from dizx import result_names
 
@@ -270,6 +277,71 @@ def crg_config(kind: str, family: str, observable: str) -> dict:
                    THRESHOLD_BUDGET)
 
 
+def base_budget(run: dict) -> tuple[int, int]:
+    """The plan's per-point budget for a run's kind, before any scaling."""
+    return LAMBDA_BUDGET if run["name"].startswith("subthreshold_lambda") else THRESHOLD_BUDGET
+
+
+# ---------------------------------------------------------------------------
+# crg refinement rounds
+# ---------------------------------------------------------------------------
+
+# {"rounds": [{"date", "target_stderr", "points": {"<curve id>/<p_l>":
+#   {"fit": {...}, "scale": s, "probs": {"<d>": [p, ...]}}}}]}
+# `scale` multiplies THRESHOLD_BUDGET (both caps) and is cumulative: the
+# budget each listed (d, p) is collected to, counting every earlier shot.
+REFINEMENT_FILE = Path(__file__).resolve().parent / "crg_refinement.json"
+
+
+def _load_rounds() -> list[dict]:
+    if not REFINEMENT_FILE.exists():
+        return []
+    return json.loads(REFINEMENT_FILE.read_text())["rounds"]
+
+
+REFINEMENT_ROUNDS: list[dict] = _load_rounds()
+
+
+@contextlib.contextmanager
+def refinement_rounds(rounds: list[dict]):
+    """Plan as if `rounds` were the frozen refinement (e.g. to price a proposal)."""
+    global REFINEMENT_ROUNDS
+    saved, REFINEMENT_ROUNDS = REFINEMENT_ROUNDS, rounds
+    try:
+        yield
+    finally:
+        REFINEMENT_ROUNDS = saved
+
+
+def crg_fit_distances() -> list[int]:
+    """The distances the crg scaling fits use: the base plan's plus any a
+    refinement round added (a point without data at one simply lacks it)."""
+    added = {int(d) for rnd in REFINEMENT_ROUNDS for pt in rnd["points"].values() for d in pt["probs"]}
+    return sorted(set(CRG_DISTANCES) | added)
+
+
+def point_key(curve_id: str, local_prob: float) -> str:
+    return f"{curve_id}/{local_prob:g}"
+
+
+def refined_runs(config: dict, curve_id: str, local_prob: float) -> list[dict]:
+    """The refinement runs of one crg (curve, p_l): one per (round, distance),
+    each at that round's cumulative budget scale."""
+    runs = []
+    max_shots, max_errors = THRESHOLD_BUDGET
+    for rnd in REFINEMENT_ROUNDS:
+        point = rnd["points"].get(point_key(curve_id, local_prob))
+        if point is None:
+            continue
+        for d, probs in sorted(point["probs"].items(), key=lambda kv: int(kv[0])):
+            run = resolve(config, local_prob, probs)
+            run["sweep"]["distances"] = [int(d)]
+            run["sinter"]["max_shots"] = math.ceil(max_shots * point["scale"])
+            run["sinter"]["max_errors"] = math.ceil(max_errors * point["scale"])
+            runs.append(run)
+    return runs
+
+
 def lambda_config(family: str, observable: str, n_boost: int,
                   local_probs: list[float] | None = None) -> dict:
     """The Lambda config for one boost level: every loss rate any of its local
@@ -322,9 +394,12 @@ class Curve:
         if self.kind in CRG_LOCAL_PROBS:
             config = crg_config(self.kind, self.family, self.observable)
             windows = config["sweep"]["local_prob_sweeps"]
+            runs = []
+            for lp in config["sweep"]["local_probs"]:
+                runs.append(resolve(config, lp, windows[str(lp)]["probs"]))
+                runs += refined_runs(config, self.id, lp)
             # The p_l = 0 point is the pure-erasure sweep.
-            return ([resolve(config, lp, windows[str(lp)]["probs"]) for lp in config["sweep"]["local_probs"]]
-                    + Curve("erasure", self.family, self.observable).runs())
+            return runs + Curve("erasure", self.family, self.observable).runs()
         points = LAMBDA_POINTS[(self.family, self.observable, self.local_prob)]
         return [resolve(lambda_config(self.family, self.observable, n, [self.local_prob]),
                         self.local_prob, losses)

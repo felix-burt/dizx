@@ -19,7 +19,8 @@ assigns every position (x, y) to a unit; ``Surgery.split_seam`` splits each
 generator touching another unit's qubits, and the halves are linked. The
 seam qubits' units are the free choice: ``straight_interface`` puts them all
 on the right (2-2 splits); ``zigzag_interface`` alternates them along the seam
-(3-1 splits, arXiv:2504.08891 App. B, arXiv:2503.04968 Fig. 2(c)).
+(3-1 splits, arXiv:2504.08891 App. B, arXiv:2503.04968 Fig. 2(c));
+``seam_column_interface`` makes the seam a unit of its own.
 
 ``surgery_hybrid_linear`` instead clusterises the merge region and splits its
 graph state into linear resource states joined by fusions.
@@ -35,14 +36,28 @@ from dizx.realisation import LinkKind, QECExperiment, RealisedSED
 from dizx.zx_diagram import Node, NodeType, SEDiagram, close_ports, compose
 
 SEAM_BASIS = {"ZZ": "X", "XX": "Z"}
+_OTHER_SPIDER = {NodeType.Z: NodeType.X, NodeType.X: NodeType.Z}
 
 Interface = Callable[[float, float], Hashable]
 """Unit of the qubit or generator at (x, y)."""
 
 
-def straight_interface(d: int) -> Interface:
-    """Left patch | seam and right patch."""
-    return lambda x, y: "left" if x < d else "right"
+def straight_interface(x_seam: int) -> Interface:
+    """Left patch | seam and right patch, the seam being the column
+    ``x_seam``: ``d`` for rotated patches, ``2 d - 1`` for unrotated ones."""
+    return lambda x, y: "left" if x < x_seam else "right"
+
+
+def seam_column_interface(x_seam: int) -> Interface:
+    """Left patch | seam column | right patch: the seam is a unit of its own,
+    for a hybrid merge of unrotated patches.
+
+    In the unrotated merge the seam column holds the seam qubits and the
+    generators of the joint's type, so ``Surgery.split_seam`` splits those
+    generators into three (a left-boundary half, a seam half and a
+    right-boundary half), and splits each generator of the other type on the
+    boundary columns once, giving the seam its leg."""
+    return lambda x, y: "left" if x < x_seam else "seam" if x == x_seam else "right"
 
 
 def zigzag_interface(d: int, phase: int = 1) -> Interface:
@@ -99,6 +114,37 @@ class Surgery:
         pos = self.sed.positions
         gens = [v for v in self.sed.types if isinstance(v, tuple) and v[0] == "gen"]
         return split_by_side(self.sed, lambda v: interface(*pos[v][:2]), gens)
+
+    def seam_column_region(self) -> tuple[SEDiagram, set[Node], dict[frozenset, LinkKind]]:
+        """The SED split along ``seam_column_interface``, the seam unit's
+        region and its boundary fusions, for ``prepare_cluster_region`` and
+        then ``RealisedSED.hybrid`` (unrotated patches).
+
+        The region holds the seam's spiders, every generator piece of the seam
+        unit, and an identity of the other colour on each edge from a
+        three-way generator's seam piece to its boundary pieces. A seam piece
+        has two boundary legs but a resource-state qubit takes one fusion, so
+        each leg gets its own (graph-like) leaf, fused (a Bell measurement)
+        with the boundary piece, which stays as the local ancilla. A
+        once-split generator's seam piece already meets its boundary piece
+        across a same-colour edge, which is the fusion.
+        """
+        sed = self.split_seam(seam_column_interface(self.seam[0][0]))
+        ed = SEDEditor(sed)
+        region = self.seam_nodes(sed)
+        fusions: dict[frozenset, LinkKind] = {}
+        for h in [v for v in sed.types if isinstance(v, tuple) and v[0] == "split"]:
+            g, unit = h[1], h[2]
+            if unit == "seam":
+                region.add(h)
+                fusions[frozenset((g, h))] = "fusion"
+                continue
+            region.add(g)
+            e = next(e for e in ed.graph.edges(g, keys=True) if e[1] == h)
+            leaf = ed.insert_identity(e, _OTHER_SPIDER[ed.types[g]])
+            region.add(leaf)
+            fusions[frozenset((leaf, h))] = "fusion"
+        return ed.freeze(), region, fusions
 
     def split_seam_linear(self, sed: SEDiagram) -> tuple[SEDiagram, dict[frozenset, LinkKind]]:
         """Split each seam spider of ``sed`` (graph-like, from

@@ -303,15 +303,18 @@ class RealisedSED(ZXDiagram):
 
         Other same-colour edges between world-lines need their kind in
         ``links`` (keyed by ``frozenset`` of the two spiders), e.g. the Bell
-        pairs of a loop (``transformations.loop_edge``).
+        pairs of a loop (``transformations.loop_edge``). An opposite-colour
+        boundary edge is allowed when ``links`` names it a fusion.
         """
         S = set(S)
         spiders = {v for v, t in sed.types.items() if t in SPIDERS}
         inside = spiders & S
         boundary = [it for it in interactions(sed, [])
                     if (it.ends[0] in S) != (it.ends[1] in S)]
-        if not all(it.same_colour(sed.types) for it in boundary):
-            raise ValueError("every boundary edge of S must be a split (same-colour) edge")
+        if not all(it.same_colour(sed.types) or (links or {}).get(frozenset(it.ends)) == "fusion"
+                   for it in boundary):
+            raise ValueError("every boundary edge of S must be a split (same-colour) edge "
+                             "or a fusion given in links")
         fused = {v for it in boundary for v in it.ends}
         fused |= {v for e, kind in (links or {}).items() if kind == "fusion" for v in e}
 

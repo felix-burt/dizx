@@ -272,7 +272,8 @@ def render(curves: list[dict], *, name: str, out_dir: Path, results_dir: Path,
     for curve in curves:
         config = curve["config"]
         known = {lp: (f.p_th, f.stderr, "scaling")
-                 for lp, f in crg_points(config, results_dir=results_dir).items() if f.valid}
+                 for lp, f in crg_points(config, results_dir=results_dir,
+                                         distances=curve.get("fit_distances")).items() if f.valid}
         if not known:
             print(f"Warning: skipping {config['name']} -- no valid threshold")
             continue

@@ -1,0 +1,13 @@
+#!/bin/bash
+#PBS -N crg_prep-linear_k1-XX
+#PBS -l select=1:ncpus=4:mem=10gb
+#PBS -l walltime=08:00:00
+#PBS -j oe
+#PBS -o /rds/general/user/ftb123/home/dizx/results/pbs/20261026-170827/logs/crg_prep-linear_k1-XX.log
+
+cd /rds/general/user/ftb123/home/dizx
+module load tools/prod Python/3.12.3-GCCcore-13.3.0; source .venv/bin/activate
+set -eo pipefail
+export OMP_NUM_THREADS=1 OPENBLAS_NUM_THREADS=1 MKL_NUM_THREADS=1
+echo "job $PBS_JOBID on $(hostname), $(date), commit $(git rev-parse --short HEAD 2>/dev/null)"
+python experiments/cluster.py run /rds/general/user/ftb123/home/dizx/results/pbs/20261026-170827/crg_prep-linear_k1-XX.json --workers 4

@@ -1,0 +1,214 @@
+job 4474681.pbs-7 on cx3-4-28, Mon 26 Oct 23:11:40 GMT 2026, commit fd93798
+
+===== linear_k1_crg_local_pl0.005_mtZZ_obsXX_pm_h_corr (12 workers) =====
+name: linear_k1_crg_local
+builder_name: surgery_hybrid_linear_5chain
+resource state: linear_k1
+local_prob: 0.005
+Running distance=11, merge_type=ZZ, observable=XX
+Running with noise probability p=0.235
+applied noise
+Target not yet reached, running collection
+Collection took 130.1s for 389950 shots (0.334 ms/shot, 12 workers)
+Logical error rate for distance=11, merge_type=ZZ, observable=XX, p=0.235: 3.1342e-01
+Running with noise probability p=0.24
+applied noise
+Target not yet reached, running collection
+Collection took 116.9s for 361517 shots (0.323 ms/shot, 12 workers)
+Logical error rate for distance=11, merge_type=ZZ, observable=XX, p=0.24: 3.2824e-01
+Running with noise probability p=0.245
+applied noise
+Target not yet reached, running collection
+Collection took 127.6s for 382509 shots (0.334 ms/shot, 12 workers)
+Logical error rate for distance=11, merge_type=ZZ, observable=XX, p=0.245: 3.4156e-01
+Running with noise probability p=0.25
+applied noise
+Target not yet reached, running collection
+Collection took 130.4s for 356414 shots (0.366 ms/shot, 12 workers)
+Logical error rate for distance=11, merge_type=ZZ, observable=XX, p=0.25: 3.5675e-01
+Running with noise probability p=0.255
+applied noise
+Target not yet reached, running collection
+Collection took 92.1s for 291407 shots (0.316 ms/shot, 12 workers)
+Logical error rate for distance=11, merge_type=ZZ, observable=XX, p=0.255: 3.7203e-01
+Running with noise probability p=0.26
+applied noise
+Target not yet reached, running collection
+Collection took 105.5s for 328416 shots (0.321 ms/shot, 12 workers)
+Logical error rate for distance=11, merge_type=ZZ, observable=XX, p=0.26: 3.8370e-01
+Running with noise probability p=0.265
+applied noise
+Target not yet reached, running collection
+Collection took 107.5s for 285280 shots (0.377 ms/shot, 12 workers)
+Logical error rate for distance=11, merge_type=ZZ, observable=XX, p=0.265: 3.9727e-01
+Running with noise probability p=0.27
+applied noise
+Target not yet reached, running collection
+Collection took 109.6s for 271712 shots (0.403 ms/shot, 12 workers)
+Logical error rate for distance=11, merge_type=ZZ, observable=XX, p=0.27: 4.0810e-01
+Running with noise probability p=0.275
+applied noise
+Target not yet reached, running collection
+Collection took 96.7s for 271072 shots (0.357 ms/shot, 12 workers)
+Logical error rate for distance=11, merge_type=ZZ, observable=XX, p=0.275: 4.2122e-01
+Running with noise probability p=0.28
+applied noise
+Target not yet reached, running collection
+Collection took 129.0s for 253647 shots (0.509 ms/shot, 12 workers)
+Logical error rate for distance=11, merge_type=ZZ, observable=XX, p=0.28: 4.3178e-01
+Running with noise probability p=0.285
+applied noise
+Target not yet reached, running collection
+Collection took 103.1s for 265952 shots (0.388 ms/shot, 12 workers)
+Logical error rate for distance=11, merge_type=ZZ, observable=XX, p=0.285: 4.3921e-01
+Running with noise probability p=0.29
+applied noise
+Target not yet reached, running collection
+Collection took 111.3s for 245792 shots (0.453 ms/shot, 12 workers)
+Logical error rate for distance=11, merge_type=ZZ, observable=XX, p=0.29: 4.4870e-01
+Running with noise probability p=0.295
+applied noise
+Target not yet reached, running collection
+Collection took 114.4s for 254253 shots (0.450 ms/shot, 12 workers)
+Logical error rate for distance=11, merge_type=ZZ, observable=XX, p=0.295: 4.5468e-01
+Running distance=13, merge_type=ZZ, observable=XX
+Running with noise probability p=0.235
+applied noise
+Target not yet reached, running collection
+Collection took 218.6s for 363416 shots (0.602 ms/shot, 12 workers)
+Logical error rate for distance=13, merge_type=ZZ, observable=XX, p=0.235: 3.0423e-01
+Running with noise probability p=0.24
+applied noise
+Target not yet reached, running collection
+Collection took 209.5s for 383128 shots (0.547 ms/shot, 12 workers)
+Logical error rate for distance=13, merge_type=ZZ, observable=XX, p=0.24: 3.2018e-01
+Running with noise probability p=0.245
+applied noise
+Target not yet reached, running collection
+Collection took 165.8s for 366424 shots (0.453 ms/shot, 12 workers)
+Logical error rate for distance=13, merge_type=ZZ, observable=XX, p=0.245: 3.3728e-01
+Running with noise probability p=0.25
+applied noise
+Target not yet reached, running collection
+Collection took 145.5s for 296600 shots (0.490 ms/shot, 12 workers)
+Logical error rate for distance=13, merge_type=ZZ, observable=XX, p=0.25: 3.5372e-01
+Running with noise probability p=0.255
+applied noise
+Target not yet reached, running collection
+Collection took 183.0s for 294936 shots (0.620 ms/shot, 12 workers)
+Logical error rate for distance=13, merge_type=ZZ, observable=XX, p=0.255: 3.6843e-01
+Running with noise probability p=0.26
+applied noise
+Target not yet reached, running collection
+Collection took 193.6s for 292312 shots (0.662 ms/shot, 12 workers)
+Logical error rate for distance=13, merge_type=ZZ, observable=XX, p=0.26: 3.8241e-01
+Running with noise probability p=0.265
+applied noise
+Target not yet reached, running collection
+Collection took 152.9s for 262744 shots (0.582 ms/shot, 12 workers)
+Logical error rate for distance=13, merge_type=ZZ, observable=XX, p=0.265: 3.9648e-01
+Running with noise probability p=0.27
+applied noise
+Target not yet reached, running collection
+Collection took 178.3s for 263480 shots (0.677 ms/shot, 12 workers)
+Logical error rate for distance=13, merge_type=ZZ, observable=XX, p=0.27: 4.0984e-01
+Running with noise probability p=0.275
+applied noise
+Target not yet reached, running collection
+Collection took 160.9s for 273944 shots (0.588 ms/shot, 12 workers)
+Logical error rate for distance=13, merge_type=ZZ, observable=XX, p=0.275: 4.2189e-01
+Running with noise probability p=0.28
+applied noise
+Target not yet reached, running collection
+Collection took 171.5s for 257688 shots (0.666 ms/shot, 12 workers)
+Logical error rate for distance=13, merge_type=ZZ, observable=XX, p=0.28: 4.3384e-01
+Running with noise probability p=0.285
+applied noise
+Target not yet reached, running collection
+Collection took 156.6s for 257720 shots (0.608 ms/shot, 12 workers)
+Logical error rate for distance=13, merge_type=ZZ, observable=XX, p=0.285: 4.4223e-01
+Running with noise probability p=0.29
+applied noise
+Target not yet reached, running collection
+Collection took 156.8s for 245592 shots (0.638 ms/shot, 12 workers)
+Logical error rate for distance=13, merge_type=ZZ, observable=XX, p=0.29: 4.5234e-01
+Running with noise probability p=0.295
+applied noise
+Target not yet reached, running collection
+Collection took 166.8s for 243704 shots (0.684 ms/shot, 12 workers)
+Logical error rate for distance=13, merge_type=ZZ, observable=XX, p=0.295: 4.6005e-01
+Running distance=15, merge_type=ZZ, observable=XX
+Running with noise probability p=0.235
+applied noise
+Target not yet reached, running collection
+Collection took 315.1s for 424216 shots (0.743 ms/shot, 12 workers)
+Logical error rate for distance=15, merge_type=ZZ, observable=XX, p=0.235: 2.9700e-01
+Running with noise probability p=0.24
+applied noise
+Target not yet reached, running collection
+Collection took 296.6s for 414456 shots (0.716 ms/shot, 12 workers)
+Logical error rate for distance=15, merge_type=ZZ, observable=XX, p=0.24: 3.1719e-01
+Running with noise probability p=0.245
+applied noise
+Target not yet reached, running collection
+Collection took 269.6s for 315416 shots (0.855 ms/shot, 12 workers)
+Logical error rate for distance=15, merge_type=ZZ, observable=XX, p=0.245: 3.3365e-01
+Running with noise probability p=0.25
+applied noise
+Target not yet reached, running collection
+Collection took 283.5s for 307640 shots (0.922 ms/shot, 12 workers)
+Logical error rate for distance=15, merge_type=ZZ, observable=XX, p=0.25: 3.5076e-01
+Running with noise probability p=0.255
+applied noise
+Target not yet reached, running collection
+Collection took 264.5s for 293464 shots (0.901 ms/shot, 12 workers)
+Logical error rate for distance=15, merge_type=ZZ, observable=XX, p=0.255: 3.6754e-01
+Running with noise probability p=0.26
+applied noise
+Target not yet reached, running collection
+Collection took 295.3s for 303768 shots (0.972 ms/shot, 12 workers)
+Logical error rate for distance=15, merge_type=ZZ, observable=XX, p=0.26: 3.8360e-01
+Running with noise probability p=0.265
+applied noise
+Target not yet reached, running collection
+Collection took 249.3s for 281560 shots (0.885 ms/shot, 12 workers)
+Logical error rate for distance=15, merge_type=ZZ, observable=XX, p=0.265: 3.9900e-01
+Running with noise probability p=0.27
+applied noise
+Target not yet reached, running collection
+Collection took 248.4s for 279096 shots (0.890 ms/shot, 12 workers)
+Logical error rate for distance=15, merge_type=ZZ, observable=XX, p=0.27: 4.1130e-01
+Running with noise probability p=0.275
+applied noise
+Target not yet reached, running collection
+Collection took 256.2s for 277272 shots (0.924 ms/shot, 12 workers)
+Logical error rate for distance=15, merge_type=ZZ, observable=XX, p=0.275: 4.2511e-01
+Running with noise probability p=0.28
+applied noise
+Target not yet reached, running collection
+Collection took 267.4s for 267064 shots (1.001 ms/shot, 12 workers)
+Logical error rate for distance=15, merge_type=ZZ, observable=XX, p=0.28: 4.3436e-01
+Running with noise probability p=0.285
+applied noise
+Target not yet reached, running collection
+Collection took 217.9s for 259736 shots (0.839 ms/shot, 12 workers)
+Logical error rate for distance=15, merge_type=ZZ, observable=XX, p=0.285: 4.4605e-01
+Running with noise probability p=0.29
+applied noise
+Target not yet reached, running collection
+Collection took 226.5s for 260760 shots (0.869 ms/shot, 12 workers)
+Logical error rate for distance=15, merge_type=ZZ, observable=XX, p=0.29: 4.5541e-01
+Running with noise probability p=0.295
+applied noise
+Target not yet reached, running collection
+Collection took 292.2s for 245848 shots (1.189 ms/shot, 12 workers)
+Logical error rate for distance=15, merge_type=ZZ, observable=XX, p=0.295: 4.6204e-01
+
+====================================
+CPU Time used: 14:53:45
+CPU Percent: 1190%
+Memory usage: 7007032kb
+Approx Power usage: 0.17859999999999998
+Walltime usage: 02:03:01
+
+====================================

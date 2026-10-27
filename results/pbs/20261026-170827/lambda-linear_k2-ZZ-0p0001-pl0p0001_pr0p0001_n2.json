@@ -1,0 +1,123 @@
+{
+ "name": "lambda-linear_k2-ZZ-0p0001-pl0p0001_pr0p0001_n2",
+ "budget_scale": 1.0,
+ "results_dir": "/rds/general/user/ftb123/home/dizx/results/cluster",
+ "runs": [
+  {
+   "name": "subthreshold_lambda_linear_k2_corr_obsZZ_n2",
+   "builder": {
+    "name": "surgery_hybrid_linear_8chain"
+   },
+   "sweep": {
+    "merge_types": [
+     "ZZ"
+    ],
+    "observables": [
+     "ZZ"
+    ],
+    "distances": [
+     5,
+     7
+    ],
+    "probs": [
+     0.001,
+     0.005,
+     0.01,
+     0.02,
+     0.03,
+     0.04,
+     0.05,
+     0.06,
+     0.08,
+     0.1
+    ]
+   },
+   "noise_model": [
+    {
+     "tag": [
+      "circuit",
+      "reset"
+     ],
+     "kind": "RESET_FLIP",
+     "probability": 0.0001
+    },
+    {
+     "tag": [
+      "circuit",
+      "single_qubit_gate"
+     ],
+     "kind": "DEPOLARIZE1",
+     "probability": 0.0001
+    },
+    {
+     "tag": [
+      "circuit",
+      "two_qubit_gate"
+     ],
+     "kind": "DEPOLARIZE2",
+     "probability": 0.0001
+    },
+    {
+     "tag": [
+      "circuit",
+      "single_qubit_measurement"
+     ],
+     "kind": "MEASUREMENT_FLIP",
+     "probability": 0.0001
+    },
+    {
+     "tag": [
+      "circuit-graph",
+      "fusion_gate"
+     ],
+     "kind": "DEPOLARIZE2",
+     "probability": 0.0001
+    },
+    {
+     "tag": [
+      "circuit-graph",
+      "fusion_measurement"
+     ],
+     "kind": "MEASUREMENT_FLIP",
+     "probability": 0.0001
+    },
+    {
+     "tag": [
+      "graph",
+      "reset",
+      "matter"
+     ],
+     "kind": "RESET_FLIP",
+     "probability": 0.0001
+    },
+    {
+     "tag": [
+      "graph",
+      "fusion_measurement"
+     ],
+     "kind": "MEASUREMENT_FLIP",
+     "probability": 0.0001
+    },
+    {
+     "tag": [
+      "graph",
+      "fusion_measurement"
+     ],
+     "kind": "HERALDED_ERASE",
+     "probability": "p_e",
+     "n_boost": 2
+    }
+   ],
+   "resource_state": "linear_k2",
+   "results_dir": "/rds/general/user/ftb123/home/dizx/results/cluster",
+   "sinter": {
+    "decoder": "pymatching_heralded",
+    "max_shots": 10000000000,
+    "max_errors": 2000,
+    "num_workers": 1,
+    "pm_decompose": true,
+    "pm_enable_correlations": true
+   }
+  }
+ ]
+}

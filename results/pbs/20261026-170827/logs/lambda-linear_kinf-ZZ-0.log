@@ -1,0 +1,88 @@
+job 4474743.pbs-7 on cx3-14-9, Mon 26 Oct 20:56:32 GMT 2026, commit fd93798
+
+===== linear_kinf_subthreshold_lambda_pl0.0_pr0.0_n2_mtZZ_obsZZ_pm_h_corr (8 workers) =====
+name: linear_kinf_subthreshold_lambda
+builder_name: surgery_hybrid_linear_3dchain
+resource state: linear_kinf
+local_prob: 0.0
+Running distance=5, merge_type=ZZ, observable=ZZ
+Running with noise probability p=0.02
+applied noise
+Target not yet reached, running collection
+Collection took 466.0s for 237820040 shots (0.002 ms/shot, 8 workers)
+Logical error rate for distance=5, merge_type=ZZ, observable=ZZ, p=0.02: 9.6754e-06
+Running with noise probability p=0.03
+applied noise
+Target not yet reached, running collection
+Collection took 111.6s for 39991432 shots (0.003 ms/shot, 8 workers)
+Logical error rate for distance=5, merge_type=ZZ, observable=ZZ, p=0.03: 5.0461e-05
+Running with noise probability p=0.04
+applied noise
+Target not yet reached, running collection
+Collection took 54.4s for 13224072 shots (0.004 ms/shot, 8 workers)
+Logical error rate for distance=5, merge_type=ZZ, observable=ZZ, p=0.04: 1.8746e-04
+Running with noise probability p=0.05
+applied noise
+Target not yet reached, running collection
+Collection took 34.7s for 4377736 shots (0.008 ms/shot, 8 workers)
+Logical error rate for distance=5, merge_type=ZZ, observable=ZZ, p=0.05: 5.9003e-04
+Running with noise probability p=0.06
+applied noise
+Target not yet reached, running collection
+Collection took 30.8s for 1472648 shots (0.021 ms/shot, 8 workers)
+Logical error rate for distance=5, merge_type=ZZ, observable=ZZ, p=0.06: 1.5985e-03
+Running with noise probability p=0.08
+applied noise
+Target not yet reached, running collection
+Collection took 26.7s for 324744 shots (0.082 ms/shot, 8 workers)
+Logical error rate for distance=5, merge_type=ZZ, observable=ZZ, p=0.08: 7.7754e-03
+Running with noise probability p=0.1
+applied noise
+Target not yet reached, running collection
+Collection took 31.8s for 102536 shots (0.310 ms/shot, 8 workers)
+Logical error rate for distance=5, merge_type=ZZ, observable=ZZ, p=0.1: 2.4352e-02
+Running distance=7, merge_type=ZZ, observable=ZZ
+Running with noise probability p=0.02
+applied noise
+Target not yet reached, running collection
+Collection took 22414.9s for 5557084296 shots (0.004 ms/shot, 8 workers)
+Logical error rate for distance=7, merge_type=ZZ, observable=ZZ, p=0.02: 3.6062e-07
+Running with noise probability p=0.03
+applied noise
+Target not yet reached, running collection
+Collection took 2898.7s for 601238664 shots (0.005 ms/shot, 8 workers)
+Logical error rate for distance=7, merge_type=ZZ, observable=ZZ, p=0.03: 3.4529e-06
+Running with noise probability p=0.04
+applied noise
+Target not yet reached, running collection
+Collection took 603.3s for 106306696 shots (0.006 ms/shot, 8 workers)
+Logical error rate for distance=7, merge_type=ZZ, observable=ZZ, p=0.04: 2.2858e-05
+Running with noise probability p=0.05
+applied noise
+Target not yet reached, running collection
+Collection took 162.3s for 19950728 shots (0.008 ms/shot, 8 workers)
+Logical error rate for distance=7, merge_type=ZZ, observable=ZZ, p=0.05: 1.1137e-04
+Running with noise probability p=0.06
+applied noise
+Target not yet reached, running collection
+Collection took 91.8s for 6355080 shots (0.014 ms/shot, 8 workers)
+Logical error rate for distance=7, merge_type=ZZ, observable=ZZ, p=0.06: 4.2155e-04
+Running with noise probability p=0.08
+applied noise
+Target not yet reached, running collection
+Collection took 45.4s for 564360 shots (0.080 ms/shot, 8 workers)
+Logical error rate for distance=7, merge_type=ZZ, observable=ZZ, p=0.08: 3.8149e-03
+Running with noise probability p=0.1
+applied noise
+Target not yet reached, running collection
+Collection took 56.4s for 134280 shots (0.420 ms/shot, 8 workers)
+Logical error rate for distance=7, merge_type=ZZ, observable=ZZ, p=0.1: 1.7270e-02
+
+====================================
+CPU Time used: 58:26:35
+CPU Percent: 795%
+Memory usage: 645636kb
+Approx Power usage: 0.7011999999999999
+Walltime usage: 07:30:54
+
+====================================

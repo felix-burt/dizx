@@ -54,20 +54,22 @@ def test_window_stays_positive():
 
 
 def test_verdict():
-    assert rc.verdict(_fit(stderr=0.0004), []) == "converged"
-    assert rc.verdict(_fit(stderr=0.001), []) == "refine"
+    T = rc.TARGET_STDERR
+    assert rc.verdict(_fit(stderr=0.8 * T), []) == "converged"
+    assert rc.verdict(_fit(stderr=2 * T), []) == "refine"
     # On target but moved more than half its error since the last round.
-    assert rc.verdict(_fit(stderr=0.0004), [{"fit": {"p_th": 0.4210}}]) == "refine"
-    assert rc.verdict(_fit(stderr=0.0004), [{"fit": {"p_th": 0.4199}}]) == "converged"
-    assert rc.verdict(_fit(), [{"fit": {"p_th": 0.42}}] * rc.MAX_ROUNDS).startswith("round cap")
+    assert rc.verdict(_fit(stderr=0.8 * T), [{"fit": {"p_th": 0.42 + T}}]) == "refine"
+    assert rc.verdict(_fit(stderr=0.8 * T), [{"fit": {"p_th": 0.42 + 0.2 * T}}]) == "converged"
+    assert rc.verdict(_fit(stderr=2 * T), [{"fit": {"p_th": 0.42}}] * rc.MAX_ROUNDS).startswith("round cap")
     assert rc.verdict(_fit(valid=False), []).startswith("no valid fit")
 
 
 def test_budget_scale_is_cumulative_and_clamped():
-    assert rc.plan_point(_fit(stderr=0.0006), [], KEY)["scale"] == rc.MIN_FACTOR
-    assert rc.plan_point(_fit(stderr=0.003), [], KEY)["scale"] == rc.MAX_FACTOR
-    # (0.001 / 0.0005)^2 = 4, clamped, on top of the 4x already planned at 0.42.
-    assert rc.plan_point(_fit(stderr=0.001), [_round(4.0)], KEY)["scale"] == 4.0 * min(4.0, rc.MAX_FACTOR)
+    T = rc.TARGET_STDERR
+    assert rc.plan_point(_fit(stderr=1.2 * T), [], KEY)["scale"] == rc.MIN_FACTOR
+    assert rc.plan_point(_fit(stderr=6 * T), [], KEY)["scale"] == rc.MAX_FACTOR
+    # (2T / T)^2 = 4, clamped, on top of the 4x already planned at 0.42.
+    assert rc.plan_point(_fit(stderr=2 * T), [_round(4.0)], KEY)["scale"] == 4.0 * min(4.0, rc.MAX_FACTOR)
 
 
 def test_rounds_become_runs_of_the_curve():

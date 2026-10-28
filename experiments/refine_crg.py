@@ -51,7 +51,10 @@ import paper  # noqa: E402
 from figures import scaling_fit  # noqa: E402
 from figures.scaling_fit import ScalingFit  # noqa: E402
 
-TARGET_STDERR = 0.0005
+# Was 0.0005 until 2026-10-28: once the fit's error carries the finite-size
+# drift (scaling_fit `fs`, larger than the statistical error at 112/154 points
+# after d = 17), shots can't reach it; 0.001 is what d = 19 can plausibly give.
+TARGET_STDERR = 0.001
 MAX_ROUNDS = 4
 # The fit window, not the widest systematic one (0.20): that one costs ~45%
 # more per round, mostly new points outside the paper's +-0.03 data when nu ~ 2.

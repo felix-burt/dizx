@@ -25,8 +25,17 @@ A fit is valid only with
     the slow drift of the crossing with d shows up in chi2; such fits carry the
     sqrt(chi2/dof)-scaled error).
 Its error is the statistical one (scaled by sqrt(chi2/dof) when that exceeds
-1) in quadrature with a systematic: half the spread of p_th over
-x_max in {0.10, 0.15, 0.20} (the valid ones).
+1) in quadrature with two systematics:
+  * window: half the spread of p_th over x_max in {0.10, 0.15, 0.20} (the
+    valid ones);
+  * finite size (with >= 4 distances): half the difference between the fits
+    to the smallest and to the largest n-1 distances (11-15 vs 13-17). The
+    form has no finite-size correction, and adding d = 17 (2026-10-28) showed
+    the crossing drifting down with d (118/154 crg points; up to 0.006, i.e.
+    3-5 stat sigma at crg_local p_c 0.5-0.9%). Fitting the WHP correction
+    D d^(-1/mu) instead left p_th nearly undetermined at d <= 17 (error x9,
+    jagged curves), so the drift is carried as an error instead. Its chi2 is
+    also why a fit with this systematic may exceed MAX_CHI2 and stay valid.
 
 Every threshold in the paper's figures comes from `scaling_threshold`: the
 crg figures' points (`crg_points`) and the pure-erasure threshold
@@ -69,12 +78,13 @@ class ScalingFit:
     p_th: float | None
     stderr: float | None   # total: statistical (chi2-scaled) + systematic
     stat: float | None
-    sys: float | None
+    sys: float | None      # window systematic
     nu: float | None
     chi2: float | None
     n: int
     valid: bool
     reason: str = ""
+    fs: float | None = None   # finite-size systematic (None: fewer than 4 distances)
 
 
 def _aggregate(stats: list[sinter.TaskStats], distances: list[int]) -> dict[tuple[int, float], tuple[int, int]]:
@@ -161,7 +171,8 @@ def _check(result, keys, distances: list[int]) -> str:
     return ""
 
 
-def scaling_threshold(stats: list[sinter.TaskStats], distances: list[int]) -> ScalingFit:
+def scaling_threshold(stats: list[sinter.TaskStats], distances: list[int],
+                      finite_size: bool = True) -> ScalingFit:
     distances = sorted(distances)
     agg = _aggregate(stats, distances)
     present = sorted({d for d, _ in agg})
@@ -183,8 +194,16 @@ def scaling_threshold(stats: list[sinter.TaskStats], distances: list[int]) -> Sc
         if r is not None and not _check(r, k, present):
             others.append(r[0])
     sys_err = (max(others) - min(others)) / 2 if len(others) >= 2 else 0.0
-    total = math.hypot(stat_scaled, sys_err)
-    return ScalingFit(p_th, total, stat_scaled, sys_err, nu, chi2, len(keys), not reason, reason)
+    fs_err = None
+    if finite_size and len(present) >= 4:
+        lo = scaling_threshold(stats, present[:-1], finite_size=False)
+        hi = scaling_threshold(stats, present[1:], finite_size=False)
+        if lo.p_th is not None and hi.p_th is not None:
+            fs_err = abs(hi.p_th - lo.p_th) / 2
+            if reason.startswith("chi2/dof"):
+                reason = ""   # the drift the finite-size error carries
+    total = math.hypot(stat_scaled, sys_err, fs_err or 0.0)
+    return ScalingFit(p_th, total, stat_scaled, sys_err, nu, chi2, len(keys), not reason, reason, fs_err)
 
 
 def crg_points(config: dict, *, results_dir: Path,
@@ -210,5 +229,6 @@ def describe(f: ScalingFit) -> str:
     if f.p_th is None:
         return f"--  ({f.reason})"
     flag = "" if f.valid else f"   FLAGGED: {f.reason}"
-    return (f"{f.p_th:.4f} ± {f.stderr:.4f} (stat {f.stat:.4f}, sys {f.sys:.4f})  "
+    fs = "" if f.fs is None else f", fs {f.fs:.4f}"
+    return (f"{f.p_th:.4f} ± {f.stderr:.4f} (stat {f.stat:.4f}, sys {f.sys:.4f}{fs})  "
             f"nu={f.nu:.2f} chi2/dof={f.chi2:.1f} n={f.n}{flag}")

@@ -1,0 +1,1009 @@
+{
+ "created": "2026-10-27T14:57:12",
+ "commit": "96781b2fec8777955a3ec9293c9dcaca3939fa09",
+ "targets": [
+  "crg_*"
+ ],
+ "split": "auto",
+ "budget_scale": 1.0,
+ "results_dir": "/rds/general/user/ftb123/home/dizx/results/cluster",
+ "jobs": {
+  "crg_local-bell-ZZ": {
+   "pbs_id": "4485748.pbs-7",
+   "spec": "/rds/general/user/ftb123/home/dizx/results/pbs/20261027-145712/crg_local-bell-ZZ.json",
+   "stems": [
+    "bell_crg_local_pl0.001_mtZZ_obsZZ_pm_h_corr",
+    "bell_crg_local_pl0.002_mtZZ_obsZZ_pm_h_corr",
+    "bell_crg_local_pl0.003_mtZZ_obsZZ_pm_h_corr",
+    "bell_crg_local_pl0.004_mtZZ_obsZZ_pm_h_corr",
+    "bell_crg_local_pl0.005_mtZZ_obsZZ_pm_h_corr",
+    "bell_crg_local_pl0.006_mtZZ_obsZZ_pm_h_corr",
+    "bell_crg_local_pl0.007_mtZZ_obsZZ_pm_h_corr",
+    "bell_crg_local_pl0.008_mtZZ_obsZZ_pm_h_corr",
+    "bell_crg_local_pl0.009_mtZZ_obsZZ_pm_h_corr",
+    "bell_crg_local_pl0.01_mtZZ_obsZZ_pm_h_corr"
+   ],
+   "ncpus": 28,
+   "mem_gb": 52,
+   "walltime_h": 12,
+   "core_hours": 153.38
+  },
+  "crg_local-bell_zigzag-ZZ-pl0p001": {
+   "pbs_id": "4485749.pbs-7",
+   "spec": "/rds/general/user/ftb123/home/dizx/results/pbs/20261027-145712/crg_local-bell_zigzag-ZZ-pl0p001.json",
+   "stems": [
+    "bell_zigzag_crg_local_pl0.001_mtZZ_obsZZ_pm_h_corr"
+   ],
+   "ncpus": 4,
+   "mem_gb": 10,
+   "walltime_h": 3,
+   "core_hours": 4.94
+  },
+  "crg_local-bell_zigzag-ZZ-pl0p002": {
+   "pbs_id": "4485750.pbs-7",
+   "spec": "/rds/general/user/ftb123/home/dizx/results/pbs/20261027-145712/crg_local-bell_zigzag-ZZ-pl0p002.json",
+   "stems": [
+    "bell_zigzag_crg_local_pl0.002_mtZZ_obsZZ_pm_h_corr"
+   ],
+   "ncpus": 4,
+   "mem_gb": 10,
+   "walltime_h": 5,
+   "core_hours": 8.92
+  },
+  "crg_local-bell_zigzag-ZZ-pl0p003": {
+   "pbs_id": "4485751.pbs-7",
+   "spec": "/rds/general/user/ftb123/home/dizx/results/pbs/20261027-145712/crg_local-bell_zigzag-ZZ-pl0p003.json",
+   "stems": [
+    "bell_zigzag_crg_local_pl0.003_mtZZ_obsZZ_pm_h_corr"
+   ],
+   "ncpus": 4,
+   "mem_gb": 10,
+   "walltime_h": 8,
+   "core_hours": 14.48
+  },
+  "crg_local-bell_zigzag-ZZ-pl0p004": {
+   "pbs_id": "4485752.pbs-7",
+   "spec": "/rds/general/user/ftb123/home/dizx/results/pbs/20261027-145712/crg_local-bell_zigzag-ZZ-pl0p004.json",
+   "stems": [
+    "bell_zigzag_crg_local_pl0.004_mtZZ_obsZZ_pm_h_corr"
+   ],
+   "ncpus": 4,
+   "mem_gb": 10,
+   "walltime_h": 9,
+   "core_hours": 16.46
+  },
+  "crg_local-bell_zigzag-ZZ-pl0p005": {
+   "pbs_id": "4485753.pbs-7",
+   "spec": "/rds/general/user/ftb123/home/dizx/results/pbs/20261027-145712/crg_local-bell_zigzag-ZZ-pl0p005.json",
+   "stems": [
+    "bell_zigzag_crg_local_pl0.005_mtZZ_obsZZ_pm_h_corr"
+   ],
+   "ncpus": 4,
+   "mem_gb": 10,
+   "walltime_h": 11,
+   "core_hours": 20.61
+  },
+  "crg_local-bell_zigzag-ZZ-pl0p006": {
+   "pbs_id": "4485754.pbs-7",
+   "spec": "/rds/general/user/ftb123/home/dizx/results/pbs/20261027-145712/crg_local-bell_zigzag-ZZ-pl0p006.json",
+   "stems": [
+    "bell_zigzag_crg_local_pl0.006_mtZZ_obsZZ_pm_h_corr"
+   ],
+   "ncpus": 4,
+   "mem_gb": 10,
+   "walltime_h": 11,
+   "core_hours": 20.81
+  },
+  "crg_local-bell_zigzag-ZZ-pl0p007": {
+   "pbs_id": "4485755.pbs-7",
+   "spec": "/rds/general/user/ftb123/home/dizx/results/pbs/20261027-145712/crg_local-bell_zigzag-ZZ-pl0p007.json",
+   "stems": [
+    "bell_zigzag_crg_local_pl0.007_mtZZ_obsZZ_pm_h_corr"
+   ],
+   "ncpus": 4,
+   "mem_gb": 10,
+   "walltime_h": 12,
+   "core_hours": 21.61
+  },
+  "crg_local-bell_zigzag-ZZ-pl0p008": {
+   "pbs_id": "4485756.pbs-7",
+   "spec": "/rds/general/user/ftb123/home/dizx/results/pbs/20261027-145712/crg_local-bell_zigzag-ZZ-pl0p008.json",
+   "stems": [
+    "bell_zigzag_crg_local_pl0.008_mtZZ_obsZZ_pm_h_corr"
+   ],
+   "ncpus": 4,
+   "mem_gb": 10,
+   "walltime_h": 13,
+   "core_hours": 23.68
+  },
+  "crg_local-bell_zigzag-ZZ-pl0p009": {
+   "pbs_id": "4485757.pbs-7",
+   "spec": "/rds/general/user/ftb123/home/dizx/results/pbs/20261027-145712/crg_local-bell_zigzag-ZZ-pl0p009.json",
+   "stems": [
+    "bell_zigzag_crg_local_pl0.009_mtZZ_obsZZ_pm_h_corr"
+   ],
+   "ncpus": 4,
+   "mem_gb": 10,
+   "walltime_h": 13,
+   "core_hours": 23.98
+  },
+  "crg_local-bell_zigzag-ZZ-pl0p01": {
+   "pbs_id": "4485758.pbs-7",
+   "spec": "/rds/general/user/ftb123/home/dizx/results/pbs/20261027-145712/crg_local-bell_zigzag-ZZ-pl0p01.json",
+   "stems": [
+    "bell_zigzag_crg_local_pl0.01_mtZZ_obsZZ_pm_h_corr"
+   ],
+   "ncpus": 8,
+   "mem_gb": 18,
+   "walltime_h": 8,
+   "core_hours": 26.89
+  },
+  "crg_local-linear_k1-ZZ-pl0p001": {
+   "pbs_id": "4485759.pbs-7",
+   "spec": "/rds/general/user/ftb123/home/dizx/results/pbs/20261027-145712/crg_local-linear_k1-ZZ-pl0p001.json",
+   "stems": [
+    "linear_k1_crg_local_pl0.001_mtZZ_obsZZ_pm_h_corr"
+   ],
+   "ncpus": 4,
+   "mem_gb": 13,
+   "walltime_h": 7,
+   "core_hours": 12.88
+  },
+  "crg_local-linear_k1-ZZ-pl0p002": {
+   "pbs_id": "4485760.pbs-7",
+   "spec": "/rds/general/user/ftb123/home/dizx/results/pbs/20261027-145712/crg_local-linear_k1-ZZ-pl0p002.json",
+   "stems": [
+    "linear_k1_crg_local_pl0.002_mtZZ_obsZZ_pm_h_corr"
+   ],
+   "ncpus": 4,
+   "mem_gb": 13,
+   "walltime_h": 12,
+   "core_hours": 23.3
+  },
+  "crg_local-linear_k1-ZZ-pl0p003": {
+   "pbs_id": "4485761.pbs-7",
+   "spec": "/rds/general/user/ftb123/home/dizx/results/pbs/20261027-145712/crg_local-linear_k1-ZZ-pl0p003.json",
+   "stems": [
+    "linear_k1_crg_local_pl0.003_mtZZ_obsZZ_pm_h_corr"
+   ],
+   "ncpus": 8,
+   "mem_gb": 23,
+   "walltime_h": 9,
+   "core_hours": 32.07
+  },
+  "crg_local-linear_k1-ZZ-pl0p004": {
+   "pbs_id": "4485762.pbs-7",
+   "spec": "/rds/general/user/ftb123/home/dizx/results/pbs/20261027-145712/crg_local-linear_k1-ZZ-pl0p004.json",
+   "stems": [
+    "linear_k1_crg_local_pl0.004_mtZZ_obsZZ_pm_h_corr"
+   ],
+   "ncpus": 8,
+   "mem_gb": 23,
+   "walltime_h": 12,
+   "core_hours": 45.99
+  },
+  "crg_local-linear_k1-ZZ-pl0p005": {
+   "pbs_id": "4485763.pbs-7",
+   "spec": "/rds/general/user/ftb123/home/dizx/results/pbs/20261027-145712/crg_local-linear_k1-ZZ-pl0p005.json",
+   "stems": [
+    "linear_k1_crg_local_pl0.005_mtZZ_obsZZ_pm_h_corr"
+   ],
+   "ncpus": 8,
+   "mem_gb": 23,
+   "walltime_h": 12,
+   "core_hours": 43.84
+  },
+  "crg_local-linear_k1-ZZ-pl0p006": {
+   "pbs_id": "4485764.pbs-7",
+   "spec": "/rds/general/user/ftb123/home/dizx/results/pbs/20261027-145712/crg_local-linear_k1-ZZ-pl0p006.json",
+   "stems": [
+    "linear_k1_crg_local_pl0.006_mtZZ_obsZZ_pm_h_corr"
+   ],
+   "ncpus": 4,
+   "mem_gb": 13,
+   "walltime_h": 9,
+   "core_hours": 16.84
+  },
+  "crg_local-linear_k1-ZZ-pl0p007": {
+   "pbs_id": "4485765.pbs-7",
+   "spec": "/rds/general/user/ftb123/home/dizx/results/pbs/20261027-145712/crg_local-linear_k1-ZZ-pl0p007.json",
+   "stems": [
+    "linear_k1_crg_local_pl0.007_mtZZ_obsZZ_pm_h_corr"
+   ],
+   "ncpus": 12,
+   "mem_gb": 33,
+   "walltime_h": 12,
+   "core_hours": 68.4
+  },
+  "crg_local-linear_k1-ZZ-pl0p008": {
+   "pbs_id": "4485766.pbs-7",
+   "spec": "/rds/general/user/ftb123/home/dizx/results/pbs/20261027-145712/crg_local-linear_k1-ZZ-pl0p008.json",
+   "stems": [
+    "linear_k1_crg_local_pl0.008_mtZZ_obsZZ_pm_h_corr"
+   ],
+   "ncpus": 16,
+   "mem_gb": 44,
+   "walltime_h": 12,
+   "core_hours": 86.9
+  },
+  "crg_local-linear_k1-ZZ-pl0p009": {
+   "pbs_id": "4485767.pbs-7",
+   "spec": "/rds/general/user/ftb123/home/dizx/results/pbs/20261027-145712/crg_local-linear_k1-ZZ-pl0p009.json",
+   "stems": [
+    "linear_k1_crg_local_pl0.009_mtZZ_obsZZ_pm_h_corr"
+   ],
+   "ncpus": 8,
+   "mem_gb": 23,
+   "walltime_h": 10,
+   "core_hours": 38.53
+  },
+  "crg_local-linear_k1-ZZ-pl0p01": {
+   "pbs_id": "4485768.pbs-7",
+   "spec": "/rds/general/user/ftb123/home/dizx/results/pbs/20261027-145712/crg_local-linear_k1-ZZ-pl0p01.json",
+   "stems": [
+    "linear_k1_crg_local_pl0.01_mtZZ_obsZZ_pm_h_corr"
+   ],
+   "ncpus": 4,
+   "mem_gb": 13,
+   "walltime_h": 9,
+   "core_hours": 15.79
+  },
+  "crg_local-linear_k2-ZZ": {
+   "pbs_id": "4485769.pbs-7",
+   "spec": "/rds/general/user/ftb123/home/dizx/results/pbs/20261027-145712/crg_local-linear_k2-ZZ.json",
+   "stems": [
+    "linear_k2_crg_local_pl0.001_mtZZ_obsZZ_pm_h_corr",
+    "linear_k2_crg_local_pl0.002_mtZZ_obsZZ_pm_h_corr",
+    "linear_k2_crg_local_pl0.003_mtZZ_obsZZ_pm_h_corr",
+    "linear_k2_crg_local_pl0.004_mtZZ_obsZZ_pm_h_corr",
+    "linear_k2_crg_local_pl0.005_mtZZ_obsZZ_pm_h_corr",
+    "linear_k2_crg_local_pl0.006_mtZZ_obsZZ_pm_h_corr",
+    "linear_k2_crg_local_pl0.007_mtZZ_obsZZ_pm_h_corr",
+    "linear_k2_crg_local_pl0.008_mtZZ_obsZZ_pm_h_corr",
+    "linear_k2_crg_local_pl0.009_mtZZ_obsZZ_pm_h_corr",
+    "linear_k2_crg_local_pl0.01_mtZZ_obsZZ_pm_h_corr"
+   ],
+   "ncpus": 32,
+   "mem_gb": 76,
+   "walltime_h": 12,
+   "core_hours": 170.49
+  },
+  "erasure-linear_k2-ZZ": {
+   "pbs_id": "4485770.pbs-7",
+   "spec": "/rds/general/user/ftb123/home/dizx/results/pbs/20261027-145712/erasure-linear_k2-ZZ.json",
+   "stems": [
+    "linear_k2_erasure_mtZZ_obsZZ_pm_h_corr"
+   ],
+   "ncpus": 4,
+   "mem_gb": 15,
+   "walltime_h": 1,
+   "core_hours": 0.02
+  },
+  "crg_local-linear_kinf-ZZ": {
+   "pbs_id": "4485771.pbs-7",
+   "spec": "/rds/general/user/ftb123/home/dizx/results/pbs/20261027-145712/crg_local-linear_kinf-ZZ.json",
+   "stems": [
+    "linear_kinf_crg_local_pl0.001_mtZZ_obsZZ_pm_h_corr",
+    "linear_kinf_crg_local_pl0.002_mtZZ_obsZZ_pm_h_corr",
+    "linear_kinf_crg_local_pl0.003_mtZZ_obsZZ_pm_h_corr",
+    "linear_kinf_crg_local_pl0.004_mtZZ_obsZZ_pm_h_corr",
+    "linear_kinf_crg_local_pl0.005_mtZZ_obsZZ_pm_h_corr",
+    "linear_kinf_crg_local_pl0.006_mtZZ_obsZZ_pm_h_corr",
+    "linear_kinf_crg_local_pl0.007_mtZZ_obsZZ_pm_h_corr",
+    "linear_kinf_crg_local_pl0.008_mtZZ_obsZZ_pm_h_corr",
+    "linear_kinf_crg_local_pl0.009_mtZZ_obsZZ_pm_h_corr",
+    "linear_kinf_crg_local_pl0.01_mtZZ_obsZZ_pm_h_corr"
+   ],
+   "ncpus": 28,
+   "mem_gb": 60,
+   "walltime_h": 12,
+   "core_hours": 145.58
+  },
+  "crg_local-bell-XX-pl0p001": {
+   "pbs_id": "4485772.pbs-7",
+   "spec": "/rds/general/user/ftb123/home/dizx/results/pbs/20261027-145712/crg_local-bell-XX-pl0p001.json",
+   "stems": [
+    "bell_crg_local_pl0.001_mtZZ_obsXX_pm_h_corr"
+   ],
+   "ncpus": 4,
+   "mem_gb": 10,
+   "walltime_h": 3,
+   "core_hours": 3.84
+  },
+  "crg_local-bell-XX-pl0p002": {
+   "pbs_id": "4485773.pbs-7",
+   "spec": "/rds/general/user/ftb123/home/dizx/results/pbs/20261027-145712/crg_local-bell-XX-pl0p002.json",
+   "stems": [
+    "bell_crg_local_pl0.002_mtZZ_obsXX_pm_h_corr"
+   ],
+   "ncpus": 4,
+   "mem_gb": 10,
+   "walltime_h": 6,
+   "core_hours": 9.75
+  },
+  "crg_local-bell-XX-pl0p003": {
+   "pbs_id": "4485774.pbs-7",
+   "spec": "/rds/general/user/ftb123/home/dizx/results/pbs/20261027-145712/crg_local-bell-XX-pl0p003.json",
+   "stems": [
+    "bell_crg_local_pl0.003_mtZZ_obsXX_pm_h_corr"
+   ],
+   "ncpus": 4,
+   "mem_gb": 10,
+   "walltime_h": 7,
+   "core_hours": 11.81
+  },
+  "crg_local-bell-XX-pl0p004": {
+   "pbs_id": "4485775.pbs-7",
+   "spec": "/rds/general/user/ftb123/home/dizx/results/pbs/20261027-145712/crg_local-bell-XX-pl0p004.json",
+   "stems": [
+    "bell_crg_local_pl0.004_mtZZ_obsXX_pm_h_corr"
+   ],
+   "ncpus": 4,
+   "mem_gb": 10,
+   "walltime_h": 6,
+   "core_hours": 11.21
+  },
+  "crg_local-bell-XX-pl0p005": {
+   "pbs_id": "4485776.pbs-7",
+   "spec": "/rds/general/user/ftb123/home/dizx/results/pbs/20261027-145712/crg_local-bell-XX-pl0p005.json",
+   "stems": [
+    "bell_crg_local_pl0.005_mtZZ_obsXX_pm_h_corr"
+   ],
+   "ncpus": 4,
+   "mem_gb": 10,
+   "walltime_h": 8,
+   "core_hours": 14.63
+  },
+  "crg_local-bell-XX-pl0p006": {
+   "pbs_id": "4485777.pbs-7",
+   "spec": "/rds/general/user/ftb123/home/dizx/results/pbs/20261027-145712/crg_local-bell-XX-pl0p006.json",
+   "stems": [
+    "bell_crg_local_pl0.006_mtZZ_obsXX_pm_h_corr"
+   ],
+   "ncpus": 8,
+   "mem_gb": 17,
+   "walltime_h": 8,
+   "core_hours": 27.0
+  },
+  "crg_local-bell-XX-pl0p007": {
+   "pbs_id": "4485778.pbs-7",
+   "spec": "/rds/general/user/ftb123/home/dizx/results/pbs/20261027-145712/crg_local-bell-XX-pl0p007.json",
+   "stems": [
+    "bell_crg_local_pl0.007_mtZZ_obsXX_pm_h_corr"
+   ],
+   "ncpus": 8,
+   "mem_gb": 17,
+   "walltime_h": 9,
+   "core_hours": 34.55
+  },
+  "crg_local-bell-XX-pl0p008": {
+   "pbs_id": "4485779.pbs-7",
+   "spec": "/rds/general/user/ftb123/home/dizx/results/pbs/20261027-145712/crg_local-bell-XX-pl0p008.json",
+   "stems": [
+    "bell_crg_local_pl0.008_mtZZ_obsXX_pm_h_corr"
+   ],
+   "ncpus": 8,
+   "mem_gb": 17,
+   "walltime_h": 9,
+   "core_hours": 34.22
+  },
+  "crg_local-bell-XX-pl0p009": {
+   "pbs_id": "4485780.pbs-7",
+   "spec": "/rds/general/user/ftb123/home/dizx/results/pbs/20261027-145712/crg_local-bell-XX-pl0p009.json",
+   "stems": [
+    "bell_crg_local_pl0.009_mtZZ_obsXX_pm_h_corr"
+   ],
+   "ncpus": 8,
+   "mem_gb": 17,
+   "walltime_h": 10,
+   "core_hours": 36.43
+  },
+  "crg_local-bell-XX-pl0p01": {
+   "pbs_id": "4485781.pbs-7",
+   "spec": "/rds/general/user/ftb123/home/dizx/results/pbs/20261027-145712/crg_local-bell-XX-pl0p01.json",
+   "stems": [
+    "bell_crg_local_pl0.01_mtZZ_obsXX_pm_h_corr"
+   ],
+   "ncpus": 12,
+   "mem_gb": 24,
+   "walltime_h": 11,
+   "core_hours": 60.07
+  },
+  "crg_local-bell_zigzag-XX-pl0p001": {
+   "pbs_id": "4485782.pbs-7",
+   "spec": "/rds/general/user/ftb123/home/dizx/results/pbs/20261027-145712/crg_local-bell_zigzag-XX-pl0p001.json",
+   "stems": [
+    "bell_zigzag_crg_local_pl0.001_mtZZ_obsXX_pm_h_corr"
+   ],
+   "ncpus": 4,
+   "mem_gb": 10,
+   "walltime_h": 3,
+   "core_hours": 4.29
+  },
+  "crg_local-bell_zigzag-XX-pl0p002": {
+   "pbs_id": "4485783.pbs-7",
+   "spec": "/rds/general/user/ftb123/home/dizx/results/pbs/20261027-145712/crg_local-bell_zigzag-XX-pl0p002.json",
+   "stems": [
+    "bell_zigzag_crg_local_pl0.002_mtZZ_obsXX_pm_h_corr"
+   ],
+   "ncpus": 4,
+   "mem_gb": 10,
+   "walltime_h": 5,
+   "core_hours": 7.59
+  },
+  "crg_local-bell_zigzag-XX-pl0p003": {
+   "pbs_id": "4485784.pbs-7",
+   "spec": "/rds/general/user/ftb123/home/dizx/results/pbs/20261027-145712/crg_local-bell_zigzag-XX-pl0p003.json",
+   "stems": [
+    "bell_zigzag_crg_local_pl0.003_mtZZ_obsXX_pm_h_corr"
+   ],
+   "ncpus": 4,
+   "mem_gb": 10,
+   "walltime_h": 7,
+   "core_hours": 12.16
+  },
+  "crg_local-bell_zigzag-XX-pl0p004": {
+   "pbs_id": "4485785.pbs-7",
+   "spec": "/rds/general/user/ftb123/home/dizx/results/pbs/20261027-145712/crg_local-bell_zigzag-XX-pl0p004.json",
+   "stems": [
+    "bell_zigzag_crg_local_pl0.004_mtZZ_obsXX_pm_h_corr"
+   ],
+   "ncpus": 4,
+   "mem_gb": 10,
+   "walltime_h": 10,
+   "core_hours": 18.07
+  },
+  "crg_local-bell_zigzag-XX-pl0p005": {
+   "pbs_id": "4485786.pbs-7",
+   "spec": "/rds/general/user/ftb123/home/dizx/results/pbs/20261027-145712/crg_local-bell_zigzag-XX-pl0p005.json",
+   "stems": [
+    "bell_zigzag_crg_local_pl0.005_mtZZ_obsXX_pm_h_corr"
+   ],
+   "ncpus": 4,
+   "mem_gb": 10,
+   "walltime_h": 11,
+   "core_hours": 20.84
+  },
+  "crg_local-bell_zigzag-XX-pl0p006": {
+   "pbs_id": "4485787.pbs-7",
+   "spec": "/rds/general/user/ftb123/home/dizx/results/pbs/20261027-145712/crg_local-bell_zigzag-XX-pl0p006.json",
+   "stems": [
+    "bell_zigzag_crg_local_pl0.006_mtZZ_obsXX_pm_h_corr"
+   ],
+   "ncpus": 4,
+   "mem_gb": 10,
+   "walltime_h": 12,
+   "core_hours": 21.45
+  },
+  "crg_local-bell_zigzag-XX-pl0p007": {
+   "pbs_id": "4485788.pbs-7",
+   "spec": "/rds/general/user/ftb123/home/dizx/results/pbs/20261027-145712/crg_local-bell_zigzag-XX-pl0p007.json",
+   "stems": [
+    "bell_zigzag_crg_local_pl0.007_mtZZ_obsXX_pm_h_corr"
+   ],
+   "ncpus": 4,
+   "mem_gb": 10,
+   "walltime_h": 11,
+   "core_hours": 20.28
+  },
+  "crg_local-bell_zigzag-XX-pl0p008": {
+   "pbs_id": "4485789.pbs-7",
+   "spec": "/rds/general/user/ftb123/home/dizx/results/pbs/20261027-145712/crg_local-bell_zigzag-XX-pl0p008.json",
+   "stems": [
+    "bell_zigzag_crg_local_pl0.008_mtZZ_obsXX_pm_h_corr"
+   ],
+   "ncpus": 4,
+   "mem_gb": 10,
+   "walltime_h": 11,
+   "core_hours": 21.3
+  },
+  "crg_local-bell_zigzag-XX-pl0p009": {
+   "pbs_id": "4485790.pbs-7",
+   "spec": "/rds/general/user/ftb123/home/dizx/results/pbs/20261027-145712/crg_local-bell_zigzag-XX-pl0p009.json",
+   "stems": [
+    "bell_zigzag_crg_local_pl0.009_mtZZ_obsXX_pm_h_corr"
+   ],
+   "ncpus": 4,
+   "mem_gb": 10,
+   "walltime_h": 9,
+   "core_hours": 16.17
+  },
+  "crg_local-bell_zigzag-XX-pl0p01": {
+   "pbs_id": "4485791.pbs-7",
+   "spec": "/rds/general/user/ftb123/home/dizx/results/pbs/20261027-145712/crg_local-bell_zigzag-XX-pl0p01.json",
+   "stems": [
+    "bell_zigzag_crg_local_pl0.01_mtZZ_obsXX_pm_h_corr"
+   ],
+   "ncpus": 4,
+   "mem_gb": 10,
+   "walltime_h": 7,
+   "core_hours": 12.21
+  },
+  "crg_local-linear_k1-XX-pl0p001": {
+   "pbs_id": "4485792.pbs-7",
+   "spec": "/rds/general/user/ftb123/home/dizx/results/pbs/20261027-145712/crg_local-linear_k1-XX-pl0p001.json",
+   "stems": [
+    "linear_k1_crg_local_pl0.001_mtZZ_obsXX_pm_h_corr"
+   ],
+   "ncpus": 4,
+   "mem_gb": 13,
+   "walltime_h": 6,
+   "core_hours": 10.24
+  },
+  "crg_local-linear_k1-XX-pl0p002": {
+   "pbs_id": "4485793.pbs-7",
+   "spec": "/rds/general/user/ftb123/home/dizx/results/pbs/20261027-145712/crg_local-linear_k1-XX-pl0p002.json",
+   "stems": [
+    "linear_k1_crg_local_pl0.002_mtZZ_obsXX_pm_h_corr"
+   ],
+   "ncpus": 4,
+   "mem_gb": 13,
+   "walltime_h": 11,
+   "core_hours": 20.49
+  },
+  "crg_local-linear_k1-XX-pl0p003": {
+   "pbs_id": "4485794.pbs-7",
+   "spec": "/rds/general/user/ftb123/home/dizx/results/pbs/20261027-145712/crg_local-linear_k1-XX-pl0p003.json",
+   "stems": [
+    "linear_k1_crg_local_pl0.003_mtZZ_obsXX_pm_h_corr"
+   ],
+   "ncpus": 8,
+   "mem_gb": 23,
+   "walltime_h": 9,
+   "core_hours": 33.83
+  },
+  "crg_local-linear_k1-XX-pl0p004": {
+   "pbs_id": "4485795.pbs-7",
+   "spec": "/rds/general/user/ftb123/home/dizx/results/pbs/20261027-145712/crg_local-linear_k1-XX-pl0p004.json",
+   "stems": [
+    "linear_k1_crg_local_pl0.004_mtZZ_obsXX_pm_h_corr"
+   ],
+   "ncpus": 12,
+   "mem_gb": 33,
+   "walltime_h": 9,
+   "core_hours": 50.68
+  },
+  "crg_local-linear_k1-XX-pl0p005": {
+   "pbs_id": "4485796.pbs-7",
+   "spec": "/rds/general/user/ftb123/home/dizx/results/pbs/20261027-145712/crg_local-linear_k1-XX-pl0p005.json",
+   "stems": [
+    "linear_k1_crg_local_pl0.005_mtZZ_obsXX_pm_h_corr"
+   ],
+   "ncpus": 12,
+   "mem_gb": 33,
+   "walltime_h": 13,
+   "core_hours": 70.65
+  },
+  "crg_local-linear_k1-XX-pl0p006": {
+   "pbs_id": "4485797.pbs-7",
+   "spec": "/rds/general/user/ftb123/home/dizx/results/pbs/20261027-145712/crg_local-linear_k1-XX-pl0p006.json",
+   "stems": [
+    "linear_k1_crg_local_pl0.006_mtZZ_obsXX_pm_h_corr"
+   ],
+   "ncpus": 16,
+   "mem_gb": 44,
+   "walltime_h": 11,
+   "core_hours": 78.3
+  },
+  "crg_local-linear_k1-XX-pl0p007": {
+   "pbs_id": "4485798.pbs-7",
+   "spec": "/rds/general/user/ftb123/home/dizx/results/pbs/20261027-145712/crg_local-linear_k1-XX-pl0p007.json",
+   "stems": [
+    "linear_k1_crg_local_pl0.007_mtZZ_obsXX_pm_h_corr"
+   ],
+   "ncpus": 20,
+   "mem_gb": 54,
+   "walltime_h": 11,
+   "core_hours": 98.02
+  },
+  "crg_local-linear_k1-XX-pl0p008": {
+   "pbs_id": "4485799.pbs-7",
+   "spec": "/rds/general/user/ftb123/home/dizx/results/pbs/20261027-145712/crg_local-linear_k1-XX-pl0p008.json",
+   "stems": [
+    "linear_k1_crg_local_pl0.008_mtZZ_obsXX_pm_h_corr"
+   ],
+   "ncpus": 16,
+   "mem_gb": 44,
+   "walltime_h": 12,
+   "core_hours": 91.77
+  },
+  "crg_local-linear_k1-XX-pl0p009": {
+   "pbs_id": "4485800.pbs-7",
+   "spec": "/rds/general/user/ftb123/home/dizx/results/pbs/20261027-145712/crg_local-linear_k1-XX-pl0p009.json",
+   "stems": [
+    "linear_k1_crg_local_pl0.009_mtZZ_obsXX_pm_h_corr"
+   ],
+   "ncpus": 20,
+   "mem_gb": 54,
+   "walltime_h": 11,
+   "core_hours": 98.07
+  },
+  "crg_local-linear_k1-XX-pl0p01": {
+   "pbs_id": "4485801.pbs-7",
+   "spec": "/rds/general/user/ftb123/home/dizx/results/pbs/20261027-145712/crg_local-linear_k1-XX-pl0p01.json",
+   "stems": [
+    "linear_k1_crg_local_pl0.01_mtZZ_obsXX_pm_h_corr"
+   ],
+   "ncpus": 20,
+   "mem_gb": 54,
+   "walltime_h": 11,
+   "core_hours": 100.87
+  },
+  "crg_local-linear_k2-XX-pl0p001": {
+   "pbs_id": "4485802.pbs-7",
+   "spec": "/rds/general/user/ftb123/home/dizx/results/pbs/20261027-145712/crg_local-linear_k2-XX-pl0p001.json",
+   "stems": [
+    "linear_k2_crg_local_pl0.001_mtZZ_obsXX_pm_h_corr"
+   ],
+   "ncpus": 4,
+   "mem_gb": 12,
+   "walltime_h": 6,
+   "core_hours": 10.98
+  },
+  "crg_local-linear_k2-XX-pl0p002": {
+   "pbs_id": "4485803.pbs-7",
+   "spec": "/rds/general/user/ftb123/home/dizx/results/pbs/20261027-145712/crg_local-linear_k2-XX-pl0p002.json",
+   "stems": [
+    "linear_k2_crg_local_pl0.002_mtZZ_obsXX_pm_h_corr"
+   ],
+   "ncpus": 4,
+   "mem_gb": 12,
+   "walltime_h": 10,
+   "core_hours": 17.95
+  },
+  "crg_local-linear_k2-XX-pl0p003": {
+   "pbs_id": "4485804.pbs-7",
+   "spec": "/rds/general/user/ftb123/home/dizx/results/pbs/20261027-145712/crg_local-linear_k2-XX-pl0p003.json",
+   "stems": [
+    "linear_k2_crg_local_pl0.003_mtZZ_obsXX_pm_h_corr"
+   ],
+   "ncpus": 8,
+   "mem_gb": 21,
+   "walltime_h": 10,
+   "core_hours": 37.45
+  },
+  "crg_local-linear_k2-XX-pl0p004": {
+   "pbs_id": "4485805.pbs-7",
+   "spec": "/rds/general/user/ftb123/home/dizx/results/pbs/20261027-145712/crg_local-linear_k2-XX-pl0p004.json",
+   "stems": [
+    "linear_k2_crg_local_pl0.004_mtZZ_obsXX_pm_h_corr"
+   ],
+   "ncpus": 12,
+   "mem_gb": 30,
+   "walltime_h": 11,
+   "core_hours": 59.91
+  },
+  "crg_local-linear_k2-XX-pl0p005": {
+   "pbs_id": "4485806.pbs-7",
+   "spec": "/rds/general/user/ftb123/home/dizx/results/pbs/20261027-145712/crg_local-linear_k2-XX-pl0p005.json",
+   "stems": [
+    "linear_k2_crg_local_pl0.005_mtZZ_obsXX_pm_h_corr"
+   ],
+   "ncpus": 12,
+   "mem_gb": 30,
+   "walltime_h": 11,
+   "core_hours": 60.88
+  },
+  "crg_local-linear_k2-XX-pl0p006": {
+   "pbs_id": "4485807.pbs-7",
+   "spec": "/rds/general/user/ftb123/home/dizx/results/pbs/20261027-145712/crg_local-linear_k2-XX-pl0p006.json",
+   "stems": [
+    "linear_k2_crg_local_pl0.006_mtZZ_obsXX_pm_h_corr"
+   ],
+   "ncpus": 16,
+   "mem_gb": 39,
+   "walltime_h": 12,
+   "core_hours": 92.24
+  },
+  "crg_local-linear_k2-XX-pl0p007": {
+   "pbs_id": "4485808.pbs-7",
+   "spec": "/rds/general/user/ftb123/home/dizx/results/pbs/20261027-145712/crg_local-linear_k2-XX-pl0p007.json",
+   "stems": [
+    "linear_k2_crg_local_pl0.007_mtZZ_obsXX_pm_h_corr"
+   ],
+   "ncpus": 16,
+   "mem_gb": 39,
+   "walltime_h": 10,
+   "core_hours": 74.64
+  },
+  "crg_local-linear_k2-XX-pl0p008": {
+   "pbs_id": "4485809.pbs-7",
+   "spec": "/rds/general/user/ftb123/home/dizx/results/pbs/20261027-145712/crg_local-linear_k2-XX-pl0p008.json",
+   "stems": [
+    "linear_k2_crg_local_pl0.008_mtZZ_obsXX_pm_h_corr"
+   ],
+   "ncpus": 24,
+   "mem_gb": 58,
+   "walltime_h": 11,
+   "core_hours": 124.42
+  },
+  "crg_local-linear_k2-XX-pl0p009": {
+   "pbs_id": "4485810.pbs-7",
+   "spec": "/rds/general/user/ftb123/home/dizx/results/pbs/20261027-145712/crg_local-linear_k2-XX-pl0p009.json",
+   "stems": [
+    "linear_k2_crg_local_pl0.009_mtZZ_obsXX_pm_h_corr"
+   ],
+   "ncpus": 20,
+   "mem_gb": 49,
+   "walltime_h": 12,
+   "core_hours": 107.27
+  },
+  "crg_local-linear_k2-XX-pl0p01": {
+   "pbs_id": "4485811.pbs-7",
+   "spec": "/rds/general/user/ftb123/home/dizx/results/pbs/20261027-145712/crg_local-linear_k2-XX-pl0p01.json",
+   "stems": [
+    "linear_k2_crg_local_pl0.01_mtZZ_obsXX_pm_h_corr"
+   ],
+   "ncpus": 24,
+   "mem_gb": 58,
+   "walltime_h": 12,
+   "core_hours": 130.69
+  },
+  "crg_local-linear_kinf-XX-pl0p001": {
+   "pbs_id": "4485812.pbs-7",
+   "spec": "/rds/general/user/ftb123/home/dizx/results/pbs/20261027-145712/crg_local-linear_kinf-XX-pl0p001.json",
+   "stems": [
+    "linear_kinf_crg_local_pl0.001_mtZZ_obsXX_pm_h_corr"
+   ],
+   "ncpus": 4,
+   "mem_gb": 11,
+   "walltime_h": 2,
+   "core_hours": 3.22
+  },
+  "crg_local-linear_kinf-XX-pl0p002": {
+   "pbs_id": "4485813.pbs-7",
+   "spec": "/rds/general/user/ftb123/home/dizx/results/pbs/20261027-145712/crg_local-linear_kinf-XX-pl0p002.json",
+   "stems": [
+    "linear_kinf_crg_local_pl0.002_mtZZ_obsXX_pm_h_corr"
+   ],
+   "ncpus": 4,
+   "mem_gb": 11,
+   "walltime_h": 4,
+   "core_hours": 6.51
+  },
+  "crg_local-linear_kinf-XX-pl0p003": {
+   "pbs_id": "4485814.pbs-7",
+   "spec": "/rds/general/user/ftb123/home/dizx/results/pbs/20261027-145712/crg_local-linear_kinf-XX-pl0p003.json",
+   "stems": [
+    "linear_kinf_crg_local_pl0.003_mtZZ_obsXX_pm_h_corr"
+   ],
+   "ncpus": 4,
+   "mem_gb": 11,
+   "walltime_h": 4,
+   "core_hours": 7.31
+  },
+  "crg_local-linear_kinf-XX-pl0p004": {
+   "pbs_id": "4485815.pbs-7",
+   "spec": "/rds/general/user/ftb123/home/dizx/results/pbs/20261027-145712/crg_local-linear_kinf-XX-pl0p004.json",
+   "stems": [
+    "linear_kinf_crg_local_pl0.004_mtZZ_obsXX_pm_h_corr"
+   ],
+   "ncpus": 4,
+   "mem_gb": 11,
+   "walltime_h": 8,
+   "core_hours": 13.72
+  },
+  "crg_local-linear_kinf-XX-pl0p005": {
+   "pbs_id": "4485816.pbs-7",
+   "spec": "/rds/general/user/ftb123/home/dizx/results/pbs/20261027-145712/crg_local-linear_kinf-XX-pl0p005.json",
+   "stems": [
+    "linear_kinf_crg_local_pl0.005_mtZZ_obsXX_pm_h_corr"
+   ],
+   "ncpus": 4,
+   "mem_gb": 11,
+   "walltime_h": 11,
+   "core_hours": 19.78
+  },
+  "crg_local-linear_kinf-XX-pl0p006": {
+   "pbs_id": "4485817.pbs-7",
+   "spec": "/rds/general/user/ftb123/home/dizx/results/pbs/20261027-145712/crg_local-linear_kinf-XX-pl0p006.json",
+   "stems": [
+    "linear_kinf_crg_local_pl0.006_mtZZ_obsXX_pm_h_corr"
+   ],
+   "ncpus": 4,
+   "mem_gb": 11,
+   "walltime_h": 12,
+   "core_hours": 22.34
+  },
+  "crg_local-linear_kinf-XX-pl0p007": {
+   "pbs_id": "4485818.pbs-7",
+   "spec": "/rds/general/user/ftb123/home/dizx/results/pbs/20261027-145712/crg_local-linear_kinf-XX-pl0p007.json",
+   "stems": [
+    "linear_kinf_crg_local_pl0.007_mtZZ_obsXX_pm_h_corr"
+   ],
+   "ncpus": 8,
+   "mem_gb": 19,
+   "walltime_h": 8,
+   "core_hours": 26.55
+  },
+  "crg_local-linear_kinf-XX-pl0p008": {
+   "pbs_id": "4485819.pbs-7",
+   "spec": "/rds/general/user/ftb123/home/dizx/results/pbs/20261027-145712/crg_local-linear_kinf-XX-pl0p008.json",
+   "stems": [
+    "linear_kinf_crg_local_pl0.008_mtZZ_obsXX_pm_h_corr"
+   ],
+   "ncpus": 8,
+   "mem_gb": 19,
+   "walltime_h": 7,
+   "core_hours": 24.43
+  },
+  "crg_local-linear_kinf-XX-pl0p009": {
+   "pbs_id": "4485820.pbs-7",
+   "spec": "/rds/general/user/ftb123/home/dizx/results/pbs/20261027-145712/crg_local-linear_kinf-XX-pl0p009.json",
+   "stems": [
+    "linear_kinf_crg_local_pl0.009_mtZZ_obsXX_pm_h_corr"
+   ],
+   "ncpus": 8,
+   "mem_gb": 19,
+   "walltime_h": 7,
+   "core_hours": 25.64
+  },
+  "crg_local-linear_kinf-XX-pl0p01": {
+   "pbs_id": "4485821.pbs-7",
+   "spec": "/rds/general/user/ftb123/home/dizx/results/pbs/20261027-145712/crg_local-linear_kinf-XX-pl0p01.json",
+   "stems": [
+    "linear_kinf_crg_local_pl0.01_mtZZ_obsXX_pm_h_corr"
+   ],
+   "ncpus": 8,
+   "mem_gb": 19,
+   "walltime_h": 8,
+   "core_hours": 29.16
+  },
+  "crg_prep-bell-ZZ": {
+   "pbs_id": "4485822.pbs-7",
+   "spec": "/rds/general/user/ftb123/home/dizx/results/pbs/20261027-145712/crg_prep-bell-ZZ.json",
+   "stems": [
+    "bell_crg_prep_pr0.01_mtZZ_obsZZ_pm_h_corr",
+    "bell_crg_prep_pr0.02_mtZZ_obsZZ_pm_h_corr",
+    "bell_crg_prep_pr0.03_mtZZ_obsZZ_pm_h_corr",
+    "bell_crg_prep_pr0.04_mtZZ_obsZZ_pm_h_corr",
+    "bell_crg_prep_pr0.05_mtZZ_obsZZ_pm_h_corr",
+    "bell_crg_prep_pr0.06_mtZZ_obsZZ_pm_h_corr"
+   ],
+   "ncpus": 4,
+   "mem_gb": 10,
+   "walltime_h": 4,
+   "core_hours": 4.47
+  },
+  "crg_prep-bell_zigzag-ZZ": {
+   "pbs_id": "4485823.pbs-7",
+   "spec": "/rds/general/user/ftb123/home/dizx/results/pbs/20261027-145712/crg_prep-bell_zigzag-ZZ.json",
+   "stems": [
+    "bell_zigzag_crg_prep_pr0.01_mtZZ_obsZZ_pm_h_corr",
+    "bell_zigzag_crg_prep_pr0.02_mtZZ_obsZZ_pm_h_corr",
+    "bell_zigzag_crg_prep_pr0.03_mtZZ_obsZZ_pm_h_corr",
+    "bell_zigzag_crg_prep_pr0.04_mtZZ_obsZZ_pm_h_corr",
+    "bell_zigzag_crg_prep_pr0.05_mtZZ_obsZZ_pm_h_corr",
+    "bell_zigzag_crg_prep_pr0.06_mtZZ_obsZZ_pm_h_corr"
+   ],
+   "ncpus": 4,
+   "mem_gb": 10,
+   "walltime_h": 5,
+   "core_hours": 7.14
+  },
+  "crg_prep-linear_k1-ZZ": {
+   "pbs_id": "4485824.pbs-7",
+   "spec": "/rds/general/user/ftb123/home/dizx/results/pbs/20261027-145712/crg_prep-linear_k1-ZZ.json",
+   "stems": [
+    "linear_k1_crg_prep_pr0.01_mtZZ_obsZZ_pm_h_corr",
+    "linear_k1_crg_prep_pr0.02_mtZZ_obsZZ_pm_h_corr",
+    "linear_k1_crg_prep_pr0.03_mtZZ_obsZZ_pm_h_corr",
+    "linear_k1_crg_prep_pr0.04_mtZZ_obsZZ_pm_h_corr"
+   ],
+   "ncpus": 4,
+   "mem_gb": 13,
+   "walltime_h": 3,
+   "core_hours": 4.2
+  },
+  "crg_prep-linear_k2-ZZ": {
+   "pbs_id": "4485825.pbs-7",
+   "spec": "/rds/general/user/ftb123/home/dizx/results/pbs/20261027-145712/crg_prep-linear_k2-ZZ.json",
+   "stems": [
+    "linear_k2_crg_prep_pr0.01_mtZZ_obsZZ_pm_h_corr",
+    "linear_k2_crg_prep_pr0.02_mtZZ_obsZZ_pm_h_corr",
+    "linear_k2_crg_prep_pr0.03_mtZZ_obsZZ_pm_h_corr",
+    "linear_k2_crg_prep_pr0.04_mtZZ_obsZZ_pm_h_corr",
+    "linear_k2_crg_prep_pr0.05_mtZZ_obsZZ_pm_h_corr"
+   ],
+   "ncpus": 4,
+   "mem_gb": 12,
+   "walltime_h": 4,
+   "core_hours": 5.3
+  },
+  "crg_prep-linear_kinf-ZZ": {
+   "pbs_id": "4485826.pbs-7",
+   "spec": "/rds/general/user/ftb123/home/dizx/results/pbs/20261027-145712/crg_prep-linear_kinf-ZZ.json",
+   "stems": [
+    "linear_kinf_crg_prep_pr0.005_mtZZ_obsZZ_pm_h_corr",
+    "linear_kinf_crg_prep_pr0.01_mtZZ_obsZZ_pm_h_corr",
+    "linear_kinf_crg_prep_pr0.02_mtZZ_obsZZ_pm_h_corr",
+    "linear_kinf_crg_prep_pr0.03_mtZZ_obsZZ_pm_h_corr",
+    "linear_kinf_crg_prep_pr0.04_mtZZ_obsZZ_pm_h_corr",
+    "linear_kinf_crg_prep_pr0.05_mtZZ_obsZZ_pm_h_corr",
+    "linear_kinf_crg_prep_pr0.06_mtZZ_obsZZ_pm_h_corr"
+   ],
+   "ncpus": 4,
+   "mem_gb": 11,
+   "walltime_h": 6,
+   "core_hours": 9.0
+  },
+  "crg_prep-bell-XX": {
+   "pbs_id": "4485827.pbs-7",
+   "spec": "/rds/general/user/ftb123/home/dizx/results/pbs/20261027-145712/crg_prep-bell-XX.json",
+   "stems": [
+    "bell_crg_prep_pr0.01_mtZZ_obsXX_pm_h_corr",
+    "bell_crg_prep_pr0.02_mtZZ_obsXX_pm_h_corr",
+    "bell_crg_prep_pr0.03_mtZZ_obsXX_pm_h_corr",
+    "bell_crg_prep_pr0.04_mtZZ_obsXX_pm_h_corr",
+    "bell_crg_prep_pr0.05_mtZZ_obsXX_pm_h_corr",
+    "bell_crg_prep_pr0.06_mtZZ_obsXX_pm_h_corr"
+   ],
+   "ncpus": 4,
+   "mem_gb": 10,
+   "walltime_h": 2,
+   "core_hours": 2.24
+  },
+  "crg_prep-bell_zigzag-XX": {
+   "pbs_id": "4485828.pbs-7",
+   "spec": "/rds/general/user/ftb123/home/dizx/results/pbs/20261027-145712/crg_prep-bell_zigzag-XX.json",
+   "stems": [
+    "bell_zigzag_crg_prep_pr0.01_mtZZ_obsXX_pm_h_corr",
+    "bell_zigzag_crg_prep_pr0.02_mtZZ_obsXX_pm_h_corr",
+    "bell_zigzag_crg_prep_pr0.03_mtZZ_obsXX_pm_h_corr",
+    "bell_zigzag_crg_prep_pr0.04_mtZZ_obsXX_pm_h_corr",
+    "bell_zigzag_crg_prep_pr0.05_mtZZ_obsXX_pm_h_corr",
+    "bell_zigzag_crg_prep_pr0.06_mtZZ_obsXX_pm_h_corr"
+   ],
+   "ncpus": 4,
+   "mem_gb": 10,
+   "walltime_h": 4,
+   "core_hours": 5.53
+  },
+  "crg_prep-linear_k1-XX": {
+   "pbs_id": "4485829.pbs-7",
+   "spec": "/rds/general/user/ftb123/home/dizx/results/pbs/20261027-145712/crg_prep-linear_k1-XX.json",
+   "stems": [
+    "linear_k1_crg_prep_pr0.01_mtZZ_obsXX_pm_h_corr",
+    "linear_k1_crg_prep_pr0.02_mtZZ_obsXX_pm_h_corr",
+    "linear_k1_crg_prep_pr0.03_mtZZ_obsXX_pm_h_corr",
+    "linear_k1_crg_prep_pr0.04_mtZZ_obsXX_pm_h_corr"
+   ],
+   "ncpus": 4,
+   "mem_gb": 13,
+   "walltime_h": 4,
+   "core_hours": 5.09
+  },
+  "crg_prep-linear_k2-XX": {
+   "pbs_id": "4485830.pbs-7",
+   "spec": "/rds/general/user/ftb123/home/dizx/results/pbs/20261027-145712/crg_prep-linear_k2-XX.json",
+   "stems": [
+    "linear_k2_crg_prep_pr0.01_mtZZ_obsXX_pm_h_corr",
+    "linear_k2_crg_prep_pr0.02_mtZZ_obsXX_pm_h_corr",
+    "linear_k2_crg_prep_pr0.03_mtZZ_obsXX_pm_h_corr",
+    "linear_k2_crg_prep_pr0.04_mtZZ_obsXX_pm_h_corr",
+    "linear_k2_crg_prep_pr0.05_mtZZ_obsXX_pm_h_corr"
+   ],
+   "ncpus": 4,
+   "mem_gb": 12,
+   "walltime_h": 4,
+   "core_hours": 5.96
+  },
+  "crg_prep-linear_kinf-XX": {
+   "pbs_id": "4485831.pbs-7",
+   "spec": "/rds/general/user/ftb123/home/dizx/results/pbs/20261027-145712/crg_prep-linear_kinf-XX.json",
+   "stems": [
+    "linear_kinf_crg_prep_pr0.005_mtZZ_obsXX_pm_h_corr",
+    "linear_kinf_crg_prep_pr0.01_mtZZ_obsXX_pm_h_corr",
+    "linear_kinf_crg_prep_pr0.02_mtZZ_obsXX_pm_h_corr",
+    "linear_kinf_crg_prep_pr0.03_mtZZ_obsXX_pm_h_corr",
+    "linear_kinf_crg_prep_pr0.04_mtZZ_obsXX_pm_h_corr",
+    "linear_kinf_crg_prep_pr0.05_mtZZ_obsXX_pm_h_corr",
+    "linear_kinf_crg_prep_pr0.06_mtZZ_obsXX_pm_h_corr"
+   ],
+   "ncpus": 4,
+   "mem_gb": 11,
+   "walltime_h": 6,
+   "core_hours": 8.97
+  }
+ }
+}

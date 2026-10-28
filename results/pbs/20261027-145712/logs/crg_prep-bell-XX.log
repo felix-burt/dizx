@@ -1,0 +1,11 @@
+job 4485827.pbs-7 on cx3-3-12, Tue 27 Oct 14:58:59 GMT 2026, commit 96781b2
+python: error while loading shared libraries: libpython3.12.so.1.0: cannot open shared object file: No such file or directory
+
+====================================
+CPU Time used: 00:00:01
+CPU Percent: 8%
+Memory usage: 47212kb
+Approx Power usage: 0.0
+Walltime usage: 00:00:16
+
+====================================

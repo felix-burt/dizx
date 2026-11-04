@@ -1,0 +1,275 @@
+job 4493515.pbs-7 on cx3-5-21, Wed 28 Oct 11:56:54 GMT 2026, commit 9af8d3c
+
+===== linear_k2_crg_local_pl0.004_mtZZ_obsZZ_pm_h_corr (4 workers) =====
+name: linear_k2_crg_local
+builder_name: surgery_hybrid_linear_8chain
+resource state: linear_k2
+local_prob: 0.004
+Running distance=11, merge_type=ZZ, observable=ZZ
+Running with noise probability p=0.29
+applied noise
+Found existing data: 1000000/1000000 shots, 31619/100000 errors
+Target already reached, skipping collection
+Running with noise probability p=0.295
+applied noise
+Found existing data: 1000000/1000000 shots, 35434/100000 errors
+Target already reached, skipping collection
+Running with noise probability p=0.3
+applied noise
+Found existing data: 1000000/1000000 shots, 39638/100000 errors
+Target already reached, skipping collection
+Running with noise probability p=0.305
+applied noise
+Found existing data: 1000000/1000000 shots, 44027/100000 errors
+Target already reached, skipping collection
+Running with noise probability p=0.31
+applied noise
+Found existing data: 1000000/1000000 shots, 48906/100000 errors
+Target already reached, skipping collection
+Running with noise probability p=0.315
+applied noise
+Found existing data: 1000000/1000000 shots, 54801/100000 errors
+Target already reached, skipping collection
+Running with noise probability p=0.32
+applied noise
+Found existing data: 1000000/1000000 shots, 60725/100000 errors
+Target already reached, skipping collection
+Running with noise probability p=0.325
+applied noise
+Found existing data: 1000000/1000000 shots, 67049/100000 errors
+Target already reached, skipping collection
+Running with noise probability p=0.33
+applied noise
+Found existing data: 1000000/1000000 shots, 72836/100000 errors
+Target already reached, skipping collection
+Running with noise probability p=0.335
+applied noise
+Found existing data: 1000000/1000000 shots, 80888/100000 errors
+Target already reached, skipping collection
+Running with noise probability p=0.34
+applied noise
+Found existing data: 1000000/1000000 shots, 88224/100000 errors
+Target already reached, skipping collection
+Running with noise probability p=0.345
+applied noise
+Found existing data: 1000000/1000000 shots, 96253/100000 errors
+Target already reached, skipping collection
+Running with noise probability p=0.35
+applied noise
+Found existing data: 989794/1000000 shots, 103823/100000 errors
+Target already reached, skipping collection
+Running distance=13, merge_type=ZZ, observable=ZZ
+Running with noise probability p=0.29
+applied noise
+Found existing data: 1000000/1000000 shots, 28874/100000 errors
+Target already reached, skipping collection
+Running with noise probability p=0.295
+applied noise
+Found existing data: 1000000/1000000 shots, 32840/100000 errors
+Target already reached, skipping collection
+Running with noise probability p=0.3
+applied noise
+Found existing data: 1000000/1000000 shots, 37125/100000 errors
+Target already reached, skipping collection
+Running with noise probability p=0.305
+applied noise
+Found existing data: 1000000/1000000 shots, 42225/100000 errors
+Target already reached, skipping collection
+Running with noise probability p=0.31
+applied noise
+Found existing data: 1000000/1000000 shots, 47944/100000 errors
+Target already reached, skipping collection
+Running with noise probability p=0.315
+applied noise
+Found existing data: 1000000/1000000 shots, 53696/100000 errors
+Target already reached, skipping collection
+Running with noise probability p=0.32
+applied noise
+Found existing data: 1000000/1000000 shots, 60398/100000 errors
+Target already reached, skipping collection
+Running with noise probability p=0.325
+applied noise
+Found existing data: 1000000/1000000 shots, 67318/100000 errors
+Target already reached, skipping collection
+Running with noise probability p=0.33
+applied noise
+Found existing data: 1000000/1000000 shots, 74561/100000 errors
+Target already reached, skipping collection
+Running with noise probability p=0.335
+applied noise
+Found existing data: 1000000/1000000 shots, 83064/100000 errors
+Target already reached, skipping collection
+Running with noise probability p=0.34
+applied noise
+Found existing data: 1000000/1000000 shots, 91569/100000 errors
+Target already reached, skipping collection
+Running with noise probability p=0.345
+applied noise
+Found existing data: 999680/1000000 shots, 101515/100000 errors
+Target already reached, skipping collection
+Running with noise probability p=0.35
+applied noise
+Found existing data: 984134/1000000 shots, 109156/100000 errors
+Target already reached, skipping collection
+Running distance=15, merge_type=ZZ, observable=ZZ
+Running with noise probability p=0.29
+applied noise
+Found existing data: 1000000/1000000 shots, 26844/100000 errors
+Target already reached, skipping collection
+Running with noise probability p=0.295
+applied noise
+Found existing data: 1000000/1000000 shots, 31213/100000 errors
+Target already reached, skipping collection
+Running with noise probability p=0.3
+applied noise
+Found existing data: 1000000/1000000 shots, 35879/100000 errors
+Target already reached, skipping collection
+Running with noise probability p=0.305
+applied noise
+Found existing data: 1000000/1000000 shots, 40908/100000 errors
+Target already reached, skipping collection
+Running with noise probability p=0.31
+applied noise
+Found existing data: 1000000/1000000 shots, 46977/100000 errors
+Target already reached, skipping collection
+Running with noise probability p=0.315
+applied noise
+Found existing data: 1000000/1000000 shots, 53387/100000 errors
+Target already reached, skipping collection
+Running with noise probability p=0.32
+applied noise
+Found existing data: 1000000/1000000 shots, 60324/100000 errors
+Target already reached, skipping collection
+Running with noise probability p=0.325
+applied noise
+Found existing data: 1000000/1000000 shots, 67652/100000 errors
+Target already reached, skipping collection
+Running with noise probability p=0.33
+applied noise
+Found existing data: 1000000/1000000 shots, 76193/100000 errors
+Target already reached, skipping collection
+Running with noise probability p=0.335
+applied noise
+Found existing data: 1000000/1000000 shots, 85098/100000 errors
+Target already reached, skipping collection
+Running with noise probability p=0.34
+applied noise
+Found existing data: 1000000/1000000 shots, 95354/100000 errors
+Target already reached, skipping collection
+Running with noise probability p=0.345
+applied noise
+Found existing data: 968976/1000000 shots, 102338/100000 errors
+Target already reached, skipping collection
+Running with noise probability p=0.35
+applied noise
+Found existing data: 940432/1000000 shots, 110370/100000 errors
+Target already reached, skipping collection
+
+===== linear_k2_crg_local_pl0.004_mtZZ_obsZZ_pm_h_corr (4 workers) =====
+name: linear_k2_crg_local
+builder_name: surgery_hybrid_linear_8chain
+resource state: linear_k2
+local_prob: 0.004
+Running distance=17, merge_type=ZZ, observable=ZZ
+Running with noise probability p=0.3
+applied noise
+Found existing data: 1000000/1000000 shots, 34285/100000 errors
+Target already reached, skipping collection
+Running with noise probability p=0.305
+applied noise
+Found existing data: 1000000/1000000 shots, 39512/100000 errors
+Target already reached, skipping collection
+Running with noise probability p=0.31
+applied noise
+Found existing data: 1000000/1000000 shots, 45848/100000 errors
+Target already reached, skipping collection
+Running with noise probability p=0.315
+applied noise
+Found existing data: 1000000/1000000 shots, 52721/100000 errors
+Target already reached, skipping collection
+Running with noise probability p=0.32
+applied noise
+Found existing data: 1000000/1000000 shots, 60437/100000 errors
+Target already reached, skipping collection
+Running with noise probability p=0.325
+applied noise
+Found existing data: 1000000/1000000 shots, 69316/100000 errors
+Target already reached, skipping collection
+Running with noise probability p=0.33
+applied noise
+Found existing data: 1000000/1000000 shots, 78202/100000 errors
+Target already reached, skipping collection
+Running with noise probability p=0.335
+applied noise
+Found existing data: 1000000/1000000 shots, 87802/100000 errors
+Target already reached, skipping collection
+Running with noise probability p=0.34
+applied noise
+Found existing data: 1000000/1000000 shots, 98830/100000 errors
+Target already reached, skipping collection
+Running with noise probability p=0.345
+applied noise
+Found existing data: 967874/1000000 shots, 106807/100000 errors
+Target already reached, skipping collection
+
+===== linear_k2_crg_local_pl0.004_mtZZ_obsZZ_pm_h_corr (4 workers) =====
+name: linear_k2_crg_local
+builder_name: surgery_hybrid_linear_8chain
+resource state: linear_k2
+local_prob: 0.004
+Running distance=19, merge_type=ZZ, observable=ZZ
+Running with noise probability p=0.3
+applied noise
+Target not yet reached, running collection
+Collection took 4808.6s for 1000000 shots (4.809 ms/shot, 4 workers)
+Logical error rate for distance=19, merge_type=ZZ, observable=ZZ, p=0.3: 3.2818e-02
+Running with noise probability p=0.305
+applied noise
+Target not yet reached, running collection
+Collection took 4763.5s for 1000000 shots (4.763 ms/shot, 4 workers)
+Logical error rate for distance=19, merge_type=ZZ, observable=ZZ, p=0.305: 3.8752e-02
+Running with noise probability p=0.31
+applied noise
+Target not yet reached, running collection
+Collection took 4534.8s for 1000000 shots (4.535 ms/shot, 4 workers)
+Logical error rate for distance=19, merge_type=ZZ, observable=ZZ, p=0.31: 4.5384e-02
+Running with noise probability p=0.315
+applied noise
+Target not yet reached, running collection
+Collection took 4630.6s for 1000000 shots (4.631 ms/shot, 4 workers)
+Logical error rate for distance=19, merge_type=ZZ, observable=ZZ, p=0.315: 5.2825e-02
+Running with noise probability p=0.32
+applied noise
+Target not yet reached, running collection
+Collection took 4691.3s for 1000000 shots (4.691 ms/shot, 4 workers)
+Logical error rate for distance=19, merge_type=ZZ, observable=ZZ, p=0.32: 6.0845e-02
+Running with noise probability p=0.325
+applied noise
+Target not yet reached, running collection
+Collection took 4663.8s for 1000000 shots (4.664 ms/shot, 4 workers)
+Logical error rate for distance=19, merge_type=ZZ, observable=ZZ, p=0.325: 7.0195e-02
+Running with noise probability p=0.33
+applied noise
+Target not yet reached, running collection
+Collection took 4804.7s for 1000000 shots (4.805 ms/shot, 4 workers)
+Logical error rate for distance=19, merge_type=ZZ, observable=ZZ, p=0.33: 7.9660e-02
+Running with noise probability p=0.335
+applied noise
+Target not yet reached, running collection
+Collection took 4807.2s for 1000000 shots (4.807 ms/shot, 4 workers)
+Logical error rate for distance=19, merge_type=ZZ, observable=ZZ, p=0.335: 9.0888e-02
+Running with noise probability p=0.34
+applied noise
+Target not yet reached, running collection
+=>> PBS: job killed: walltime 39630 exceeded limit 39600
+/rds/easybuild/rome/apps/software/Python/3.12.3-GCCcore-13.3.0/lib/python3.12/multiprocessing/resource_tracker.py:254: UserWarning: resource_tracker: There appear to be 14 leaked semaphore objects to clean up at shutdown
+  warnings.warn('resource_tracker: There appear to be %d '
+
+====================================
+CPU Time used: 42:56:55
+CPU Percent: 397%
+Memory usage: 4606380kb
+Approx Power usage: 0.5151999999999999
+Walltime usage: 11:00:41
+
+====================================

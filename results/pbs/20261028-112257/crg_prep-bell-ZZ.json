@@ -1,0 +1,1238 @@
+{
+ "name": "crg_prep-bell-ZZ",
+ "budget_scale": 1.0,
+ "results_dir": "/rds/general/user/ftb123/home/dizx/results/cluster",
+ "runs": [
+  {
+   "name": "crg_prep_bell_corr_obsZZ",
+   "builder": {
+    "name": "surgery_bell_prep_fusion"
+   },
+   "sweep": {
+    "merge_types": [
+     "ZZ"
+    ],
+    "observables": [
+     "ZZ"
+    ],
+    "distances": [
+     11,
+     13,
+     15
+    ],
+    "probs": [
+     0.405,
+     0.41,
+     0.415,
+     0.42,
+     0.425,
+     0.43,
+     0.435,
+     0.44,
+     0.445,
+     0.45,
+     0.455,
+     0.46,
+     0.465
+    ]
+   },
+   "noise_model": [
+    {
+     "tag": [
+      "graph",
+      "reset",
+      "matter"
+     ],
+     "kind": "RESET_FLIP",
+     "probability": 0.01
+    },
+    {
+     "tag": [
+      "graph",
+      "fusion_measurement"
+     ],
+     "kind": "MEASUREMENT_FLIP",
+     "probability": 0.01
+    },
+    {
+     "tag": [
+      "graph",
+      "fusion_measurement"
+     ],
+     "kind": "HERALDED_ERASE",
+     "scale": 1.0
+    }
+   ],
+   "resource_state": "bell",
+   "results_dir": "/rds/general/user/ftb123/home/dizx/results/cluster",
+   "sinter": {
+    "decoder": "pymatching_heralded",
+    "max_shots": 1000000,
+    "max_errors": 100000,
+    "num_workers": 1,
+    "pm_decompose": true,
+    "pm_enable_correlations": true
+   }
+  },
+  {
+   "name": "crg_prep_bell_corr_obsZZ",
+   "builder": {
+    "name": "surgery_bell_prep_fusion"
+   },
+   "sweep": {
+    "merge_types": [
+     "ZZ"
+    ],
+    "observables": [
+     "ZZ"
+    ],
+    "distances": [
+     17
+    ],
+    "probs": [
+     0.405,
+     0.41,
+     0.415,
+     0.42,
+     0.425,
+     0.43,
+     0.435,
+     0.44,
+     0.445,
+     0.45,
+     0.455,
+     0.46,
+     0.465
+    ]
+   },
+   "noise_model": [
+    {
+     "tag": [
+      "graph",
+      "reset",
+      "matter"
+     ],
+     "kind": "RESET_FLIP",
+     "probability": 0.01
+    },
+    {
+     "tag": [
+      "graph",
+      "fusion_measurement"
+     ],
+     "kind": "MEASUREMENT_FLIP",
+     "probability": 0.01
+    },
+    {
+     "tag": [
+      "graph",
+      "fusion_measurement"
+     ],
+     "kind": "HERALDED_ERASE",
+     "scale": 1.0
+    }
+   ],
+   "resource_state": "bell",
+   "results_dir": "/rds/general/user/ftb123/home/dizx/results/cluster",
+   "sinter": {
+    "decoder": "pymatching_heralded",
+    "max_shots": 1000000,
+    "max_errors": 100000,
+    "num_workers": 1,
+    "pm_decompose": true,
+    "pm_enable_correlations": true
+   }
+  },
+  {
+   "name": "crg_prep_bell_corr_obsZZ",
+   "builder": {
+    "name": "surgery_bell_prep_fusion"
+   },
+   "sweep": {
+    "merge_types": [
+     "ZZ"
+    ],
+    "observables": [
+     "ZZ"
+    ],
+    "distances": [
+     19
+    ],
+    "probs": [
+     0.405,
+     0.41,
+     0.415,
+     0.42,
+     0.425,
+     0.43,
+     0.435,
+     0.44,
+     0.445,
+     0.45,
+     0.455,
+     0.46
+    ]
+   },
+   "noise_model": [
+    {
+     "tag": [
+      "graph",
+      "reset",
+      "matter"
+     ],
+     "kind": "RESET_FLIP",
+     "probability": 0.01
+    },
+    {
+     "tag": [
+      "graph",
+      "fusion_measurement"
+     ],
+     "kind": "MEASUREMENT_FLIP",
+     "probability": 0.01
+    },
+    {
+     "tag": [
+      "graph",
+      "fusion_measurement"
+     ],
+     "kind": "HERALDED_ERASE",
+     "scale": 1.0
+    }
+   ],
+   "resource_state": "bell",
+   "results_dir": "/rds/general/user/ftb123/home/dizx/results/cluster",
+   "sinter": {
+    "decoder": "pymatching_heralded",
+    "max_shots": 1000000,
+    "max_errors": 100000,
+    "num_workers": 1,
+    "pm_decompose": true,
+    "pm_enable_correlations": true
+   }
+  },
+  {
+   "name": "crg_prep_bell_corr_obsZZ",
+   "builder": {
+    "name": "surgery_bell_prep_fusion"
+   },
+   "sweep": {
+    "merge_types": [
+     "ZZ"
+    ],
+    "observables": [
+     "ZZ"
+    ],
+    "distances": [
+     11,
+     13,
+     15
+    ],
+    "probs": [
+     0.325,
+     0.33,
+     0.335,
+     0.34,
+     0.345,
+     0.35,
+     0.355,
+     0.36,
+     0.365,
+     0.37,
+     0.375,
+     0.38,
+     0.385
+    ]
+   },
+   "noise_model": [
+    {
+     "tag": [
+      "graph",
+      "reset",
+      "matter"
+     ],
+     "kind": "RESET_FLIP",
+     "probability": 0.02
+    },
+    {
+     "tag": [
+      "graph",
+      "fusion_measurement"
+     ],
+     "kind": "MEASUREMENT_FLIP",
+     "probability": 0.02
+    },
+    {
+     "tag": [
+      "graph",
+      "fusion_measurement"
+     ],
+     "kind": "HERALDED_ERASE",
+     "scale": 1.0
+    }
+   ],
+   "resource_state": "bell",
+   "results_dir": "/rds/general/user/ftb123/home/dizx/results/cluster",
+   "sinter": {
+    "decoder": "pymatching_heralded",
+    "max_shots": 1000000,
+    "max_errors": 100000,
+    "num_workers": 1,
+    "pm_decompose": true,
+    "pm_enable_correlations": true
+   }
+  },
+  {
+   "name": "crg_prep_bell_corr_obsZZ",
+   "builder": {
+    "name": "surgery_bell_prep_fusion"
+   },
+   "sweep": {
+    "merge_types": [
+     "ZZ"
+    ],
+    "observables": [
+     "ZZ"
+    ],
+    "distances": [
+     17
+    ],
+    "probs": [
+     0.33,
+     0.335,
+     0.34,
+     0.345,
+     0.35,
+     0.355,
+     0.36,
+     0.365,
+     0.37,
+     0.375,
+     0.38
+    ]
+   },
+   "noise_model": [
+    {
+     "tag": [
+      "graph",
+      "reset",
+      "matter"
+     ],
+     "kind": "RESET_FLIP",
+     "probability": 0.02
+    },
+    {
+     "tag": [
+      "graph",
+      "fusion_measurement"
+     ],
+     "kind": "MEASUREMENT_FLIP",
+     "probability": 0.02
+    },
+    {
+     "tag": [
+      "graph",
+      "fusion_measurement"
+     ],
+     "kind": "HERALDED_ERASE",
+     "scale": 1.0
+    }
+   ],
+   "resource_state": "bell",
+   "results_dir": "/rds/general/user/ftb123/home/dizx/results/cluster",
+   "sinter": {
+    "decoder": "pymatching_heralded",
+    "max_shots": 1000000,
+    "max_errors": 100000,
+    "num_workers": 1,
+    "pm_decompose": true,
+    "pm_enable_correlations": true
+   }
+  },
+  {
+   "name": "crg_prep_bell_corr_obsZZ",
+   "builder": {
+    "name": "surgery_bell_prep_fusion"
+   },
+   "sweep": {
+    "merge_types": [
+     "ZZ"
+    ],
+    "observables": [
+     "ZZ"
+    ],
+    "distances": [
+     19
+    ],
+    "probs": [
+     0.33,
+     0.335,
+     0.34,
+     0.345,
+     0.35,
+     0.355,
+     0.36,
+     0.365,
+     0.37,
+     0.375
+    ]
+   },
+   "noise_model": [
+    {
+     "tag": [
+      "graph",
+      "reset",
+      "matter"
+     ],
+     "kind": "RESET_FLIP",
+     "probability": 0.02
+    },
+    {
+     "tag": [
+      "graph",
+      "fusion_measurement"
+     ],
+     "kind": "MEASUREMENT_FLIP",
+     "probability": 0.02
+    },
+    {
+     "tag": [
+      "graph",
+      "fusion_measurement"
+     ],
+     "kind": "HERALDED_ERASE",
+     "scale": 1.0
+    }
+   ],
+   "resource_state": "bell",
+   "results_dir": "/rds/general/user/ftb123/home/dizx/results/cluster",
+   "sinter": {
+    "decoder": "pymatching_heralded",
+    "max_shots": 1000000,
+    "max_errors": 100000,
+    "num_workers": 1,
+    "pm_decompose": true,
+    "pm_enable_correlations": true
+   }
+  },
+  {
+   "name": "crg_prep_bell_corr_obsZZ",
+   "builder": {
+    "name": "surgery_bell_prep_fusion"
+   },
+   "sweep": {
+    "merge_types": [
+     "ZZ"
+    ],
+    "observables": [
+     "ZZ"
+    ],
+    "distances": [
+     11,
+     13,
+     15
+    ],
+    "probs": [
+     0.25,
+     0.255,
+     0.26,
+     0.265,
+     0.27,
+     0.275,
+     0.28,
+     0.285,
+     0.29,
+     0.295,
+     0.3,
+     0.305,
+     0.31
+    ]
+   },
+   "noise_model": [
+    {
+     "tag": [
+      "graph",
+      "reset",
+      "matter"
+     ],
+     "kind": "RESET_FLIP",
+     "probability": 0.03
+    },
+    {
+     "tag": [
+      "graph",
+      "fusion_measurement"
+     ],
+     "kind": "MEASUREMENT_FLIP",
+     "probability": 0.03
+    },
+    {
+     "tag": [
+      "graph",
+      "fusion_measurement"
+     ],
+     "kind": "HERALDED_ERASE",
+     "scale": 1.0
+    }
+   ],
+   "resource_state": "bell",
+   "results_dir": "/rds/general/user/ftb123/home/dizx/results/cluster",
+   "sinter": {
+    "decoder": "pymatching_heralded",
+    "max_shots": 1000000,
+    "max_errors": 100000,
+    "num_workers": 1,
+    "pm_decompose": true,
+    "pm_enable_correlations": true
+   }
+  },
+  {
+   "name": "crg_prep_bell_corr_obsZZ",
+   "builder": {
+    "name": "surgery_bell_prep_fusion"
+   },
+   "sweep": {
+    "merge_types": [
+     "ZZ"
+    ],
+    "observables": [
+     "ZZ"
+    ],
+    "distances": [
+     17
+    ],
+    "probs": [
+     0.26,
+     0.265,
+     0.27,
+     0.275,
+     0.28,
+     0.285,
+     0.29,
+     0.295,
+     0.3,
+     0.305
+    ]
+   },
+   "noise_model": [
+    {
+     "tag": [
+      "graph",
+      "reset",
+      "matter"
+     ],
+     "kind": "RESET_FLIP",
+     "probability": 0.03
+    },
+    {
+     "tag": [
+      "graph",
+      "fusion_measurement"
+     ],
+     "kind": "MEASUREMENT_FLIP",
+     "probability": 0.03
+    },
+    {
+     "tag": [
+      "graph",
+      "fusion_measurement"
+     ],
+     "kind": "HERALDED_ERASE",
+     "scale": 1.0
+    }
+   ],
+   "resource_state": "bell",
+   "results_dir": "/rds/general/user/ftb123/home/dizx/results/cluster",
+   "sinter": {
+    "decoder": "pymatching_heralded",
+    "max_shots": 1000000,
+    "max_errors": 100000,
+    "num_workers": 1,
+    "pm_decompose": true,
+    "pm_enable_correlations": true
+   }
+  },
+  {
+   "name": "crg_prep_bell_corr_obsZZ",
+   "builder": {
+    "name": "surgery_bell_prep_fusion"
+   },
+   "sweep": {
+    "merge_types": [
+     "ZZ"
+    ],
+    "observables": [
+     "ZZ"
+    ],
+    "distances": [
+     19
+    ],
+    "probs": [
+     0.26,
+     0.265,
+     0.27,
+     0.275,
+     0.28,
+     0.285,
+     0.29,
+     0.295,
+     0.3,
+     0.305
+    ]
+   },
+   "noise_model": [
+    {
+     "tag": [
+      "graph",
+      "reset",
+      "matter"
+     ],
+     "kind": "RESET_FLIP",
+     "probability": 0.03
+    },
+    {
+     "tag": [
+      "graph",
+      "fusion_measurement"
+     ],
+     "kind": "MEASUREMENT_FLIP",
+     "probability": 0.03
+    },
+    {
+     "tag": [
+      "graph",
+      "fusion_measurement"
+     ],
+     "kind": "HERALDED_ERASE",
+     "scale": 1.0
+    }
+   ],
+   "resource_state": "bell",
+   "results_dir": "/rds/general/user/ftb123/home/dizx/results/cluster",
+   "sinter": {
+    "decoder": "pymatching_heralded",
+    "max_shots": 1000000,
+    "max_errors": 100000,
+    "num_workers": 1,
+    "pm_decompose": true,
+    "pm_enable_correlations": true
+   }
+  },
+  {
+   "name": "crg_prep_bell_corr_obsZZ",
+   "builder": {
+    "name": "surgery_bell_prep_fusion"
+   },
+   "sweep": {
+    "merge_types": [
+     "ZZ"
+    ],
+    "observables": [
+     "ZZ"
+    ],
+    "distances": [
+     11,
+     13,
+     15
+    ],
+    "probs": [
+     0.18,
+     0.185,
+     0.19,
+     0.195,
+     0.2,
+     0.205,
+     0.21,
+     0.215,
+     0.22,
+     0.225,
+     0.23,
+     0.235,
+     0.24
+    ]
+   },
+   "noise_model": [
+    {
+     "tag": [
+      "graph",
+      "reset",
+      "matter"
+     ],
+     "kind": "RESET_FLIP",
+     "probability": 0.04
+    },
+    {
+     "tag": [
+      "graph",
+      "fusion_measurement"
+     ],
+     "kind": "MEASUREMENT_FLIP",
+     "probability": 0.04
+    },
+    {
+     "tag": [
+      "graph",
+      "fusion_measurement"
+     ],
+     "kind": "HERALDED_ERASE",
+     "scale": 1.0
+    }
+   ],
+   "resource_state": "bell",
+   "results_dir": "/rds/general/user/ftb123/home/dizx/results/cluster",
+   "sinter": {
+    "decoder": "pymatching_heralded",
+    "max_shots": 1000000,
+    "max_errors": 100000,
+    "num_workers": 1,
+    "pm_decompose": true,
+    "pm_enable_correlations": true
+   }
+  },
+  {
+   "name": "crg_prep_bell_corr_obsZZ",
+   "builder": {
+    "name": "surgery_bell_prep_fusion"
+   },
+   "sweep": {
+    "merge_types": [
+     "ZZ"
+    ],
+    "observables": [
+     "ZZ"
+    ],
+    "distances": [
+     17
+    ],
+    "probs": [
+     0.18,
+     0.185,
+     0.19,
+     0.195,
+     0.2,
+     0.205,
+     0.21,
+     0.215,
+     0.22,
+     0.225,
+     0.23
+    ]
+   },
+   "noise_model": [
+    {
+     "tag": [
+      "graph",
+      "reset",
+      "matter"
+     ],
+     "kind": "RESET_FLIP",
+     "probability": 0.04
+    },
+    {
+     "tag": [
+      "graph",
+      "fusion_measurement"
+     ],
+     "kind": "MEASUREMENT_FLIP",
+     "probability": 0.04
+    },
+    {
+     "tag": [
+      "graph",
+      "fusion_measurement"
+     ],
+     "kind": "HERALDED_ERASE",
+     "scale": 1.0
+    }
+   ],
+   "resource_state": "bell",
+   "results_dir": "/rds/general/user/ftb123/home/dizx/results/cluster",
+   "sinter": {
+    "decoder": "pymatching_heralded",
+    "max_shots": 1000000,
+    "max_errors": 100000,
+    "num_workers": 1,
+    "pm_decompose": true,
+    "pm_enable_correlations": true
+   }
+  },
+  {
+   "name": "crg_prep_bell_corr_obsZZ",
+   "builder": {
+    "name": "surgery_bell_prep_fusion"
+   },
+   "sweep": {
+    "merge_types": [
+     "ZZ"
+    ],
+    "observables": [
+     "ZZ"
+    ],
+    "distances": [
+     19
+    ],
+    "probs": [
+     0.185,
+     0.19,
+     0.195,
+     0.2,
+     0.205,
+     0.21,
+     0.215,
+     0.22,
+     0.225,
+     0.23
+    ]
+   },
+   "noise_model": [
+    {
+     "tag": [
+      "graph",
+      "reset",
+      "matter"
+     ],
+     "kind": "RESET_FLIP",
+     "probability": 0.04
+    },
+    {
+     "tag": [
+      "graph",
+      "fusion_measurement"
+     ],
+     "kind": "MEASUREMENT_FLIP",
+     "probability": 0.04
+    },
+    {
+     "tag": [
+      "graph",
+      "fusion_measurement"
+     ],
+     "kind": "HERALDED_ERASE",
+     "scale": 1.0
+    }
+   ],
+   "resource_state": "bell",
+   "results_dir": "/rds/general/user/ftb123/home/dizx/results/cluster",
+   "sinter": {
+    "decoder": "pymatching_heralded",
+    "max_shots": 1000000,
+    "max_errors": 100000,
+    "num_workers": 1,
+    "pm_decompose": true,
+    "pm_enable_correlations": true
+   }
+  },
+  {
+   "name": "crg_prep_bell_corr_obsZZ",
+   "builder": {
+    "name": "surgery_bell_prep_fusion"
+   },
+   "sweep": {
+    "merge_types": [
+     "ZZ"
+    ],
+    "observables": [
+     "ZZ"
+    ],
+    "distances": [
+     11,
+     13,
+     15
+    ],
+    "probs": [
+     0.105,
+     0.11,
+     0.115,
+     0.12,
+     0.125,
+     0.13,
+     0.135,
+     0.14,
+     0.145,
+     0.15,
+     0.155,
+     0.16,
+     0.165
+    ]
+   },
+   "noise_model": [
+    {
+     "tag": [
+      "graph",
+      "reset",
+      "matter"
+     ],
+     "kind": "RESET_FLIP",
+     "probability": 0.05
+    },
+    {
+     "tag": [
+      "graph",
+      "fusion_measurement"
+     ],
+     "kind": "MEASUREMENT_FLIP",
+     "probability": 0.05
+    },
+    {
+     "tag": [
+      "graph",
+      "fusion_measurement"
+     ],
+     "kind": "HERALDED_ERASE",
+     "scale": 1.0
+    }
+   ],
+   "resource_state": "bell",
+   "results_dir": "/rds/general/user/ftb123/home/dizx/results/cluster",
+   "sinter": {
+    "decoder": "pymatching_heralded",
+    "max_shots": 1000000,
+    "max_errors": 100000,
+    "num_workers": 1,
+    "pm_decompose": true,
+    "pm_enable_correlations": true
+   }
+  },
+  {
+   "name": "crg_prep_bell_corr_obsZZ",
+   "builder": {
+    "name": "surgery_bell_prep_fusion"
+   },
+   "sweep": {
+    "merge_types": [
+     "ZZ"
+    ],
+    "observables": [
+     "ZZ"
+    ],
+    "distances": [
+     17
+    ],
+    "probs": [
+     0.095,
+     0.1,
+     0.105,
+     0.11,
+     0.115,
+     0.12,
+     0.125,
+     0.13,
+     0.135,
+     0.14,
+     0.145,
+     0.15,
+     0.155,
+     0.16
+    ]
+   },
+   "noise_model": [
+    {
+     "tag": [
+      "graph",
+      "reset",
+      "matter"
+     ],
+     "kind": "RESET_FLIP",
+     "probability": 0.05
+    },
+    {
+     "tag": [
+      "graph",
+      "fusion_measurement"
+     ],
+     "kind": "MEASUREMENT_FLIP",
+     "probability": 0.05
+    },
+    {
+     "tag": [
+      "graph",
+      "fusion_measurement"
+     ],
+     "kind": "HERALDED_ERASE",
+     "scale": 1.0
+    }
+   ],
+   "resource_state": "bell",
+   "results_dir": "/rds/general/user/ftb123/home/dizx/results/cluster",
+   "sinter": {
+    "decoder": "pymatching_heralded",
+    "max_shots": 1000000,
+    "max_errors": 100000,
+    "num_workers": 1,
+    "pm_decompose": true,
+    "pm_enable_correlations": true
+   }
+  },
+  {
+   "name": "crg_prep_bell_corr_obsZZ",
+   "builder": {
+    "name": "surgery_bell_prep_fusion"
+   },
+   "sweep": {
+    "merge_types": [
+     "ZZ"
+    ],
+    "observables": [
+     "ZZ"
+    ],
+    "distances": [
+     19
+    ],
+    "probs": [
+     0.1,
+     0.105,
+     0.11,
+     0.115,
+     0.12,
+     0.125,
+     0.13,
+     0.135,
+     0.14,
+     0.145,
+     0.15,
+     0.155
+    ]
+   },
+   "noise_model": [
+    {
+     "tag": [
+      "graph",
+      "reset",
+      "matter"
+     ],
+     "kind": "RESET_FLIP",
+     "probability": 0.05
+    },
+    {
+     "tag": [
+      "graph",
+      "fusion_measurement"
+     ],
+     "kind": "MEASUREMENT_FLIP",
+     "probability": 0.05
+    },
+    {
+     "tag": [
+      "graph",
+      "fusion_measurement"
+     ],
+     "kind": "HERALDED_ERASE",
+     "scale": 1.0
+    }
+   ],
+   "resource_state": "bell",
+   "results_dir": "/rds/general/user/ftb123/home/dizx/results/cluster",
+   "sinter": {
+    "decoder": "pymatching_heralded",
+    "max_shots": 1000000,
+    "max_errors": 100000,
+    "num_workers": 1,
+    "pm_decompose": true,
+    "pm_enable_correlations": true
+   }
+  },
+  {
+   "name": "crg_prep_bell_corr_obsZZ",
+   "builder": {
+    "name": "surgery_bell_prep_fusion"
+   },
+   "sweep": {
+    "merge_types": [
+     "ZZ"
+    ],
+    "observables": [
+     "ZZ"
+    ],
+    "distances": [
+     11,
+     13,
+     15
+    ],
+    "probs": [
+     0.02,
+     0.025,
+     0.03,
+     0.035,
+     0.04,
+     0.045,
+     0.05,
+     0.055,
+     0.06,
+     0.065,
+     0.07,
+     0.075,
+     0.08
+    ]
+   },
+   "noise_model": [
+    {
+     "tag": [
+      "graph",
+      "reset",
+      "matter"
+     ],
+     "kind": "RESET_FLIP",
+     "probability": 0.06
+    },
+    {
+     "tag": [
+      "graph",
+      "fusion_measurement"
+     ],
+     "kind": "MEASUREMENT_FLIP",
+     "probability": 0.06
+    },
+    {
+     "tag": [
+      "graph",
+      "fusion_measurement"
+     ],
+     "kind": "HERALDED_ERASE",
+     "scale": 1.0
+    }
+   ],
+   "resource_state": "bell",
+   "results_dir": "/rds/general/user/ftb123/home/dizx/results/cluster",
+   "sinter": {
+    "decoder": "pymatching_heralded",
+    "max_shots": 1000000,
+    "max_errors": 100000,
+    "num_workers": 1,
+    "pm_decompose": true,
+    "pm_enable_correlations": true
+   }
+  },
+  {
+   "name": "crg_prep_bell_corr_obsZZ",
+   "builder": {
+    "name": "surgery_bell_prep_fusion"
+   },
+   "sweep": {
+    "merge_types": [
+     "ZZ"
+    ],
+    "observables": [
+     "ZZ"
+    ],
+    "distances": [
+     17
+    ],
+    "probs": [
+     0.03,
+     0.035,
+     0.04,
+     0.045,
+     0.05,
+     0.055,
+     0.06,
+     0.065,
+     0.07,
+     0.075
+    ]
+   },
+   "noise_model": [
+    {
+     "tag": [
+      "graph",
+      "reset",
+      "matter"
+     ],
+     "kind": "RESET_FLIP",
+     "probability": 0.06
+    },
+    {
+     "tag": [
+      "graph",
+      "fusion_measurement"
+     ],
+     "kind": "MEASUREMENT_FLIP",
+     "probability": 0.06
+    },
+    {
+     "tag": [
+      "graph",
+      "fusion_measurement"
+     ],
+     "kind": "HERALDED_ERASE",
+     "scale": 1.0
+    }
+   ],
+   "resource_state": "bell",
+   "results_dir": "/rds/general/user/ftb123/home/dizx/results/cluster",
+   "sinter": {
+    "decoder": "pymatching_heralded",
+    "max_shots": 1000000,
+    "max_errors": 100000,
+    "num_workers": 1,
+    "pm_decompose": true,
+    "pm_enable_correlations": true
+   }
+  },
+  {
+   "name": "crg_prep_bell_corr_obsZZ",
+   "builder": {
+    "name": "surgery_bell_prep_fusion"
+   },
+   "sweep": {
+    "merge_types": [
+     "ZZ"
+    ],
+    "observables": [
+     "ZZ"
+    ],
+    "distances": [
+     19
+    ],
+    "probs": [
+     0.025,
+     0.03,
+     0.035,
+     0.04,
+     0.045,
+     0.05,
+     0.055,
+     0.06,
+     0.065,
+     0.07
+    ]
+   },
+   "noise_model": [
+    {
+     "tag": [
+      "graph",
+      "reset",
+      "matter"
+     ],
+     "kind": "RESET_FLIP",
+     "probability": 0.06
+    },
+    {
+     "tag": [
+      "graph",
+      "fusion_measurement"
+     ],
+     "kind": "MEASUREMENT_FLIP",
+     "probability": 0.06
+    },
+    {
+     "tag": [
+      "graph",
+      "fusion_measurement"
+     ],
+     "kind": "HERALDED_ERASE",
+     "scale": 1.0
+    }
+   ],
+   "resource_state": "bell",
+   "results_dir": "/rds/general/user/ftb123/home/dizx/results/cluster",
+   "sinter": {
+    "decoder": "pymatching_heralded",
+    "max_shots": 1000000,
+    "max_errors": 100000,
+    "num_workers": 1,
+    "pm_decompose": true,
+    "pm_enable_correlations": true
+   }
+  }
+ ]
+}

@@ -105,3 +105,28 @@ poetry run python experiments/run_threshold_experiment.py my_config.yaml   # thr
 poetry run python experiments/run_correctable_regime.py my_config.yaml     # erasure threshold vs local noise
 poetry run python experiments/run_subthreshold.py my_config.yaml           # Λ vs loss
 ```
+
+## Citation
+
+If you use dizx in your work, please cite the code and the accompanying paper:
+
+```bibtex
+@software{burt2026dizx,
+  author  = {Burt, Felix},
+  title   = {dizx: distributed quantum error correction from syndrome extraction ZX diagrams},
+  year    = {2026},
+  version = {0.1.0},
+  url     = {https://github.com/felix-burt/dizx}
+}
+
+@misc{burtLosstolerantDistributedLattice2026,
+  title         = {Loss-Tolerant Distributed Lattice Surgery Using Fusion Networks},
+  author        = {Burt, Felix and Meister, Richard and Lin, Sheng-Ku and Chen, Kuan-Cheng and Hanks, Michael and Bondesan, Roberto and Kim, M. S. and Leung, Kin K.},
+  year          = {2026},
+  month         = oct,
+  eprint        = {2610.01923},
+  archiveprefix = {arXiv},
+  doi           = {10.48550/arXiv.2610.01923},
+  url           = {https://arxiv.org/abs/2610.01923}
+}
+```

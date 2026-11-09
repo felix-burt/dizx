@@ -26,7 +26,7 @@ KEY = "crg_local/bell/ZZ/0.004"
 
 
 def _fit(p_th=0.42, stderr=0.001, nu=1.5, valid=True):
-    return ScalingFit(p_th, stderr, stderr, 0.0, nu, 1.0, 30, valid)
+    return ScalingFit(p_th, stderr, nu, 1.0, 30, valid)
 
 
 def _round(scale=4.0, p_th=0.42, probs=None):

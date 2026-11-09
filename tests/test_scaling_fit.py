@@ -1,4 +1,4 @@
-"""The finite-size systematic of the crg threshold fit (experiments/figures/scaling_fit.py)."""
+"""The crg threshold fit (experiments/figures/scaling_fit.py)."""
 from __future__ import annotations
 
 import sys
@@ -29,21 +29,13 @@ def _stats(distances, drift):
     return out
 
 
-def test_no_drift_no_finite_size_error():
+def test_recovers_the_crossing_with_the_fit_error():
     fit = sf.scaling_threshold(_stats([11, 13, 15, 17], 0.0), [11, 13, 15, 17])
     assert fit.valid and abs(fit.p_th - 0.30) < 1e-4
-    assert fit.fs is not None and fit.fs < 1e-4
+    assert 0 < fit.stderr < 1e-3
 
 
-def test_drift_is_carried_as_an_error():
-    stats = _stats([11, 13, 15, 17], 0.3)
-    fit = sf.scaling_threshold(stats, [11, 13, 15, 17])
-    lo = sf.scaling_threshold(stats, [11, 13, 15], finite_size=False)
-    hi = sf.scaling_threshold(stats, [13, 15, 17], finite_size=False)
-    assert abs(hi.p_th - lo.p_th) > 1e-3
-    assert abs(fit.fs - abs(hi.p_th - lo.p_th) / 2) < 1e-12
-    assert fit.stderr >= fit.fs > fit.stat
-
-
-def test_three_distances_have_no_finite_size_error():
-    assert sf.scaling_threshold(_stats([11, 13, 15], 0.3), [11, 13, 15]).fs is None
+def test_a_poor_fit_stays_valid():
+    # A crossing drifting with d makes chi2/dof large (exact LERs, 1e7 shots); no chi2 cut.
+    fit = sf.scaling_threshold(_stats([11, 13, 15, 17], 0.3), [11, 13, 15, 17])
+    assert fit.chi2 > 5 and fit.valid

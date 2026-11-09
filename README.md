@@ -31,6 +31,7 @@ The maths is in `docs/`:
 - `definitions.md` and `sed_definitions.md` cover SEDs and webs;
 - `transformations.md` covers the rewrite rules and the editor;
 - `realisations.md` covers realisations;
+- `pauli_webs_f2.md` covers how webs are found with F2 linear algebra;
 - `crg_threshold_fit.md` and `leading_order_erasure.md` cover the analysis behind the figures.
 
 `examples/` has notebooks for each stage.
@@ -64,6 +65,8 @@ c = BUILDERS["surgery_bell_prep_fusion_zigzag"](5, 5, "ZZ", "ZZ").circuit
 - the noise models;
 - every curve of every figure, with its distances, probability windows and shot budgets.
 
+The crg curves also include two refinement rounds, which added d = 17 and 19 over each point's fitted scaling window. They are frozen in `experiments/crg_refinement.json`, which `paper.py` loads, so they are part of the fixed plan. `experiments/refine_crg.py` planned them (`status` shows each point's fit; `next` freezes a new round). Reproducing the paper doesn't need it. The threshold fit and its error bars are described in `docs/crg_threshold_fit.md`.
+
 `experiments/reproduce.py` collects data and draws the figures.
 
 ```bash
@@ -95,13 +98,14 @@ Defaults are deliberately light: 2 workers, under `nice`. Pass `--workers` and `
 ```bash
 python experiments/cluster.py plan all --results-dir results/cluster      # jobs, ncpus, memory, walltime
 python experiments/cluster.py submit all --results-dir results/cluster --plot \
-    --setup 'module load Python/3.12.3-GCCcore-13.3.0; source .venv/bin/activate'
+    --setup 'module load tools/prod Python/3.12.3-GCCcore-13.3.0; source .venv/bin/activate'
 python experiments/cluster.py status                                      # progress, PBS state
 ```
 
 How jobs are split:
-- By default each job is one curve. A curve that would run past `--target-hours` (12) on `--max-cpus` (64) is split into one job per run (one sinter CSV). At full budget this applies to the crg_local curves. The full plan comes to about 150 jobs and about 7,000 expected core-hours.
-- No two jobs write the same CSV.
+- By default each job is one curve. A curve that would run past `--target-hours` (12) on `--max-cpus` (64) is split into one job per sinter CSV. At full budget this applies to the crg_local curves.
+- The full plan, including the crg refinement rounds, comes to 164 jobs and about 14,000 expected core-hours. The planner overestimated the refinement rounds by about 1.5×.
+- No two jobs write the same CSV. A crg point's refinement runs share its CSV, so they stay in one job.
 
 How resources are sized:
 - `experiments/cluster_costs.json` holds the expected core-seconds of every task, measured from the DISQEC collection behind the paper. Rebuild it with `cluster.py calibrate <results dir>`.

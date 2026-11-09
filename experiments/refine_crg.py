@@ -51,9 +51,9 @@ import paper  # noqa: E402
 from figures import scaling_fit  # noqa: E402
 from figures.scaling_fit import ScalingFit  # noqa: E402
 
-# Was 0.0005 until 2026-10-28: once the fit's error carries the finite-size
-# drift (scaling_fit `fs`, larger than the statistical error at 112/154 points
-# after d = 17), shots can't reach it; 0.001 is what d = 19 can plausibly give.
+# Was 0.0005 until 2026-10-28, when the fit's error briefly carried a
+# finite-size systematic that shots couldn't reduce (since dropped; see
+# scaling_fit). Refinement ended after the d = 19 round (2026-11-04).
 TARGET_STDERR = 0.001
 MAX_ROUNDS = 4
 # The fit window, not the widest systematic one (0.20): that one costs ~45%

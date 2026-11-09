@@ -1,4 +1,4 @@
-"""Realisations of SEDs and QEC experiments (see docs/realisations.md).
+"""Realisations of SEDs and QEC experiments.
 
 A ``RealisedSED`` adds classical outputs and world-lines to an SED. A
 ``QECExperiment`` additionally closes every port with a preparation or a

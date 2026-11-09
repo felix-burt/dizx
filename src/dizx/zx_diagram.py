@@ -1,4 +1,4 @@
-"""ZX diagrams and Pauli webs (see docs/definitions.md).
+"""ZX diagrams and Pauli webs.
 
 A ZX diagram is a multigraph with a type map ``t : V -> {Z, X, H, P}`` and a
 phase map on spiders. A Pauli web is an F2 vector ``(x | z)`` of length
@@ -412,7 +412,7 @@ WebLike = PauliWeb | Mapping[Edge, str] | np.ndarray
 
 
 class SEDiagram(ZXDiagram):
-    """A syndrome extraction diagram (see docs/sed_definitions.md).
+    """A syndrome extraction diagram.
 
     A phase-free ZX diagram with no classical outputs, i.e. a codespace
     projector with no fixed realisation, together with a chosen generating set

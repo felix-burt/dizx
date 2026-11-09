@@ -1,4 +1,4 @@
-"""Web-preserving transformations of SEDs (see docs/transformations.md).
+"""Web-preserving transformations of SEDs.
 
 Each transformation takes an ``SEDiagram`` and returns a new one, with every
 web carried across by the rule's bijection ``tau``. The new SED re-checks

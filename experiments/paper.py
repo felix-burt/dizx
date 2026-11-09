@@ -28,9 +28,9 @@ The sampling plan is fixed:
   * Lambda points: exactly the (boost level, loss rate) points the paper
     plots (`LAMBDA_POINTS`), at d = 5, 7, each to `LAMBDA_BUDGET`;
   * crg refinement rounds (`REFINEMENT_FILE`): extra points and larger
-    budgets inside each crg point's scaling window, planned from the data by
-    `refine_crg.py` but frozen here once planned, so a rerun from scratch
-    collects exactly the same tasks.
+    budgets inside each crg point's scaling window, planned from the data
+    but frozen once planned, so a rerun from scratch collects exactly the
+    same tasks.
 
 `reproduce.py` is the command-line front end.
 """

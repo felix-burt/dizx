@@ -58,7 +58,7 @@ c = BUILDERS["surgery_bell_prep_fusion_zigzag"](5, 5, "ZZ", "ZZ").circuit
 - the noise models;
 - every curve of every figure, with its distances, probability windows and shot budgets.
 
-The crg curves also include two refinement rounds, which added d = 17 and 19 over each point's fitted scaling window. They are frozen in `experiments/crg_refinement.json`, which `paper.py` loads, so they are part of the fixed plan. `experiments/refine_crg.py` planned them (`status` shows each point's fit; `next` freezes a new round). Reproducing the paper doesn't need it. The threshold fit and its error bars are described in `docs/crg_threshold_fit.md`.
+The crg curves also include two refinement rounds, which added d = 17 and 19 over each point's fitted scaling window. They are frozen in `experiments/crg_refinement.json`, which `paper.py` loads, so they are part of the fixed plan.
 
 `experiments/reproduce.py` collects data and draws the figures.
 

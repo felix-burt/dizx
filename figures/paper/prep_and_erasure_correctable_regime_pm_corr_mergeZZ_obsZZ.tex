@@ -13,7 +13,7 @@
   ymax=0.55,
   restrict y to domain=0:0.55,
   xmin=0,
-  xmax=6.61569,
+  xmax=6.59804,
   xtick distance=1,
   scaled x ticks=false,
   scaled y ticks=false,
@@ -21,132 +21,132 @@
   x tick label style={/pgf/number format/fixed, /pgf/number format/precision=2}]
   \addplot[color=blue, mark=diamond*, name path=upper] coordinates {
         (0,0.503255)
-        (1,0.432918)
-        (2,0.353721)
-        (3,0.280956)
-        (4,0.206613)
-        (5,0.128169)
-        (6,0.0484742)
+        (1,0.431503)
+        (2,0.352461)
+        (3,0.280555)
+        (4,0.205647)
+        (5,0.127655)
+        (6,0.0469953)
   };
   \addlegendentry{\textsc{Bell}}
   \path[name path=lower] (axis cs:0,0) -- (axis cs:6,0);
   \addplot[opacity=0.2, blue, forget plot] fill between [of=upper and lower];
   \addplot[color=blue, mark=diamond*, dashed, mark=none, name path=upper, forget plot] coordinates {
-        (6,0.0484742)
-        (6.61569,0)
+        (6,0.0469953)
+        (6.59804,0)
   };
-  \path[name path=lower] (axis cs:6,0) -- (axis cs:6.61569,0);
+  \path[name path=lower] (axis cs:6,0) -- (axis cs:6.59804,0);
   \addplot[opacity=0.2, blue, forget plot] fill between [of=upper and lower];
   \addplot[only marks, mark=diamond*, color=blue, forget plot, error bars/.cd, y dir=both, y explicit] coordinates {
-        (0,0.503255) +- (0,0.000313088)
-        (1,0.432918) +- (0,0.000403598)
-        (2,0.353721) +- (0,0.000525221)
-        (3,0.280956) +- (0,0.000575743)
-        (4,0.206613) +- (0,0.000641629)
-        (5,0.128169) +- (0,0.000905016)
-        (6,0.0484742) +- (0,0.000977489)
+        (0,0.503255) +- (0,0.000220301)
+        (1,0.431503) +- (0,0.00027458)
+        (2,0.352461) +- (0,0.000334058)
+        (3,0.280555) +- (0,0.000393671)
+        (4,0.205647) +- (0,0.000470951)
+        (5,0.127655) +- (0,0.000567106)
+        (6,0.0469953) +- (0,0.000640529)
   };
   \addplot[color=red, mark=diamond, name path=upper] coordinates {
         (0,0.493699)
-        (1,0.419038)
-        (2,0.335143)
-        (3,0.258656)
-        (4,0.180041)
-        (5,0.09683)
+        (1,0.418941)
+        (2,0.335997)
+        (3,0.259947)
+        (4,0.181191)
+        (5,0.0984317)
   };
   \addlegendentry{\textsc{BellZigZag}}
   \path[name path=lower] (axis cs:0,0) -- (axis cs:5,0);
   \addplot[opacity=0.2, red, forget plot] fill between [of=upper and lower];
   \addplot[color=red, mark=diamond, dashed, mark=none, name path=upper, forget plot] coordinates {
-        (5,0.09683)
-        (6.20618,0)
+        (5,0.0984317)
+        (6.22711,0)
   };
-  \path[name path=lower] (axis cs:5,0) -- (axis cs:6.20618,0);
+  \path[name path=lower] (axis cs:5,0) -- (axis cs:6.22711,0);
   \addplot[opacity=0.2, red, forget plot] fill between [of=upper and lower];
   \addplot[only marks, mark=diamond, color=red, forget plot, error bars/.cd, y dir=both, y explicit] coordinates {
-        (0,0.493699) +- (0,0.000260137)
-        (1,0.419038) +- (0,0.000333739)
-        (2,0.335143) +- (0,0.000410863)
-        (3,0.258656) +- (0,0.00046)
-        (4,0.180041) +- (0,0.000571199)
-        (5,0.09683) +- (0,0.000564778)
+        (0,0.493699) +- (0,0.000216259)
+        (1,0.418941) +- (0,0.00021605)
+        (2,0.335997) +- (0,0.000232389)
+        (3,0.259947) +- (0,0.000270542)
+        (4,0.181191) +- (0,0.000309006)
+        (5,0.0984317) +- (0,0.000363757)
   };
   \addplot[color=OliveGreen, mark=*, name path=upper] coordinates {
         (0,0.315689)
-        (1,0.23591)
-        (2,0.163904)
-        (3,0.0932018)
-        (4,0.0213811)
+        (1,0.235903)
+        (2,0.164328)
+        (3,0.0935754)
+        (4,0.0215033)
   };
   \addlegendentry{\textsc{$5$-Chain}}
   \path[name path=lower] (axis cs:0,0) -- (axis cs:4,0);
   \addplot[opacity=0.2, OliveGreen, forget plot] fill between [of=upper and lower];
   \addplot[color=OliveGreen, mark=*, dashed, mark=none, name path=upper, forget plot] coordinates {
-        (4,0.0213811)
-        (4.30265,0)
+        (4,0.0215033)
+        (4.3042,0)
   };
-  \path[name path=lower] (axis cs:4,0) -- (axis cs:4.30265,0);
+  \path[name path=lower] (axis cs:4,0) -- (axis cs:4.3042,0);
   \addplot[opacity=0.2, OliveGreen, forget plot] fill between [of=upper and lower];
   \addplot[only marks, mark=*, color=OliveGreen, forget plot, error bars/.cd, y dir=both, y explicit] coordinates {
-        (0,0.315689) +- (0,0.000255455)
-        (1,0.23591) +- (0,0.00027885)
-        (2,0.163904) +- (0,0.000387328)
-        (3,0.0932018) +- (0,0.000343628)
-        (4,0.0213811) +- (0,0.000435715)
+        (0,0.315689) +- (0,0.0001582)
+        (1,0.235903) +- (0,0.000201132)
+        (2,0.164328) +- (0,0.000229925)
+        (3,0.0935754) +- (0,0.000239439)
+        (4,0.0215033) +- (0,0.000267139)
   };
   \addplot[color=orange, mark=square*, name path=upper] coordinates {
         (0,0.380054)
-        (1,0.302575)
-        (2,0.228091)
-        (3,0.1558)
-        (4,0.0834406)
-        (5,0.0080347)
+        (1,0.30259)
+        (2,0.228156)
+        (3,0.156048)
+        (4,0.0833054)
+        (5,0.00752509)
   };
   \addlegendentry{\textsc{$8$-Chain}}
   \path[name path=lower] (axis cs:0,0) -- (axis cs:5,0);
   \addplot[opacity=0.2, orange, forget plot] fill between [of=upper and lower];
   \addplot[color=orange, mark=square*, dashed, mark=none, name path=upper, forget plot] coordinates {
-        (5,0.0080347)
-        (5.11562,0)
+        (5,0.00752509)
+        (5.10815,0)
   };
-  \path[name path=lower] (axis cs:5,0) -- (axis cs:5.11562,0);
+  \path[name path=lower] (axis cs:5,0) -- (axis cs:5.10815,0);
   \addplot[opacity=0.2, orange, forget plot] fill between [of=upper and lower];
   \addplot[only marks, mark=square*, color=orange, forget plot, error bars/.cd, y dir=both, y explicit] coordinates {
-        (0,0.380054) +- (0,0.000189459)
-        (1,0.302575) +- (0,0.000289176)
-        (2,0.228091) +- (0,0.000397507)
-        (3,0.1558) +- (0,0.000373777)
-        (4,0.0834406) +- (0,0.000439704)
-        (5,0.0080347) +- (0,0.000701703)
+        (0,0.380054) +- (0,0.000175665)
+        (1,0.30259) +- (0,0.000208886)
+        (2,0.228156) +- (0,0.000237315)
+        (3,0.156048) +- (0,0.000261434)
+        (4,0.0833054) +- (0,0.000294552)
+        (5,0.00752509) +- (0,0.000547707)
   };
   \addplot[color=Purple, mark=triangle*, name path=upper] coordinates {
         (0,0.498616)
-        (0.5,0.462825)
-        (1,0.42414)
-        (2,0.348741)
-        (3,0.274526)
-        (4,0.1966)
-        (5,0.118265)
-        (6,0.0366834)
+        (0.5,0.462503)
+        (1,0.42388)
+        (2,0.348946)
+        (3,0.274442)
+        (4,0.196825)
+        (5,0.11807)
+        (6,0.0371644)
   };
   \addlegendentry{$3d$-\textsc{Chain}}
   \path[name path=lower] (axis cs:0,0) -- (axis cs:6,0);
   \addplot[opacity=0.2, Purple, forget plot] fill between [of=upper and lower];
   \addplot[color=Purple, mark=triangle*, dashed, mark=none, name path=upper, forget plot] coordinates {
-        (6,0.0366834)
-        (6.46555,0)
+        (6,0.0371644)
+        (6.47003,0)
   };
-  \path[name path=lower] (axis cs:6,0) -- (axis cs:6.46555,0);
+  \path[name path=lower] (axis cs:6,0) -- (axis cs:6.47003,0);
   \addplot[opacity=0.2, Purple, forget plot] fill between [of=upper and lower];
   \addplot[only marks, mark=triangle*, color=Purple, forget plot, error bars/.cd, y dir=both, y explicit] coordinates {
-        (0,0.498616) +- (0,0.000244389)
-        (0.5,0.462825) +- (0,0.000253244)
-        (1,0.42414) +- (0,0.000296642)
-        (2,0.348741) +- (0,0.000371469)
-        (3,0.274526) +- (0,0.000435161)
-        (4,0.1966) +- (0,0.000496865)
-        (5,0.118265) +- (0,0.000551207)
-        (6,0.0366834) +- (0,0.00059191)
+        (0,0.498616) +- (0,0.000193257)
+        (0.5,0.462503) +- (0,0.000177167)
+        (1,0.42388) +- (0,0.000219839)
+        (2,0.348946) +- (0,0.000266278)
+        (3,0.274442) +- (0,0.000311805)
+        (4,0.196825) +- (0,0.000343909)
+        (5,0.11807) +- (0,0.000376155)
+        (6,0.0371644) +- (0,0.000437733)
   };
 \end{axis}
 \end{tikzpicture}

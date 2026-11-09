@@ -10,3 +10,10 @@ figures/paper/pdf/
 results/old_circuits/
 docs/
 examples/beta/
+# cluster / refinement tooling (local only)
+experiments/cluster.py
+experiments/cluster_costs.json
+experiments/refine_crg.py
+tests/test_cluster.py
+tests/test_refine_crg.py
+results/pbs/
